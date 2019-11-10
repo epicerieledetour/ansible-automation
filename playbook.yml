@@ -1,0 +1,44 @@
+---
+- name: "Épicerie Le Détour Ansible playbook"
+  hosts: webservers
+  remote_user: charles
+  become: true
+  tasks:
+    - name: Upgrade all packages
+      apt:
+        name: "*"
+        state: latest
+
+    - name: Install needed packages
+      apt:
+        pkg:
+          - nginx
+          - git
+
+    - name: Install membres page code
+      git:
+        repo: https://github.com/epicerieledetour/ledetour-membres.git
+        dest: /srv/www/ledetour-membres
+
+    - name: Install sites-available file
+      copy:
+        src: ledetour-membres
+        dest: /etc/nginx/sites-available/ledetour-membres
+
+    - name: Install sites-enabled symbolic link
+      file:
+        src: /etc/nginx/sites-available/ledetour-membres
+        dest: /etc/nginx/sites-enabled/ledetour-membres
+        state: link
+      notify: restart nginx
+
+  handlers:
+    - name: restart nginx
+      service:
+        name=nginx
+        state=restarted
+
+    # - name: Upgrade all packages to the latest version
+    #   apt:
+    #     name: "*"
+    #     state: latest
