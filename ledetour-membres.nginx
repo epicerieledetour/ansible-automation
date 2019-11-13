@@ -41,12 +41,9 @@ server {
 	# Add index.php to the list if you are using PHP
 	index index.html;
 
-	server_name ledetour-membres.charlesfleche.net;
+	server_name membres.epicerieledetour.org;
 
 	location / {
 		try_files $uri $uri/ =404;
 	}
-
-  listen 80;
-  listen [::]:80;
 }
