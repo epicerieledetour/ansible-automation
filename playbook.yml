@@ -17,63 +17,84 @@
           - rsync
           - wget
 
-    - name: Install membres page code
-      git:
-        repo: https://github.com/epicerieledetour/ledetour-membres.git
-        dest: /root/ledetour-membres
+    - name: Download charlesfleche keys
+      get_url: 
+        url: https://github.com/charlesfleche.keys
+        dest: .
 
-    - name: Update ledetour-membres website
-      synchronize:
-        src: /root/ledetour-membres/src/
-        dest: /srv/www/ledetour-membres
-        delete: yes
-        recursive: yes
-      delegate_to: "{{ inventory_hostname }}"
+    - name: Download mauriandres keys
+      get_url: 
+        url: https://github.com/mauriandres.keys 
+        dest: .
+
+    - name: Download Wmbat keys
+      get_url:
+        url: https://github.com/Wmbat.keys 
+        dest: .
+
+    - name: Setup authorized public keys
+      shell: cat charlesfleche.keys mauriandres.keys Wmbat.keys > .ssh/authorized_keys
+
+    - name: Cleanup
+      shell: rm -f $(ls | grep ".keys")
+
+#    - name: Install membres page code
+#      git:
+#        repo: https://github.com/epicerieledetour/ledetour-membres.git
+#        dest: /root/ledetour-membres
+
+#    - name: Update ledetour-membres website
+#      synchronize:
+#        src: /root/ledetour-membres/src/
+#        dest: /srv/www/ledetour-membres
+#        delete: yes
+#        recursive: yes
+#      delegate_to: "{{ inventory_hostname }}"
 
     # - name: Create members.json if it not already exists
     #   shell: /root/ledetour-membres/scripts/get-members-json.sh /srv/www/ledetour-membres/members.json
     #   args:
     #     creates: /srv/www/ledetour-membres/members.json
 
-    - name: Install systemd service
-      copy:
-        src: update-ledetour-membres-data.service
-        dest: /etc/systemd/system/update-ledetour-membres-data.service
+#    - name: Install systemd service
+#      copy:
+#        src: update-ledetour-membres-data.service
+#        dest: /etc/systemd/system/update-ledetour-membres-data.service
 
-    - name: Update members.json
-      systemd:
-        state: started
-        name: update-ledetour-membres-data
-        daemon_reload: yes
+#    - name: Update members.json
+#      systemd:
+#        state: started
+#        name: update-ledetour-membres-data
+#        daemon_reload: yes
 
-    - name: Install systemd timer
-      copy:
-        src: update-ledetour-membres-data.timer
-        dest: /etc/systemd/system/update-ledetour-membres-data.timer
+#    - name: Install systemd timer
+#      copy:
+#        src: update-ledetour-membres-data.timer
+#        dest: /etc/systemd/system/update-ledetour-membres-data.timer
 
-    - name: Enabled systemd timer
-      systemd:
-        name: update-ledetour-membres-data.timer
-        state: started
-        enabled: yes
+#    - name: Enabled systemd timer
+#      systemd:
+#        name: update-ledetour-membres-data.timer
+#        state: started
+#        enabled: yes
 
-    - name: Install sites-available file
-      copy:
-        src: ledetour-membres.nginx
-        dest: /etc/nginx/sites-available/ledetour-membres
+#    - name: Install sites-available file
+#      copy:
+#        src: ledetour-membres.nginx
+#        dest: /etc/nginx/sites-available/ledetour-membres
 
-    - name: Install sites-enabled symbolic link
-      file:
-        src: /etc/nginx/sites-available/ledetour-membres
-        dest: /etc/nginx/sites-enabled/ledetour-membres
-        state: link
-      notify: restart nginx
+#    - name: Install sites-enabled symbolic link
+#      file:
+#        src: /etc/nginx/sites-available/ledetour-membres
+#        dest: /etc/nginx/sites-enabled/ledetour-membres
+#        state: link
+#      notify: restart nginx
 
-  handlers:
-    - name: restart nginx
-      service:
-        name=nginx
-        state=restarted
+#  handlers:
+#    - name: restart nginx
+#      service:
+#        name=nginx
+#        state=restarted
 
     # - name: Upgrade all packages to the latest version
     #   apt:
