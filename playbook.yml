@@ -1,7 +1,6 @@
 ---
 - name: "Épicerie Le Détour Ansible playbook"
   hosts: webservers
-  remote_user: charles
   become: true
   tasks:
     - name: Upgrade all packages
