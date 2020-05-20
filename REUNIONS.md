@@ -15,3 +15,9 @@
     - Qu'ai-je appris aujourd'hui ? (question supplémentaire ajoutée pour le stage)
   - Surtout ne pas rester bloqué: poser ses questions sur le [canal Slack](https://epicerieledetour.slack.com/archives/CAFUP51N3) si quelque chose coince, les membres du Comité Informatique essayerons de répondre dès que possible
   
+## 2020-05-20
+
+- Point sur la première PR
+  - Charles n'avait pas vu qu'Hugo avait déjà apporté des changements valides la veille au soir
+  - Faire des PR indépendantes pour les Scrums
+- Plan pour la suite: Ansible authorized_key et configurer le firewall
