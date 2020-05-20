@@ -10,7 +10,7 @@
       line: 'APT::Periodic::AutocleanInterval "7";'
 
 - name: Remove non-security upgrades
-  replace:
+  lineinfile:
       path: /etc/apt/apt.conf.d/50unattended-upgrades
-      regexp: '"origin=Debian,codename=${distro_codename},label=Debian";'
-      replace: '// "origin=Debian,codename=${distro_codename},label=Debian";'
+      regexp: 'label=Debian";'
+      state: absent
