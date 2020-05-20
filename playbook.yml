@@ -17,9 +17,13 @@
           - wget
           - ufw
           - python3
+          - unattended-upgrades
 
     - name: Fetching public keys
       import_tasks: tasks/fetching_keys.yml
 
     - name: Setting up firewall
       import_tasks: tasks/firewall.yml
+
+    - name: Setting up unattended upgrades
+      import_tasks: tasks/unattended_upgrades.yml
