@@ -1,7 +1,6 @@
 ---
 - name: "Épicerie Le Détour Ansible playbook"
   hosts: webservers
-  remote_user: charles
   become: true
   tasks:
     - name: Upgrade all packages
@@ -16,66 +15,15 @@
           - nginx
           - rsync
           - wget
+          - ufw
+          - python3
+          - unattended-upgrades
 
-    - name: Install membres page code
-      git:
-        repo: https://github.com/epicerieledetour/ledetour-membres.git
-        dest: /root/ledetour-membres
+    - name: Fetching public keys
+      import_tasks: tasks/fetching_keys.yml
 
-    - name: Update ledetour-membres website
-      synchronize:
-        src: /root/ledetour-membres/src/
-        dest: /srv/www/ledetour-membres
-        delete: yes
-        recursive: yes
-      delegate_to: "{{ inventory_hostname }}"
+    - name: Setting up firewall
+      import_tasks: tasks/firewall.yml
 
-    # - name: Create members.json if it not already exists
-    #   shell: /root/ledetour-membres/scripts/get-members-json.sh /srv/www/ledetour-membres/members.json
-    #   args:
-    #     creates: /srv/www/ledetour-membres/members.json
-
-    - name: Install systemd service
-      copy:
-        src: update-ledetour-membres-data.service
-        dest: /etc/systemd/system/update-ledetour-membres-data.service
-
-    - name: Update members.json
-      systemd:
-        state: started
-        name: update-ledetour-membres-data
-        daemon_reload: yes
-
-    - name: Install systemd timer
-      copy:
-        src: update-ledetour-membres-data.timer
-        dest: /etc/systemd/system/update-ledetour-membres-data.timer
-
-    - name: Enabled systemd timer
-      systemd:
-        name: update-ledetour-membres-data.timer
-        state: started
-        enabled: yes
-
-    - name: Install sites-available file
-      copy:
-        src: ledetour-membres.nginx
-        dest: /etc/nginx/sites-available/ledetour-membres
-
-    - name: Install sites-enabled symbolic link
-      file:
-        src: /etc/nginx/sites-available/ledetour-membres
-        dest: /etc/nginx/sites-enabled/ledetour-membres
-        state: link
-      notify: restart nginx
-
-  handlers:
-    - name: restart nginx
-      service:
-        name=nginx
-        state=restarted
-
-    # - name: Upgrade all packages to the latest version
-    #   apt:
-    #     name: "*"
-    #     state: latest
+    - name: Setting up unattended upgrades
+      import_tasks: tasks/unattended_upgrades.yml

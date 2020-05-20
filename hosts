@@ -1,3 +1,2 @@
 [webservers]
-
-charlesfleche.net
+main_server ansible_host=debian@vps-65c98ca9.vps.ovh.ca
