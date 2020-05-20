@@ -15,24 +15,7 @@
           - nginx
           - rsync
           - wget
+          - ufw
 
-    - name: Setup charlesfleches keys
-      authorized_key:
-          user: debian
-          state: present
-          key: https://github.com/charlesfleche.keys 
-          path: .ssh/authorized_keys 
-
-    - name: Setup mauriandres keys
-      authorized_key:
-          user: debian
-          state: present
-          key: https://github.com/mauriandres.keys 
-          path: .ssh/authorized_keys 
-
-    - name: Setup Wmbat keys
-      authorized_key:
-          user: debian
-          state: present
-          key: https://github.com/Wmbat.keys 
-          path: .ssh/authorized_keys 
+    - name: Fetching public keys
+      import_tasks: tasks/fetching_keys.yml
