@@ -16,6 +16,10 @@
           - rsync
           - wget
           - ufw
+          - python3
 
     - name: Fetching public keys
       import_tasks: tasks/fetching_keys.yml
+
+    - name: Setting up firewall
+      import_tasks: tasks/firewall.yml
