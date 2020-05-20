@@ -16,23 +16,23 @@
           - rsync
           - wget
 
-    - name: Download charlesfleche keys
-      get_url: 
-        url: https://github.com/charlesfleche.keys
-        dest: .
+    - name: Setup charlesfleches keys
+      authorized_key:
+          user: debian
+          state: present
+          key: https://github.com/charlesfleche.keys 
+          path: .ssh/authorized_keys 
 
-    - name: Download mauriandres keys
-      get_url: 
-        url: https://github.com/mauriandres.keys 
-        dest: .
+    - name: Setup mauriandres keys
+      authorized_key:
+          user: debian
+          state: present
+          key: https://github.com/mauriandres.keys 
+          path: .ssh/authorized_keys 
 
-    - name: Download Wmbat keys
-      get_url:
-        url: https://github.com/Wmbat.keys 
-        dest: .
-
-    - name: Setup authorized public keys
-      shell: cat charlesfleche.keys mauriandres.keys Wmbat.keys > .ssh/authorized_keys
-
-    - name: Cleanup
-      shell: rm -f $(ls | grep ".keys")
+    - name: Setup Wmbat keys
+      authorized_key:
+          user: debian
+          state: present
+          key: https://github.com/Wmbat.keys 
+          path: .ssh/authorized_keys 
