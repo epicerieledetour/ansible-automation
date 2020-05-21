@@ -21,3 +21,9 @@
   - Charles n'avait pas vu qu'Hugo avait déjà apporté des changements valides la veille au soir
   - Faire des PR indépendantes pour les Scrums
 - Plan pour la suite: Ansible authorized_key et configurer le firewall
+
+## 2020-05-21
+
+- Rappel de faire les PR de scrums tous les soirs
+- Présentation du système de RFC du Détour
+- Prochain point quand on a un Grafana installé avec des métriques serveur basiques (CPU, MEM, etc), sans auth ni chiffrement pour le moment
