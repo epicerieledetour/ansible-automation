@@ -6,4 +6,9 @@
 - name: Open port 22
   ufw:
     rule: allow
-    port: 22
+    port: '22'
+
+- name: Open port 3000
+  ufw:
+    rule: allow
+    port: '3000'

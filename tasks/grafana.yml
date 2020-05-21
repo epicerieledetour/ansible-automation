@@ -1,0 +1,13 @@
+- name: Fetch Grafana
+  get_url:
+    url: "https://dl.grafana.com/oss/release/grafana_7.0.0_amd64.deb"
+    dest: .
+
+- name: Install Grafana
+  apt:
+    deb: grafana_7.0.0_amd64.deb
+
+- name: Start Grafana
+  systemd:
+      name: grafana-server
+      state: started
