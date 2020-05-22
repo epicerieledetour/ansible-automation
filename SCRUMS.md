@@ -40,7 +40,7 @@ Je n'ai pas eu de grande difficultés aujourd'hui
 J'ai appris des fonctionnalité de firewall sur linux.
 
 
-Date 20-05-2020
+Date 21-05-2020
 1. Sur quoi j'ai travaillé aujourd'hui ?
 
 J'ai travaillé sur l'integration de Grafana a travers ansible ainsi que de la recherche sur le system monitoring a
