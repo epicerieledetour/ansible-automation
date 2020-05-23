@@ -1,14 +1,3 @@
-- name: Enable unattended upgrades
-  lineinfile:
-      path: /etc/apt/apt.conf.d/20auto-upgrades
-      line: 'APT::Periodic::Enable "1";'
-      insertbefore: BOF
-
-- name: Enable autoclean
-  lineinfile:
-      path: /etc/apt/apt.conf.d/20auto-upgrades
-      line: 'APT::Periodic::AutocleanInterval "7";'
-
 - name: Remove non-security upgrades
   lineinfile:
       path: /etc/apt/apt.conf.d/50unattended-upgrades
