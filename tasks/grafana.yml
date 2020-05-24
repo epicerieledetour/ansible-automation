@@ -17,4 +17,5 @@
 - name: Start Grafana
   systemd:
       name: grafana-server
+      enabled: true
       state: started
