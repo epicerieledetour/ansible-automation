@@ -2,6 +2,22 @@
 - name: "Épicerie Le Détour Ansible playbook"
   hosts: webservers
   become: true
+  roles:
+  - role: cloudalchemy.grafana
+    vars:
+      grafana_security:
+        admin_user: admin
+        admin_password: admin
+      grafana_datasources:
+        - name: telegraf
+          type: influxdb
+          url: 'http://localhost:8086'
+          database: telegraf
+      grafana_dashboards:
+        - dashboard_id: 5955
+          revision_id: 1
+          datasource: telegraf
+
   tasks:
     - name: Upgrade all packages
       apt:
