@@ -1,6 +1,12 @@
 # ansible-automation
 Automation of IT related tasks
 
+## Install required roles
+
+```sh
+ansible-galaxy install -r requirements.yml
+```
+
 ## Production mode
 
 ```sh
