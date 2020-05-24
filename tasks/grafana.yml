@@ -1,3 +1,6 @@
+# This guide has been useful in setting up InfluxDB / telegraf / grafaana
+# https://www.howtoforge.com/tutorial/how-to-install-tig-stack-telegraf-influxdb-and-grafana-on-ubuntu-1804/
+
 - name: Add InfluxDB / Telegraf repository key
   apt_key:
       url: 'https://repos.influxdata.com/influxdb.key'
