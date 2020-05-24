@@ -1,20 +1,20 @@
 - name: Setup charlesfleches keys
   authorized_key:
-    user: debian
+    user: "{{ ansible_user }}"
     state: present
     key: https://github.com/charlesfleche.keys 
     path: .ssh/authorized_keys 
 
 - name: Setup mauriandres keys
   authorized_key:
-    user: debian
+    user: "{{ ansible_user }}"
     state: present
     key: https://github.com/mauriandres.keys 
     path: .ssh/authorized_keys 
 
 - name: Setup Wmbat keys
   authorized_key:
-    user: debian
+    user: "{{ ansible_user }}"
     state: present
     key: https://github.com/Wmbat.keys 
     path: .ssh/authorized_keys 
