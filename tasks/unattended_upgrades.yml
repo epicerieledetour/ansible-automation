@@ -1,13 +1,13 @@
-- name: Enable unattended upgrades
-  lineinfile:
-      path: /etc/apt/apt.conf.d/20auto-upgrades
-      line: 'APT::Periodic::Enable "1";'
-      insertbefore: BOF
-
-- name: Enable autoclean
-  lineinfile:
-      path: /etc/apt/apt.conf.d/20auto-upgrades
-      line: 'APT::Periodic::AutocleanInterval "7";'
+- name: Activate unattended-upgrades
+  block:
+    - name: Update debconf parameters
+      debconf:
+        name: 'unattended-upgrades'
+        question: 'unattended-upgrades/enable_auto_updates'
+        value: 'true'
+        vtype: 'boolean'
+    - name: Reconfigure dpkg
+      command: dpkg-reconfigure -f noninteractive unattended-upgrades creates=/etc/apt/apt.conf.d/20auto-upgrades
 
 - name: Remove non-security upgrades
   lineinfile:
