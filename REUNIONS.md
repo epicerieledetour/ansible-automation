@@ -27,3 +27,15 @@
 - Rappel de faire les PR de scrums tous les soirs
 - Présentation du système de RFC du Détour
 - Prochain point quand on a un Grafana installé avec des métriques serveur basiques (CPU, MEM, etc), sans auth ni chiffrement pour le moment
+
+## 2020-05-22
+
+- Point rapide, continuation du travail de setup de Grafana
+
+## 2020-05-25
+
+- Code Review des deux PRs de cette fin de semaine #55 #56
+- Discussion sur l'importance des Firewall avec test sur un NGinx non configuré
+- Présentation de `netstat -plntu` pour afficher les ports ouverts
+- Suite du projet: fail2ban et affichage des alertes fw / fail2ban #18 #19 #20
+
