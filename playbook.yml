@@ -38,6 +38,8 @@
           - unattended-upgrades
           - adduser
           - libfontconfig1
+          - vim
+          - net-tools
 
     - name: Fetching public keys
       import_tasks: tasks/fetching_keys.yml
