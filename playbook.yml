@@ -40,6 +40,7 @@
           - libfontconfig1
           - vim
           - net-tools
+          - fail2ban
 
     - name: Fetching public keys
       import_tasks: tasks/fetching_keys.yml
