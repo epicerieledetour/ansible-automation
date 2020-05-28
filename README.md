@@ -30,3 +30,9 @@ ssh -F .ssh.config vagrant lsb_release -a
 # Run the Ansible playbook on the Vagrant virtual machine
 ansible-playbook --inventory hosts-dev --ssh-extra-args='-F .ssh.config' playbook.yml
 ```
+
+### Get ssh logging info
+
+```sh
+sudo cat /var/log/auth.log | grep "sshd"
+```
