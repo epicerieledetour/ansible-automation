@@ -2,6 +2,23 @@
 
 ## Template
 
+Date 27-05-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+
+J'ai fais des rercherches sur l'acquisition des logs de UFW a travers Grafana/loki ainsi que l'integration de loki sur
+le serveur
+
+2. Sur quoi je vais travailler demain ?
+
+J'espere avoir les logs de UFW visible sur grafana a travers loki
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+
+J'ai du mal a trouver des bonnes informations sur Loki ainsi que j'ai du mal a setup loki
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
+
 Date 25-05-2020
 1. Sur quoi j'ai travaillé aujourd'hui ?
 
