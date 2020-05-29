@@ -13,6 +13,9 @@
           type: influxdb
           url: 'http://localhost:8086'
           database: telegraf
+        - name: firewall
+          type: loki
+          url: 'http://localhost:3100'
       grafana_dashboards:
         - dashboard_id: 5955
           revision_id: 1

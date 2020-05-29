@@ -10,6 +10,22 @@
       remote_src: yes
       mode: "a+x"
 
+- name: Copying Loki systemd service config
+  copy:
+      src: ./configs/loki.service
+      dest: /etc/systemd/system/
+
+- name: Copying Loki config
+  copy:
+      src: ./configs/config-loki.yml
+      dest: /usr/local/bin/
+
+- name: Start Loki
+  systemd:
+      name: loki
+      enabled: true
+      state: started
+
 - name: Promtail Download
   get_url:
       url: "https://github.com/grafana/loki/releases/download/v1.5.0/promtail-linux-amd64.zip"
@@ -21,3 +37,19 @@
       dest: /usr/local/bin/
       remote_src: yes
       mode: "a+x"
+
+- name: Copying Promtail service config
+  copy:
+      src: ./configs/promtail.service
+      dest: /etc/systemd/system/
+
+- name: Copying promtail config
+  copy:
+      src: ./configs/config-promtail.yml
+      dest: /usr/local/bin/
+
+- name: Start promtail
+  systemd:
+      name: promtail
+      enabled: true
+      state: started

@@ -1,0 +1,10 @@
+[Unit]
+Description=Promtail Service.
+Documentation=https://github.com/grafana/loki
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/promtail-linux-amd64 -config.file /usr/local/bin/config-promtail.yml
+
+[Install]
+WantedBy=multi-user.target
