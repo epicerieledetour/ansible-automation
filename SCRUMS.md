@@ -2,6 +2,21 @@
 
 ## Template
 
+Date 28-05-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+
+J'ai trouvé comment implementer le monitoring des logs et j'ai commencé l'implementation a travers ansible
+
+2. Sur quoi je vais travailler demain ?
+
+je vais finir l'implementation du monitoring des logs a travers ansible
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+
+je n'ai pas eu de grande difficultés aujourd'hui
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
 Date 27-05-2020
 1. Sur quoi j'ai travaillé aujourd'hui ?
 
