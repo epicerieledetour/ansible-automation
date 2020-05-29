@@ -1,4 +1,3 @@
----
 - name: "Épicerie Le Détour Ansible playbook"
   hosts: webservers
   become: true
@@ -44,6 +43,7 @@
           - vim
           - net-tools
           - unzip
+          - fail2ban
 
     - name: Fetching public keys
       import_tasks: tasks/fetching_keys.yml
