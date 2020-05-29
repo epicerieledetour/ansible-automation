@@ -1,0 +1,23 @@
+- name: Loki Download
+  get_url:
+      url: "https://github.com/grafana/loki/releases/download/v1.5.0/loki-linux-amd64.zip"
+      dest: /usr/local/bin/loki.gz
+
+- name: Unzip Loki
+  unarchive:
+      src: /usr/local/bin/loki.gz
+      dest: /usr/local/bin/
+      remote_src: yes
+      mode: "a+x"
+
+- name: Promtail Download
+  get_url:
+      url: "https://github.com/grafana/loki/releases/download/v1.5.0/promtail-linux-amd64.zip"
+      dest: /usr/local/bin/promtail.gz
+
+- name: Unzip Promtail
+  unarchive:
+      src: /usr/local/bin/promtail.gz
+      dest: /usr/local/bin/
+      remote_src: yes
+      mode: "a+x"
