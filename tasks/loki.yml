@@ -53,3 +53,8 @@
       name: promtail
       enabled: true
       state: started
+
+- name: Copying grafana logs dashboard
+  copy:
+      src: ./configs/logs_dashboard.json
+      dest: ./

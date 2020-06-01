@@ -4,7 +4,7 @@ server:
 
 # Positions
 positions:
-  filename: /tmp/positions.yaml
+  filename: /var/positions.yaml
 
 # Loki Server URL
 clients:
