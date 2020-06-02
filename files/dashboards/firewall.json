@@ -19,7 +19,7 @@
   "links": [],
   "panels": [
     {
-      "datasource": "firewall",
+      "datasource": "loki",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -114,7 +114,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Firewall logs",
+      "title": "ufw logs",
       "type": "logs"
     }
   ],
@@ -142,7 +142,7 @@
     ]
   },
   "timezone": "",
-  "title": "Logs",
+  "title": "ufw logs",
   "uid": "fVNAjlkGk",
   "version": 3
 }

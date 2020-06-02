@@ -12,12 +12,12 @@
 
 - name: Copying Loki systemd service config
   copy:
-      src: ./configs/loki.service
+      src: ./files/loki.service
       dest: /etc/systemd/system/
 
 - name: Copying Loki config
   copy:
-      src: ./configs/config-loki.yml
+      src: ./files/config-loki.yml
       dest: /usr/local/bin/
 
 - name: Start Loki
@@ -40,12 +40,12 @@
 
 - name: Copying Promtail service config
   copy:
-      src: ./configs/promtail.service
+      src: ./files/promtail.service
       dest: /etc/systemd/system/
 
 - name: Copying promtail config
   copy:
-      src: ./configs/config-promtail.yml
+      src: ./files/config-promtail.yml
       dest: /usr/local/bin/
 
 - name: Start promtail
@@ -53,8 +53,3 @@
       name: promtail
       enabled: true
       state: started
-
-- name: Copying grafana logs dashboard
-  copy:
-      src: ./configs/logs_dashboard.json
-      dest: ./

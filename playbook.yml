@@ -1,6 +1,18 @@
 - name: "Épicerie Le Détour Ansible playbook"
   hosts: webservers
   become: true
+
+  pre_tasks:  
+    - name: Copying grafana firewall dashboard
+      copy:
+        src: ./files/dashboards/firewall.json
+        dest: /var/lib/grafana/dashboards/
+
+    - name: Copying grafana fail2ban dashboard
+      copy:
+        src: ./files/dashboards/fail2ban.json
+        dest: /var/lib/grafana/dashboards/
+
   roles:
   - role: cloudalchemy.grafana
     vars:
@@ -12,7 +24,7 @@
           type: influxdb
           url: 'http://localhost:8086'
           database: telegraf
-        - name: firewall
+        - name: loki
           type: loki
           url: 'http://localhost:3100'
       grafana_dashboards:
