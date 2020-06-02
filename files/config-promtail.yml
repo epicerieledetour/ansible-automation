@@ -17,13 +17,12 @@ scrape_configs:
           - localhost
         labels:
           job: ufw
-          host: localhost
           __path__: /var/log/ufw.log
+
   - job_name: fail2ban
     static_configs:
       - targets:
           - localhost
         labels:
           job: fail2ban
-          host: localhost
           __path__: /var/log/fail2ban.log
