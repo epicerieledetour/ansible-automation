@@ -27,12 +27,44 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 23,
+        "h": 7,
         "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 2,
+      "id": 6,
+      "options": {
+        "showLabels": false,
+        "showTime": false,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "targets": [
+        {
+          "expr": "{job=\"ufw\"}",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "ufw",
+      "type": "logs"
+    },
+    {
+      "datasource": "loki",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "id": 4,
       "options": {
         "showLabels": false,
         "showTime": false,
@@ -47,7 +79,39 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "fail2ban logs",
+      "title": "fail2ban",
+      "type": "logs"
+    },
+    {
+      "datasource": "loki",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "id": 2,
+      "options": {
+        "showLabels": false,
+        "showTime": false,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "expr": "{job=\"ssh\"}",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "auth",
       "type": "logs"
     }
   ],
@@ -75,7 +139,7 @@
     ]
   },
   "timezone": "",
-  "title": "fail2ban logs",
+  "title": "Logs",
   "uid": null,
   "version": 0
 }

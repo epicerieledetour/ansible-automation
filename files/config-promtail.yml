@@ -26,3 +26,11 @@ scrape_configs:
         labels:
           job: fail2ban
           __path__: /var/log/fail2ban.log
+
+  - job_name: ssh
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: ssh
+          __path__: /var/log/auth.log

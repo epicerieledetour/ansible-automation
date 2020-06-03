@@ -3,14 +3,9 @@
   become: true
 
   pre_tasks:  
-    - name: Copying grafana firewall dashboard
+    - name: Copying grafana logs dashboard
       copy:
-        src: ./files/dashboards/firewall.json
-        dest: /var/lib/grafana/dashboards/
-
-    - name: Copying grafana fail2ban dashboard
-      copy:
-        src: ./files/dashboards/fail2ban.json
+        src: ./files/dashboards/logs.json
         dest: /var/lib/grafana/dashboards/
 
   roles:
