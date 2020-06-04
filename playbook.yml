@@ -41,6 +41,7 @@
           - vim
           - net-tools
           - fail2ban
+          - borgbackup
 
     - name: Fetching public keys
       import_tasks: tasks/fetching_keys.yml
