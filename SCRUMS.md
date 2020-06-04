@@ -1,6 +1,19 @@
 # Scrums
 
-## Template
+#### 03-06-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+    J'ai combiné les 3 dashboards de logs. J'ai commencé a travailler sur les RFCs et j'ai commencé a travaillé sur
+    BorgBackup.
+
+2. Sur quoi je vais travailler demain ?
+
+    Je vais continuer de travailler sur les RFC et sur BorgBackup
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+    
+    J'ai eu un peu de confusion sur les RFCs.
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
 
 #### 02-06-2020
 1. Sur quoi j'ai travaillé aujourd'hui ?
