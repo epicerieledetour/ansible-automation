@@ -54,3 +54,6 @@
 
     - name: Setting up Grafana
       import_tasks: tasks/grafana.yml
+
+    - name: Setting up BorgBackup
+      import_tasks: tasks/borg_backup.yml
