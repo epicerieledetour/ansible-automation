@@ -1,0 +1,10 @@
+- name: Setup backup repository
+  command: 'borg init --encryption=repokey ./backup/'
+  environment:
+      BORG_PASSPHRASE: TEST
+
+
+- name: Backup directories
+  command: 'borg create ./backup::Test /home /etc /var'
+  environment:
+      BORG_PASSPHRASE: TEST
