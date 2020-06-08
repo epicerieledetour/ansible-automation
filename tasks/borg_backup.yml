@@ -18,3 +18,9 @@
   copy:
       src: ./files/borgbackup/backup.timer
       dest: /etc/systemd/system/
+
+- name: Start backup script timer
+  systemd:
+      name: backup.timer
+      enabled: true
+      state: started
