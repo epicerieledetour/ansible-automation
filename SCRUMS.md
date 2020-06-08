@@ -1,5 +1,20 @@
 # Scrums
 
+#### 05-06-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+    J'ai vérifier qu'un bug sur le dashboards des logs n'etais pas présent sur le server principale and j'ai travailler
+    sur l'automatisation de BorgBackup
+
+2. Sur quoi je vais travailler demain ?
+
+    J'espere finaliser l'automatisation de borgbackup
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+
+    Je ne suis par certain  que mon scripte pour l'automatisation de borgbackup marche.
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
 #### 03-06-2020
 1. Sur quoi j'ai travaillé aujourd'hui ?
     J'ai combiné les 3 dashboards de logs. J'ai commencé a travailler sur les RFCs et j'ai commencé a travaillé sur
