@@ -1,0 +1,26 @@
+- name: Setup backup repository
+  command: 'borg init --encryption=repokey /home/backup/'
+  environment:
+      BORG_PASSPHRASE: TEST
+
+- name: Copying backup script
+  copy:
+      src: ./files/borgbackup/backup.sh
+      dest: /usr/bin/backup/
+      mode: a+x
+
+- name: Copying backup script systemd service file
+  copy:
+      src: ./files/borgbackup/backup.service
+      dest: /etc/systemd/system/
+
+- name: Copying backup script systemd timer file
+  copy:
+      src: ./files/borgbackup/backup.timer
+      dest: /etc/systemd/system/
+
+- name: Start backup script timer
+  systemd:
+      name: backup.timer
+      enabled: true
+      state: started

@@ -51,6 +51,7 @@
           - net-tools
           - unzip
           - fail2ban
+          - borgbackup
 
     - name: Fetching public keys
       import_tasks: tasks/fetching_keys.yml
@@ -66,3 +67,6 @@
 
     - name: Setting up Loki/promtail
       import_tasks: tasks/loki.yml
+
+    - name: Setting up BorgBackup
+      import_tasks: tasks/borg_backup.yml
