@@ -15,7 +15,6 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": null,
   "links": [],
   "panels": [
     {
@@ -105,7 +104,7 @@
       },
       "targets": [
         {
-          "expr": "{job=\"ssh\"}",
+          "expr": "{job=\"ssh\"}|~\"sshd\"",
           "refId": "A"
         }
       ],
@@ -140,6 +139,6 @@
   },
   "timezone": "",
   "title": "Logs",
-  "uid": null,
-  "version": 0
+  "uid": "T1EUTxiGz",
+  "version": 1
 }

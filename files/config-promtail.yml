@@ -34,3 +34,19 @@ scrape_configs:
         labels:
           job: ssh
           __path__: /var/log/auth.log
+
+  - job_name: borg
+    pipeline_stages:
+    - json:
+        expressions:
+            archive: archive
+    - labels:
+        archive:
+    - output:
+        source: output 
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: borg
+          __path__: /var/log/borg.log

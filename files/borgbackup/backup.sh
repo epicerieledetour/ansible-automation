@@ -13,9 +13,24 @@ info "Starting backup"
 # Backup the most important directories into an archive named after
 # the machine this script is currently running on:
 
-borg create --verbose --filter AME --list --stats --show-rc --compression lz4 \
-    --exclude-caches --exclude '/home/*/.cache/*' --exclude '/var/cache/*' --exclude '/var/tmp/*' \
-    ::'{hostname}-{now}' /etc /home /root /var >> /home/logs.txt 2>&1
+borg create                         \
+    --verbose                       \
+    --json                          \
+    --stats                         \
+    --show-rc                       \
+    --compression lz4               \
+    --exclude-caches                \
+    --exclude '/home/*/.cache/*'    \
+    --exclude '/var/cache/*'        \
+    --exclude '/var/tmp/*'          \
+                                    \
+    ::'{hostname}-{now}'            \
+    /etc                            \
+    /home                           \
+    /root                           \
+    /var                            \
+                                    \
+    >> /var/log/borg.log 2>&1
 
 backup_exit=$?
 
