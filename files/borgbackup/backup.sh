@@ -17,7 +17,6 @@ borg create                         \
     --verbose                       \
     --json                          \
     --stats                         \
-    --show-rc                       \
     --compression lz4               \
     --exclude-caches                \
     --exclude '/home/*/.cache/*'    \
@@ -30,7 +29,11 @@ borg create                         \
     /root                           \
     /var                            \
                                     \
-    >> /var/log/borg.log 2>&1
+    > /var/tmp/raw_borg.log 2>&1
+
+tail -n +2 /var/tmp/raw_borg.log | jq -c '.' >> /var/log/borg.log
+# sed -i "s/ //g" /var/tmp/borg.log
+# tr -d "\n\r" < /var/tmp/borg.log > /var/log/borg.log
 
 backup_exit=$?
 

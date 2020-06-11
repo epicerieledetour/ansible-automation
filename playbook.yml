@@ -52,6 +52,7 @@
           - unzip
           - fail2ban
           - borgbackup
+          - jq
 
     - name: Fetching public keys
       import_tasks: tasks/fetching_keys.yml
