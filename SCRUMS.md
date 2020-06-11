@@ -1,5 +1,40 @@
 # Scrums
 
+#### 10-06-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+
+    J'ai travaillé sur le parsing des données de backup pour les afficher sur Grafana
+
+2. Sur quoi je vais travailler demain ?
+
+    J'espère finaliser l'issue 23.
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+
+    Je n'arrive pas a parse les données que BorgBackup génére a travers Loki/Promtail
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
+    J'ai appris plus d'informations à propos des configs de promtail.
+
+#### 09-06-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+
+    J'ai travaillé sur le deroutement des informations de backup de Borg vers un document que loki/promtail puissent
+    lire.
+
+2. Sur quoi je vais travailler demain ?
+    
+    Je vais travailler sur comment écrire les informations do création de borgbackup sur in ficher et comment les parse
+    et afficher sur grafana.
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+
+    Je n'arrive pas a faire que les informations de creation de borgbackup soit ecrit sur un document texte.
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
+
 #### 05-06-2020
 1. Sur quoi j'ai travaillé aujourd'hui ?
     J'ai vérifier qu'un bug sur le dashboards des logs n'etais pas présent sur le server principale and j'ai travailler
