@@ -52,6 +52,7 @@
           - unzip
           - fail2ban
           - borgbackup
+          - rclone
 
     - name: Fetching public keys
       import_tasks: tasks/fetching_keys.yml
@@ -70,3 +71,6 @@
 
     - name: Setting up BorgBackup
       import_tasks: tasks/borg_backup.yml
+
+    - name: Setting up Drive Backup
+      import_tasks: tasks/drive.yml
