@@ -1,0 +1,15 @@
+- name: Copying Google Drive sync script
+  copy:
+      src: ./files/google-drive/gdrive-sync.sh
+      dest: /usr/local/bin/gdrive/
+      mode: a+x
+
+- name: Copying google drive sync script systemd service
+  copy:
+      src: ./files/google-drive/gdrive-sync.service
+      dest: /etc/systemd/system/
+
+- name: Copying google drive sync script systemd timer
+  copy:
+      src: ./files/google-drive/gdrive-sync.timer
+      dest: /etc/systemd/system/
