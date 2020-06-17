@@ -34,3 +34,25 @@ scrape_configs:
         labels:
           job: ssh
           __path__: /var/log/auth.log
+
+  - job_name: borg
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: borg
+          env: backups
+          __path__: /var/log/borg.log
+
+    pipeline_stages:
+    - match:
+        selector: '{job="borg"}'
+        stages:
+        - json:
+            expressions:
+              duration: archive.duration
+              compressed_size: archive.stats.compressed_size
+              timestamp: archive.start
+        - timestamp:
+            format: RFC3339Nano
+            source: timestamp
