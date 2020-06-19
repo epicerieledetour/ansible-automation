@@ -1,15 +1,31 @@
 - name: Copying Google Drive sync script
   copy:
-      src: ./files/google-drive/gdrive-sync.sh
-      dest: /usr/local/bin/gdrive/
-      mode: a+x
+    src: ./files/gdrive/gdrive-sync.sh
+    dest: /usr/local/bin/gdrive/
+    mode: a+x
 
 - name: Copying google drive sync script systemd service
   copy:
-      src: ./files/google-drive/gdrive-sync.service
-      dest: /etc/systemd/system/
+    src: ./files/gdrive/gdrive-sync.service
+    dest: /etc/systemd/system/
 
 - name: Copying google drive sync script systemd timer
   copy:
-      src: ./files/google-drive/gdrive-sync.timer
-      dest: /etc/systemd/system/
+    src: ./files/gdrive/gdrive-sync.timer
+    dest: /etc/systemd/system/
+
+- name: Copying rclone configuration
+  copy:
+    src: ./files/gdrive/rclone.conf
+    dest: /home/gdrive/
+
+- name: Copying auth
+  copy:
+    src: ./files/gdrive/credentials.json
+    dest: /home/gdrive/
+
+- name: Start Google drive backup script
+  systemd:
+      name: "gdrive-sync.timer"
+      enabled: true
+      state: started
