@@ -1,5 +1,7 @@
 - name: Setup backup repository
   command: 'borg init --encryption=repokey /home/backup/'
+  args:
+    creates: /home/backup
   environment:
       BORG_PASSPHRASE: TEST
 
