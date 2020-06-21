@@ -35,7 +35,8 @@ Vagrant.configure("2") do |config|
     # Create a private network, which allows host-only access to the machine
     # using a specific IP.
     # config.vm.network "private_network", ip: "192.168.33.10"
-
+    vps.vm.network "private_network", ip: "192.168.2.10", virtualbox__intnet: "laptopserver-internet"
+    vps.vm.network "private_network", ip: "192.168.3.10", virtualbox__intnet: "b7server-internet"
 
     # Create a public network, which generally matched to bridged network.
     # Bridged networks make the machine appear as another physical device on
@@ -71,5 +72,19 @@ Vagrant.configure("2") do |config|
     #   apt-get update
     #   apt-get install -y apache2
     # SHELL
+  end
+
+  config.vm.define "laptopserver" do |laptopserver|
+    laptopserver.vm.hostname = "laptopserver"
+    laptopserver.vm.box = "debian/buster64"
+    laptopserver.vm.network "private_network", ip: "192.168.2.20", virtualbox__intnet: "laptopserver-internet"
+    laptopserver.vm.synced_folder ".", "/vagrant", disabled: true
+  end
+
+  config.vm.define "b7server" do |b7server|
+    b7server.vm.hostname = "b7server"
+    b7server.vm.box = "debian/buster64"
+    b7server.vm.network "private_network", ip: "192.168.3.30", virtualbox__intnet: "b7server-internet"
+    b7server.vm.synced_folder ".", "/vagrant", disabled: true
   end
 end
