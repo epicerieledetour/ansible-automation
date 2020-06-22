@@ -15,10 +15,7 @@ info "Starting backup"
 
 borg create                         \
     --verbose                       \
-    --filter AME                    \
-    --list                          \
     --stats                         \
-    --show-rc                       \
     --compression lz4               \
     --exclude-caches                \
     --exclude '/home/*/.cache/*'    \
@@ -30,6 +27,8 @@ borg create                         \
     /home                           \
     /root                           \
     /var                            \
+                                    \
+    > /var/log/borg.log 2>&1
 
 backup_exit=$?
 

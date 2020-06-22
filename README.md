@@ -10,19 +10,20 @@ ansible-galaxy install -r requirements.yml
 ## Production mode
 
 ```sh
-ansible-playbook playbook.yml
+ansible-playbook --vault-id @prompt secret.yml playbook.yml
 ```
 
 ## Encrypt Sensitive Files
 
-To encryt a sensitive file using `Ansible-vault`
 ```sh
+# Encrypt the secret file
 ansible-vault encrypt --vault-id @prompt secret.yml
-```
-and to view or decrypt the file
-```sh
-ansible-vault view --vault-id @prompt secret.yml
-ansible-vault decrypt --vault-id @promtp secret.yml
+
+# View the content of the secret file, will ask for password
+ansible-vault view secret.yml
+
+# Decrypt the content of the secret file, will ask for password
+ansible-vault decrypt secret.yml
 ```
 
 ## Developement mode
@@ -40,7 +41,7 @@ vagrant ssh-config --host vagrant > .ssh.config
 ssh -F .ssh.config vagrant lsb_release -a
 
 # Run the Ansible playbook on the Vagrant virtual machine
-ansible-playbook --inventory hosts-dev --ssh-extra-args='-F .ssh.config' playbook.yml
+ansible-playbook --inventory hosts-dev --ssh-extra-args='-F .ssh.config' --vault-id @prompt secret.yml playbook.yml
 ```
 
 ### Get ssh logging info

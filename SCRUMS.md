@@ -1,5 +1,33 @@
 # Scrums
 
+#### 15-06-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+
+    J'ai exploré plusieurs application CLI pour la synchronisation des fichiers du Google Drive et le serveur.
+
+2. Sur quoi je vais travailler demain ?
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+
+    Je n'ai pas eu de problème durant la journée.
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
+    J'ai appris certain programmmes capable de synchronisation entre des document remote et des document locaux
+
+#### 12-06-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+
+    J'ai travaillé sur l'utilisation de Prometheus pour le parsing des metriques de BorgBackup
+
+2. Sur quoi je vais travailler demain ?
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+    
+    Je n'ai pas réussi a setup Prometheus pour les métriques de BorgBackup
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
 #### 10-06-2020
 1. Sur quoi j'ai travaillé aujourd'hui ?
 

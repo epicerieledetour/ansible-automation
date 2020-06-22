@@ -15,7 +15,6 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": null,
   "links": [],
   "panels": [
     {
@@ -105,13 +104,45 @@
       },
       "targets": [
         {
-          "expr": "{job=\"ssh\"}",
+          "expr": "{job=\"ssh\"}|~\"sshd\"",
           "refId": "A"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
       "title": "auth",
+      "type": "logs"
+    },
+    {
+      "datasource": "loki",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 8,
+      "options": {
+        "showLabels": false,
+        "showTime": false,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "targets": [
+        {
+          "expr": "{job=\"borg\"}",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Borg",
       "type": "logs"
     }
   ],
@@ -140,6 +171,6 @@
   },
   "timezone": "",
   "title": "Logs",
-  "uid": null,
-  "version": 0
+  "uid": "T1EUTxiGz",
+  "version": 1
 }

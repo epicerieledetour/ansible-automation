@@ -1,12 +1,14 @@
 - name: Setup backup repository
   command: 'borg init --encryption=repokey /home/backup/'
+  args:
+    creates: /home/backup
   environment:
       BORG_PASSPHRASE: TEST
 
 - name: Copying backup script
   copy:
       src: ./files/borgbackup/backup.sh
-      dest: /usr/bin/backup/
+      dest: /usr/local/bin/backup/
       mode: a+x
 
 - name: Copying backup script systemd service file
