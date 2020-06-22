@@ -1,5 +1,48 @@
 # Scrums
 
+#### 19-06-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+   
+    J'ai fait des recherches sur `Ansible-Vault` et comment encrypter les documents sensibles.
+
+2. Sur quoi je vais travailler demain ?
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+
+    Je n'ai pas eu de problème durant la journée.
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
+#### 18-06-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+
+    J'ai réussi à utiliser `rclone` pour la synchronisation de documents Google Drive.
+
+2. Sur quoi je vais travailler demain ?
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+    
+    Pour un long moment, je n'arrivais pas a télécharger des documents du Google Drive à travers `rclone`
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
+    J'ai appris a utiliser `rclone` pour la synchronisation de documents locaux et de document sur a google drive
+
+#### 17-06-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+    
+    J'ai passé ma journée bloquée à configurer `rclone` pour synchroniser les documents du Google-Drive
+
+2. Sur quoi je vais travailler demain ?
+    
+    Je vais essayer de finir le setup de synchronisation avec `rclone`
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+
+    Je n'arrive pas a télécharger les documents du Google-Drive avec `rclone`
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
 #### 15-06-2020
 1. Sur quoi j'ai travaillé aujourd'hui ?
 
