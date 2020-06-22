@@ -54,6 +54,9 @@
           - borgbackup
           - rclone
 
+    - name: Test
+      import_tasks: secret.yml
+
     - name: Fetching public keys
       import_tasks: tasks/fetching_keys.yml
 

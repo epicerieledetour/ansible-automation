@@ -13,6 +13,18 @@ ansible-galaxy install -r requirements.yml
 ansible-playbook playbook.yml
 ```
 
+## Encrypt Sensitive Files
+
+To encryt a sensitive file using `Ansible-vault`
+```sh
+ansible-vault encrypt --vault-id @prompt secret.yml
+```
+and to view or decrypt the file
+```sh
+ansible-vault view --vault-id @prompt secret.yml
+ansible-vault decrypt --vault-id @promtp secret.yml
+```
+
 ## Developement mode
 
 A [Vagrant](https://vagrantup.com) virtual machine can be used during development to safely test new configurations without modifying the production servers.
