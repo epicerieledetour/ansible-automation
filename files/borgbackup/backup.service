@@ -2,4 +2,4 @@
 Description="A script to run borgbackup"
 
 [Service]
-ExecStart=/bin/bash /usr/local/bin/backup/backup.sh
+ExecStart=sudo /bin/bash /usr/local/bin/backup/backup.sh
