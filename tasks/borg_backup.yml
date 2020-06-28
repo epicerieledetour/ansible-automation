@@ -3,26 +3,26 @@
   args:
     creates: /home/backup
   environment:
-      BORG_PASSPHRASE: TEST
+    BORG_PASSPHRASE: "{{ lookup('env', 'BORG_PASSPHRASE') }}"
 
 - name: Copying backup script
   copy:
-      src: ./files/borgbackup/backup.sh
-      dest: /usr/local/bin/backup/
-      mode: a+x
+    src: ./files/borgbackup/backup.sh
+    dest: /usr/local/bin/backup/
+    mode: a+x
 
 - name: Copying backup script systemd service file
   copy:
-      src: ./files/borgbackup/backup.service
-      dest: /etc/systemd/system/
+    src: ./files/borgbackup/backup.service
+    dest: /etc/systemd/system/
 
 - name: Copying backup script systemd timer file
   copy:
-      src: ./files/borgbackup/backup.timer
-      dest: /etc/systemd/system/
+    src: ./files/borgbackup/backup.timer
+    dest: /etc/systemd/system/
 
 - name: Start backup script timer
   systemd:
-      name: backup.timer
-      enabled: true
-      state: started
+    name: backup.timer
+    enabled: true
+    state: started

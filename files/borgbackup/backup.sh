@@ -2,7 +2,7 @@
 export BORG_REPO=/home/backup/
 
 # See the section "Passphrase notes" for more infos.
-export BORG_PASSPHRASE='TEST'
+export BORG_PASSPHRASE=$BORG_PASSPHRASE
 
 # some helpers and error handling:
 info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }

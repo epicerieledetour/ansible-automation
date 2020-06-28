@@ -1,0 +1,10 @@
+[Unit]
+Description=""
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=24h
+Unit=gdrive-sync.service
+
+[Install]
+WantedBy=multi-user.target
