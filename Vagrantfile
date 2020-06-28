@@ -72,6 +72,9 @@ Vagrant.configure("2") do |config|
     #   apt-get update
     #   apt-get install -y apache2
     # SHELL
+    # vps.vm.provision "ansible" do |ansible|
+      # ansible.playbook = "playbook.yml"
+    # end
   end
 
   config.vm.define "laptopserver" do |laptopserver|
@@ -86,5 +89,12 @@ Vagrant.configure("2") do |config|
     b7server.vm.box = "debian/buster64"
     b7server.vm.network "private_network", ip: "192.168.3.30", virtualbox__intnet: "b7server-internet"
     b7server.vm.synced_folder ".", "/vagrant", disabled: true
+  end
+
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "playbook.yml"
+    ansible.groups = {
+      "webservers" => ["vps"]
+    }
   end
 end

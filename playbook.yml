@@ -1,31 +1,37 @@
+- name: "This is my test"
+  hosts: all
+  tasks:
+    - name: Test ping
+      ping:
+
 - name: "Épicerie Le Détour Ansible playbook"
   hosts: webservers
   become: true
 
-  pre_tasks:  
-    - name: Copying grafana logs dashboard
-      copy:
-        src: ./files/dashboards/logs.json
-        dest: /var/lib/grafana/dashboards/
-
-  roles:
-  - role: cloudalchemy.grafana
-    vars:
-      grafana_security:
-        admin_user: admin
-        admin_password: admin
-      grafana_datasources:
-        - name: telegraf
-          type: influxdb
-          url: 'http://localhost:8086'
-          database: telegraf
-        - name: loki
-          type: loki
-          url: 'http://localhost:3100'
-      grafana_dashboards:
-        - dashboard_id: 5955
-          revision_id: 1
-          datasource: telegraf
+  # pre_tasks:
+  #   - name: Copying grafana logs dashboard
+  #     copy:
+  #       src: ./files/dashboards/logs.json
+  #       dest: /var/lib/grafana/dashboards/
+  #
+  # roles:
+  # - role: cloudalchemy.grafana
+  #   vars:
+  #     grafana_security:
+  #       admin_user: admin
+  #       admin_password: admin
+  #     grafana_datasources:
+  #       - name: telegraf
+  #         type: influxdb
+  #         url: 'http://localhost:8086'
+  #         database: telegraf
+  #       - name: loki
+  #         type: loki
+  #         url: 'http://localhost:3100'
+  #     grafana_dashboards:
+  #       - dashboard_id: 5955
+  #         revision_id: 1
+  #         datasource: telegraf
 
   tasks:
     - name: Upgrade all packages

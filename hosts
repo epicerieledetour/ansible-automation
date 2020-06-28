@@ -1,2 +1,5 @@
 [webservers]
 main_server ansible_host=vps-65c98ca9.vps.ovh.ca ansible_user=debian
+
+[mygroups]
+vps
