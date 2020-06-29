@@ -1,0 +1,12 @@
+[Interface]
+Address = {{ wireguard_address }}
+PrivateKey = {{ wireguard_private_key }}
+
+{% for host in groups['all'] if hostvars[host].wireguard_type == "endpoint" %}
+[Peer]  # {{ host }}
+PublicKey = {{ hostvars[host].wireguard_public_key }}
+EndPoint = {{ hostvars[host].wireguard_endpoint_address }}:{{ hostvars[host].wireguard_endpoint_port }}
+AllowedIPs = {{ hostvars[host].wireguard_allowed_ips }}
+PersistentKeepalive = 25
+
+{% endfor %}

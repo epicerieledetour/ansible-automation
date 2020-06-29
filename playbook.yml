@@ -1,12 +1,13 @@
-- name: "This is my test"
+- name: "Setup common tools and VPN"
   hosts: all
-  tasks:
-    - name: Test ping
-      ping:
-
-- name: "Épicerie Le Détour Ansible playbook"
-  hosts: webservers
   become: true
+  roles:
+    - common
+    - wireguard
+
+# - name: "Épicerie Le Détour Ansible playbook"
+#   hosts: webservers
+#   become: true
 
   # pre_tasks:
   #   - name: Copying grafana logs dashboard
@@ -32,51 +33,51 @@
   #       - dashboard_id: 5955
   #         revision_id: 1
   #         datasource: telegraf
+  #
+  # tasks:
+  #   - name: Upgrade all packages
+  #     apt:
+  #       name: "*"
+  #       state: latest
+  #
+  #   - name: Install needed packages
+  #     apt:
+  #       pkg:
+  #         - aptitude
+  #         - debconf-utils
+  #         - git
+  #         - nginx
+  #         - rsync
+  #         - wget
+  #         - ufw
+  #         - python3
+  #         - unattended-upgrades
+  #         - adduser
+  #         - libfontconfig1
+  #         - vim
+  #         - net-tools
+  #         - unzip
+  #         - fail2ban
+  #         - borgbackup
+  #         - rclone
 
-  tasks:
-    - name: Upgrade all packages
-      apt:
-        name: "*"
-        state: latest
-
-    - name: Install needed packages
-      apt:
-        pkg:
-          - aptitude
-          - debconf-utils
-          - git
-          - nginx
-          - rsync
-          - wget
-          - ufw
-          - python3
-          - unattended-upgrades
-          - adduser
-          - libfontconfig1
-          - vim
-          - net-tools
-          - unzip
-          - fail2ban
-          - borgbackup
-          - rclone
-
-    - name: Fetching public keys
-      import_tasks: tasks/fetching_keys.yml
-
-    - name: Setting up firewall
-      import_tasks: tasks/firewall.yml
-
-    - name: Setting up unattended upgrades
-      import_tasks: tasks/unattended_upgrades.yml
-
-    - name: Setting up Grafana
-      import_tasks: tasks/grafana.yml
-
-    - name: Setting up Loki/promtail
-      import_tasks: tasks/loki.yml
-
-    - name: Setting up BorgBackup
-      import_tasks: tasks/borg_backup.yml
-
-    - name: Setting up Drive Backup
-      import_tasks: tasks/gdrive-sync.yml
+    # - name: Fetching public keys
+    #   import_tasks: tasks/fetching_keys.yml
+    #
+    # - name: Setting up firewall
+    #   import_tasks: tasks/firewall.yml
+    #
+    # - name: Setting up unattended upgrades
+    #   import_tasks: tasks/unattended_upgrades.yml
+    #
+    # - name: Setting up Grafana
+    #   import_tasks: tasks/grafana.yml
+    #
+    # - name: Setting up Loki/promtail
+    #   import_tasks: tasks/loki.yml
+    #
+    # - name: Setting up BorgBackup
+    #   import_tasks: tasks/borg_backup.yml
+    #
+    # - name: Setting up Drive Backup
+    #   import_tasks: tasks/gdrive-sync.yml

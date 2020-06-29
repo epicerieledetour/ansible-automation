@@ -1,0 +1,26 @@
+- name: Upgrade all packages
+  apt:
+    name: "*"
+    state: latest
+
+- name: Install common packages
+  apt:
+    pkg:
+      - aptitude
+      - fail2ban
+      - python3
+      - unattended-upgrades
+      - vim
+
+      # - debconf-utils
+      # - git
+      # - nginx
+      # - rsync
+      # - wget
+      # - ufw
+      # - adduser
+      # - libfontconfig1
+      # - net-tools
+      # - unzip
+      # - borgbackup
+      # - rclone

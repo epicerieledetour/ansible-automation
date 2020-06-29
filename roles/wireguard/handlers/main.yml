@@ -1,0 +1,4 @@
+- name: reload wireguard
+  systemd:
+    name: wg-quick@wg-ledetour.service
+    state: restarted

@@ -1,0 +1,17 @@
+[Interface]
+Address = {{ wireguard_address }}
+PrivateKey = {{ wireguard_private_key }}
+ListenPort = {{ wireguard_endpoint_port }}
+
+PostUp = sysctl -w net.ipv4.ip_forward=1
+PostUp = sysctl -w net.ipv6.conf.all.forwarding=1
+
+PreDown = sysctl -w net.ipv6.conf.all.forwarding=0
+PreDown = sysctl -w net.ipv4.ip_forward=0
+
+{% for host in groups['all'] if hostvars[host].wireguard_type == "client" %}
+[Peer]  # {{ host }}
+PublicKey = {{ hostvars[host].wireguard_public_key }}
+AllowedIPs = {{ hostvars[host].wireguard_address }}/32
+
+{% endfor %}
