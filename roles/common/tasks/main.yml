@@ -28,6 +28,7 @@
       - fail2ban
       - python3
       - unattended-upgrades
+      - ufw
       - vim
 
       # - debconf-utils
@@ -35,7 +36,6 @@
       # - nginx
       # - rsync
       # - wget
-      # - ufw
       # - adduser
       # - libfontconfig1
       # - net-tools
@@ -60,3 +60,13 @@
           path: /etc/apt/apt.conf.d/50unattended-upgrades
           regexp: 'label=Debian";'
           state: absent
+
+- name: Disable all ports
+  ufw:
+    state: enabled
+    policy: deny
+
+- name: Open port 22 for SSH
+  ufw:
+    rule: allow
+    port: '22'

@@ -2,3 +2,4 @@ wireguard_type: client
 wireguard_address: 192.168.211.30
 wireguard_private_key: "{{ vault_wireguard_private_key }}"
 wireguard_public_key: "YtG8/u5+S1dBp9RHGggn3gKNBzxRaL5FXp1Fcodo0A0="
+wireguard_endpoint_port: 51820

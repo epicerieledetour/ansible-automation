@@ -1,6 +1,7 @@
 [Interface]
 Address = {{ wireguard_address }}
 PrivateKey = {{ wireguard_private_key }}
+ListenPort = {{ wireguard_endpoint_port }}
 
 {% for host in groups['all'] if hostvars[host].wireguard_type == "endpoint" %}
 [Peer]  # {{ host }}
