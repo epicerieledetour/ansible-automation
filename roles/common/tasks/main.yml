@@ -39,7 +39,6 @@
       # - adduser
       # - libfontconfig1
       # - net-tools
-      # - unzip
       # - borgbackup
       # - rclone
 

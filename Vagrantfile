@@ -98,6 +98,9 @@ Vagrant.configure("2") do |config|
     b7server.vm.provision "ansible" do |ansible|
       ansible.limit = "all"
       ansible.playbook = "playbook.yml"
+      ansible.groups = {
+        "webservers": ["vps"]
+      }
     end
   end
 end

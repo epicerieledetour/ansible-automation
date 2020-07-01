@@ -1,0 +1,148 @@
+# This guide has been useful in setting up InfluxDB / telegraf / grafaana
+# https://www.howtoforge.com/tutorial/how-to-install-tig-stack-telegraf-influxdb-and-grafana-on-ubuntu-1804/
+
+# Grafana
+
+- name: Copying grafana logs dashboard
+  copy:
+    src: logs.json
+    dest: /var/lib/grafana/dashboards/
+
+- name: Execute cloudalchemy.grafana role
+  include_role:
+    name: cloudalchemy.grafana
+  vars:
+    grafana_security:
+      admin_user: admin
+      admin_password: admin  # TODO: replace and encrypt
+    grafana_datasources:
+      - name: telegraf
+        type: influxdb
+        url: 'http://localhost:8086'
+        database: telegraf
+      - name: loki
+        type: loki
+        url: 'http://localhost:3100'
+    grafana_dashboards:
+      - dashboard_id: 5955
+        revision_id: 1
+        datasource: telegraf
+
+- name: Add InfluxDB / Telegraf repository key
+  apt_key:
+      url: 'https://repos.influxdata.com/influxdb.key'
+      state: present
+
+- name: Add InfluxDB / Telegraf Repository
+  apt_repository:
+      repo: 'deb https://repos.influxdata.com/debian buster stable'
+      state: present
+
+- name: Add Grafana repository key
+  apt_key:
+      url: 'https://packages.grafana.com/gpg.key'
+      state: present
+
+- name: Add Grafana Repository
+  apt_repository:
+      repo: 'deb https://packages.grafana.com/oss/deb stable main'
+      state: present
+
+- name: Install InfluxDB / Telegraf / Grafana
+  apt:
+    update_cache: yes
+    pkg:
+      - influxdb
+      - telegraf
+      - grafana
+
+- name: Start InfluxDB
+  systemd:
+      name: influxdb
+      enabled: true
+      state: started
+
+- name: Start telegraf
+  systemd:
+      name: telegraf
+      enabled: true
+      state: started
+
+- name: Start Grafana
+  systemd:
+      name: grafana-server
+      enabled: true
+      state: started
+
+- name: Open port 3000 for Grafana
+  ufw:
+    rule: allow
+    port: '3000'
+
+
+# Loki
+
+- name: Install unzip
+  apt:
+    pkg:
+      - unzip
+
+- name: Loki Download
+  get_url:
+      url: "https://github.com/grafana/loki/releases/download/v1.5.0/loki-linux-amd64.zip"
+      dest: /tmp/loki-v1.5.0-linux-amd64.zip
+
+- name: Unzip Loki
+  unarchive:
+      src: /tmp/loki-v1.5.0-linux-amd64.zip
+      dest: /usr/local/bin/
+      remote_src: yes
+      mode: "a+x"
+
+- name: Copying Loki systemd service config
+  copy:
+      src: loki.service
+      dest: /etc/systemd/system/
+
+- name: Copying Loki config
+  copy:
+      src: config-loki.yml
+      dest: /usr/local/bin/
+
+- name: Start Loki
+  systemd:
+      name: loki
+      enabled: true
+      state: started
+
+
+# Promtail
+
+
+- name: Promtail Download
+  get_url:
+      url: "https://github.com/grafana/loki/releases/download/v1.5.0/promtail-linux-amd64.zip"
+      dest: /tmp/promtail-v1.5.0-linux-amd64.zip
+
+- name: Unzip Promtail
+  unarchive:
+      src: /tmp/promtail-v1.5.0-linux-amd64.zip
+      dest: /usr/local/bin/
+      remote_src: yes
+      mode: "a+x"
+
+- name: Copying Promtail service config
+  copy:
+      src: promtail.service
+      dest: /etc/systemd/system/
+
+- name: Copying promtail config
+  copy:
+      src: config-promtail.yml
+      dest: /usr/local/bin/
+
+- name: Start promtail
+  systemd:
+      name: promtail
+      enabled: true
+      state: started
