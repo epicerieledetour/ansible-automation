@@ -56,3 +56,18 @@ w
 USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
 vagrant  pts/0    10.0.2.2         12:41    1.00s  0.07s  0.00s w
 ```
+
+### Wordpress backup info
+
+The plugin used for backups of the wordpress documents and databases is
+[UpDraftPlus](https://wordpress.org/plugins/updraftplus/). To change the google drive recipient 
+account of the wordpress backups. You may go to the 
+[settings](https://epicerieledetour.org/wp-admin/options-general.php?page=updraftplus) page.
+
+Go to the `settings` tab showed below
+
+![](pictures/settings_tab.png)
+
+Scroll down until you reach the `Google Drive` section
+
+![](pictures/gdrive_options.png)
