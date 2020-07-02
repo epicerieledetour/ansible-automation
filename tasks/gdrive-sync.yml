@@ -19,13 +19,13 @@
     src: ./files/gdrive/rclone.conf
     dest: /home/gdrive/
 
-- name: Copying auth
-  copy:
-    src: ./files/gdrive/credentials.json
-    dest: /home/gdrive/
-
-- name: Start Google drive backup script
-  systemd:
-      name: "gdrive-sync.timer"
-      enabled: true
-      state: started
+#- name: Copying auth
+#  copy:
+#    src: ./files/gdrive/credentials.json
+#    dest: /home/gdrive/
+#
+#- name: Start Google drive backup script
+#  systemd:
+#      name: "gdrive-sync.timer"
+#      enabled: true
+#      state: started
