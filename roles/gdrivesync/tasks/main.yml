@@ -1,27 +1,32 @@
+- name: Install gdrivesync packages
+  apt:
+    pkg:
+      - rclone
+
 - name: Copying Google Drive sync script
   copy:
-    src: ./files/gdrive/gdrive-sync.sh
-    dest: /usr/local/bin/gdrive/
+    src: gdrive-sync.sh
+    dest: /usr/local/bin/gdrive/  # TODO: move to /usr/local/bin
     mode: a+x
 
 - name: Copying google drive sync script systemd service
   copy:
-    src: ./files/gdrive/gdrive-sync.service
+    src: gdrive-sync.service
     dest: /etc/systemd/system/
 
 - name: Copying google drive sync script systemd timer
   copy:
-    src: ./files/gdrive/gdrive-sync.timer
+    src: gdrive-sync.timer
     dest: /etc/systemd/system/
 
 - name: Copying rclone configuration
   copy:
-    src: ./files/gdrive/rclone.conf
+    src: rclone.conf
     dest: /home/gdrive/
 
 - name: Copying auth
   copy:
-    src: ./files/gdrive/credentials.json
+    src: credentials.json
     dest: /home/gdrive/
 
 - name: Start Google drive backup script

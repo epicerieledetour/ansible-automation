@@ -11,9 +11,9 @@
   roles:
     - grafana
 
-    #
-    # - name: Setting up BorgBackup
-    #   import_tasks: tasks/borg_backup.yml
-    #
-    # - name: Setting up Drive Backup
-    #   import_tasks: tasks/gdrive-sync.yml
+- name: "Setup data proxies"
+  hosts: "backuphead"
+  become: true
+  roles:
+    - gdrivesync
+    - borgbackup

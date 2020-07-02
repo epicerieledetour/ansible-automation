@@ -99,7 +99,8 @@ Vagrant.configure("2") do |config|
       ansible.limit = "all"
       ansible.playbook = "playbook.yml"
       ansible.groups = {
-        "webservers": ["vps"]
+        "webservers": ["vps"],
+        "backuphead": ["vps"]
       }
     end
   end

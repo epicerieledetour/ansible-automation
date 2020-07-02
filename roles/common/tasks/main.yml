@@ -39,8 +39,6 @@
       # - adduser
       # - libfontconfig1
       # - net-tools
-      # - borgbackup
-      # - rclone
 
 - name: Activate unattended-upgrades
   block:
