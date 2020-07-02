@@ -1,5 +1,34 @@
 # Scrums
 
+#### 02-07-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+   
+2. Sur quoi je vais travailler demain ?
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
+#### 30-07-2020
+
+1. Sur quoi j'ai travaillé aujourd'hui ?
+   
+2. Sur quoi je vais travailler demain ?
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
+#### 29-07-2020
+
+1. Sur quoi j'ai travaillé aujourd'hui ?
+   
+2. Sur quoi je vais travailler demain ?
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
 #### 19-06-2020
 1. Sur quoi j'ai travaillé aujourd'hui ?
    
