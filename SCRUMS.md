@@ -1,5 +1,14 @@
 # Scrums
 
+#### 03-07-2020
+1. Sur quoi j'ai travaillé aujourd'hui ?
+   
+2. Sur quoi je vais travailler demain ?
+
+3. Qu'est-ce qui m'a posé des difficultés ?
+
+4. Qu'est-ce que j'ai appris aujourd'hui ?
+
 #### 02-07-2020
 1. Sur quoi j'ai travaillé aujourd'hui ?
    
@@ -12,8 +21,12 @@
 #### 30-07-2020
 
 1. Sur quoi j'ai travaillé aujourd'hui ?
+
+    J'ai commencé des recherches sur `nginx` ainsi que finir les detailles des backup de wordpress
    
 2. Sur quoi je vais travailler demain ?
+
+    Je vais continuer de travaillé sur l'implemenation de Grafana a travers nginx
 
 3. Qu'est-ce qui m'a posé des difficultés ?
 
@@ -22,7 +35,10 @@
 #### 29-07-2020
 
 1. Sur quoi j'ai travaillé aujourd'hui ?
-   
+  
+    J'ai travaillé sur l'implemenation de `UpDraftPlus` sur un site wordpress de test et comment envoyer les backups du
+    site
+
 2. Sur quoi je vais travailler demain ?
 
 3. Qu'est-ce qui m'a posé des difficultés ?
