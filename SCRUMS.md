@@ -2,21 +2,31 @@
 
 #### 03-07-2020
 1. Sur quoi j'ai travaillé aujourd'hui ?
+
+    J'ai commencer a implementer nginx manuellement sur le vagrant afin de reverse proxy Grafana a travers le port 80.
    
 2. Sur quoi je vais travailler demain ?
 
 3. Qu'est-ce qui m'a posé des difficultés ?
+
+    Je n'ai pas eu de problème durant la journée.
 
 4. Qu'est-ce que j'ai appris aujourd'hui ?
 
 #### 02-07-2020
 1. Sur quoi j'ai travaillé aujourd'hui ?
+
+    J'ai continuer d'apprendre comment nginx marche et comment le configurer
    
 2. Sur quoi je vais travailler demain ?
 
 3. Qu'est-ce qui m'a posé des difficultés ?
 
+    Je n'ai pas eu de problème durant la journée.
+
 4. Qu'est-ce que j'ai appris aujourd'hui ?
+
+    J'ai appris plus d'information sur un morceau de logiciel (nginx) que je ne connaissais pas avant
 
 #### 30-07-2020
 
@@ -30,6 +40,8 @@
 
 3. Qu'est-ce qui m'a posé des difficultés ?
 
+    Je n'ai pas eu de problème durant la journée.
+
 4. Qu'est-ce que j'ai appris aujourd'hui ?
 
 #### 29-07-2020
@@ -42,6 +54,8 @@
 2. Sur quoi je vais travailler demain ?
 
 3. Qu'est-ce qui m'a posé des difficultés ?
+
+    Je n'ai pas eu de problème durant la journée.
 
 4. Qu'est-ce que j'ai appris aujourd'hui ?
 
