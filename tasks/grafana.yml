@@ -24,7 +24,7 @@
 - name: Update grafana root URL
   replace:
     path: /etc/grafana/grafana.ini
-    replace: 'root_url = http://localhost:3000/grafana/'
+    replace: 'root_url = %(protocol)s://%(domain)s/grafana/'
     regexp: 'root_url.*'
 
 - name: Allow Grafana to be served as subpath
