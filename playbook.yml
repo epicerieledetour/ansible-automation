@@ -74,3 +74,6 @@
 
     - name: Setting up Drive Backup
       import_tasks: tasks/gdrive-sync.yml
+
+    - name: Nginx settup
+      import_tasks: tasks/nginx.yml

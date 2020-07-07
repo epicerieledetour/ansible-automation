@@ -21,6 +21,18 @@
       repo: 'deb https://packages.grafana.com/oss/deb stable main'
       state: present
 
+- name: Update grafana root URL
+  replace:
+    path: /etc/grafana/grafana.ini
+    replace: 'root_url = http://localhost:3000/grafana/'
+    regexp: 'root_url.*'
+
+- name: Allow Grafana to be served as subpath
+  replace:
+    path: /etc/grafana/grafana.ini
+    replace: 'serve_from_sub_path = True'
+    regexp: 'serve_from_sub_path.*'
+
 - name: Install InfluxDB / Telegraf / Grafana
   apt:
     update_cache: yes

@@ -1,0 +1,21 @@
+- name: Copy grafana's nginx configuration file
+  copy:
+    src: ./files/nginx/grafana.conf
+    dest: /etc/nginx/sites-available/
+
+- name: Enable grafana's nginx configuration file
+  file:
+    src: /etc/nginx/sites-available/grafana.conf
+    dest: /etc/nginx/sites-enabled/grafana.conf
+    state: link
+
+#- name: Restart Grafana
+#  systemd:
+#    name: grafana-server
+#    state: restarted
+
+- name: Reload Nginx
+  systemd:
+    name: nginx
+    state: reloaded
+
