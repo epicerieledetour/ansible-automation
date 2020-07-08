@@ -8,10 +8,10 @@
     rule: allow
     port: '22'
 
-- name: Open port 3000 for Grafana
-  ufw:
-    rule: allow
-    port: '3000'
+#- name: Open port 3000 for Grafana
+#  ufw:
+#    rule: allow
+#    port: '3000'
 
 - name: Open port 80
   ufw:
