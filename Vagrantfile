@@ -102,6 +102,11 @@ Vagrant.configure("2") do |config|
         "webservers": ["vps"],
         "backuphead": ["vps"]
       }
+      ansible.host_vars = {
+        "vps" => {
+          "wireguard_endpoint_address" => "192.168.1.11"
+        }
+      }
     end
   end
 end
