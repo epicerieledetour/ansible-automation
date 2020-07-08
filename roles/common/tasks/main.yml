@@ -26,6 +26,7 @@
     pkg:
       - aptitude
       - fail2ban
+      - "linux-image-4.19.0-9-{{ architecture }}"
       - python3
       - unattended-upgrades
       - ufw
