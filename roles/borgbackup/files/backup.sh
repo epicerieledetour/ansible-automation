@@ -23,9 +23,12 @@ borg create                         \
     --exclude '/var/tmp/*'          \
                                     \
     ::'{hostname}-{now}'            \
+                                    \
     /etc                            \
     /home                           \
     /root                           \
+    /srv                            \
+    /usr/local                      \
     /var                            \
                                     \
     > /var/log/borg.log 2>&1
