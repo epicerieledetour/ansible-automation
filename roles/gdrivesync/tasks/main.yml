@@ -6,7 +6,7 @@
 - name: Copying Google Drive sync script
   copy:
     src: gdrive-sync.sh
-    dest: /usr/local/bin/gdrive/  # TODO: move to /usr/local/bin
+    dest: /usr/local/bin
     mode: a+x
 
 - name: Copying google drive sync script systemd service
@@ -22,15 +22,22 @@
 - name: Copying rclone configuration
   copy:
     src: rclone.conf
-    dest: /home/gdrive/
+    dest: /usr/local/etc/rclone/
 
 - name: Copying auth
   copy:
     src: credentials.json
-    dest: /home/gdrive/
+    dest:  /usr/local/etc/rclone/
+    mode: 0400
+
+- name: Make /srv/rclone/gdrive-sync directory
+  file:
+    path: /srv/rclone/gdrive-sync
+    state: directory
+    mode: 0700
 
 - name: Start Google drive backup script
   systemd:
-      name: "gdrive-sync.timer"
+      name: gdrive-sync.timer
       enabled: true
       state: started

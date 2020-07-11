@@ -2,4 +2,4 @@
 Description="A script to copy the google drive data to the server"
 
 [Service]
-ExecStart=/bin/bash /usr/local/bin/gdrive/gdrive-sync.sh
+ExecStart=/usr/local/bin/gdrive-sync.sh
