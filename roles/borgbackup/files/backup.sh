@@ -21,6 +21,7 @@ borg create                         \
     --compression lz4               \
     --exclude-caches                \
     --exclude '/home/*/.cache/*'    \
+    --exclude '/srv/borg/*'         \
     --exclude '/var/cache/*'        \
     --exclude '/var/tmp/*'          \
                                     \
