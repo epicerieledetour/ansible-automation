@@ -65,12 +65,9 @@
           regexp: 'label=Debian";'
           state: absent
 
-- name: Disable all ports
+- name: Disable all ports but ssh
   ufw:
     state: enabled
     policy: deny
-
-- name: Open port 22 for SSH
-  ufw:
     rule: allow
     port: '22'
