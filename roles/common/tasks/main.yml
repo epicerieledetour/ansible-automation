@@ -37,15 +37,6 @@
   apt:
     upgrade: dist
 
-      # - debconf-utils
-      # - git
-      # - nginx
-      # - rsync
-      # - wget
-      # - adduser
-      # - libfontconfig1
-      # - net-tools
-
 - name: Check if a reboot is required
   register: rebootrequired
   stat:
