@@ -3,14 +3,7 @@
     pkg:
       - borgbackup
 
-- name: Setup backup repository
-  # TODO: loop through borg-repository groups and init them with ssh
-  command: 'borg init --encryption=repokey '
-  args:
-    creates: "{{ borg_repo }}"
-  environment:
-    BORG_PASSPHRASE: "{{ borg_passphrase }}"
-    BORG_REPO: "{{ borg_repo }}"
+# Static configuration
 
 - name: Copying backup script
   copy:
@@ -23,12 +16,6 @@
     path: /usr/local/etc/borg
     state: directory
     mode: 0700
-
-- name: Instanciate borg environment
-  template:
-    src: env.j2
-    dest: "/usr/local/etc/borg/{{ borg_repo_name }}.env"
-    mode: 0400
 
 - name: Copying backup script systemd service file
   copy:
@@ -44,8 +31,22 @@
   notify:
     - systemd changed
 
-- name: Start backup script timer
-  systemd:
-    name: "backup@{{ borg_repo_name }}.timer"
-    enabled: true
-    state: started
+# Dynamic configuration per borgstore host in inventory
+
+- name: "Generate an ssh keypair for borg stores"
+  openssh_keypair:
+    path: /usr/local/etc/borg/id_ssh_rsa
+    comment: "{{ inventory_hostname }} borg"
+    mode: 0400
+  register: borg_ssh
+
+- name: "Configure borg backup stores"
+  include_tasks:
+    file: store.yml
+  loop: "{{ groups['borgstores'] }}"
+  vars:
+    borg_store_host: "{{ hostvars[item].wireguard_address }}"
+    borg_store_name: "{{ item }}"
+    borg_store_user: "{{ hostvars[item].ansible_user }}"
+    borg_repo_name: "{{ inventory_hostname }}"
+    borg_repo: "{{ borg_store_user }}@{{ borg_store_host }}:/srv/borg/{{ inventory_hostname }}"

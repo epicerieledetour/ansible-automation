@@ -7,9 +7,11 @@
 
 - name: "Setup web applications"
   hosts: webservers
+- name: Setup borg repository stores
+  hosts: borgstores
   become: true
   roles:
-    - grafana
+    - borgstore
 
 - name: "Setup data proxies"
   hosts: "backuphead"

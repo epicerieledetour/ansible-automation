@@ -2,7 +2,8 @@
 Description="Run backup to repo %I"
 
 [Timer]
-OnCalendar=*-*-* 8:00:00  # 3:00 / 4:00 Montreal time
+# 3:00 / 4:00 Montreal time
+OnCalendar=*-*-* 8:00:00
 Unit=backup@%i.service
 
 [Install]

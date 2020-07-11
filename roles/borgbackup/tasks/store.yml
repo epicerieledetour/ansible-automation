@@ -1,0 +1,29 @@
+- name: "Set ssh key for repo {{ borg_repo }}"
+  authorized_key:
+    user: "{{ borg_store_user }}"
+    key: "{{ borg_ssh.public_key }}"
+    state: present
+  delegate_to: "{{ borg_store_name }}"
+
+- name: Instanciate borg environment for repo {{ borg_store_name }} {{ borg_repo }}
+  template:
+    src: env.j2
+    dest: "/usr/local/etc/borg/{{ borg_store_name }}.env"
+    mode: 0400
+
+- name: Setup backup repository {{ borg_repo }}
+  command: borg init --encryption=repokey
+  register: borg_init
+  changed_when: borg_init.rc == 0
+  failed_when: not (borg_init.rc == 0 or (borg_init.rc == 2 and borg_init.stderr.startswith("A repository already exists")))
+  environment:
+    # TODO: this replicates env.j2
+    BORG_PASSPHRASE: "{{ borg_passphrase }}"
+    BORG_REPO: "{{ borg_repo }}"
+    BORG_RSH: "ssh -i {{ borg_ssh.filename }}"
+
+- name: Start backup script timer
+  systemd:
+    name: "backup@{{ borg_store_name }}.timer"
+    enabled: true
+    state: started

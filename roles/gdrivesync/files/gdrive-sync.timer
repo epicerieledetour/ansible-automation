@@ -2,7 +2,8 @@
 Description="Call the gdrive-sync.service every 24h"
 
 [Timer]
-OnCalendar=*-*-* 6:00:00  # 1:00 / 2:00 Montreal time
+# 1:00 / 2:00 Montreal time
+OnCalendar=*-*-* 6:00:00
 Unit=gdrive-sync.service
 
 [Install]

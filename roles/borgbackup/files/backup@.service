@@ -3,5 +3,6 @@ Description="Backup to repo %I"
 
 [Service]
 ExecStart=/usr/local/bin/backup.sh
+Type=oneshot
 
 EnvironmentFile=/usr/local/etc/borg/%i.env

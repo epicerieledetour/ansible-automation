@@ -1,0 +1,11 @@
+- name: Install borg packages
+  apt:
+    pkg:
+      - borgbackup
+
+- name: Make root borg directory /srv/borg
+  file:
+    path: /srv/borg
+    state: directory
+    mode: 0700
+    owner: "{{ ansible_user }}"
