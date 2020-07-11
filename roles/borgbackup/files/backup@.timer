@@ -1,0 +1,10 @@
+[Unit]
+Description="Run backup to repo %I"
+
+[Timer]
+OnBootSec=1min
+OnCalendar=*-*-* 8:00:00  # 3:00 / 4:00 Montreal time
+Unit=backup@%i.service
+
+[Install]
+WantedBy=multi-user.target

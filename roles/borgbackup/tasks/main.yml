@@ -3,39 +3,49 @@
     pkg:
       - borgbackup
 
-- name: Setting up Borg passphrase in /etc/environment
-  # TODO: remove BORG_PASSPHRASE from /etc/environment
-  lineinfile:
-    path: /etc/environment
-    insertafter: EOF
-    line: "export BORG_PASSPHRASE='{{ borg_passphrase }}'"
-
 - name: Setup backup repository
   # TODO: loop through borg-repository groups and init them with ssh
-  command: 'borg init --encryption=repokey /home/backup/'
+  command: 'borg init --encryption=repokey '
   args:
-    creates: /home/backup  # TODO: move to /var/backups
+    creates: "{{ borg_repo }}"
   environment:
     BORG_PASSPHRASE: "{{ borg_passphrase }}"
+    BORG_REPO: "{{ borg_repo }}"
 
 - name: Copying backup script
   copy:
     src: backup.sh
-    dest: /usr/local/bin/backup/  # TODO: install to /usr/local/bin
-    mode: a+x
+    dest: /usr/local/bin/
+    mode: 0500
+
+- name: Make /usr/local/etc/borg directory
+  file:
+    path: /usr/local/etc/borg
+    state: directory
+    mode: 0700
+
+- name: Instanciate borg environment
+  template:
+    src: env.j2
+    dest: "/usr/local/etc/borg/{{ borg_repo_name }}.env"
+    mode: 0400
 
 - name: Copying backup script systemd service file
   copy:
-    src: backup.service
+    src: backup@.service
     dest: /etc/systemd/system/
+  notify:
+    - systemd changed
 
 - name: Copying backup script systemd timer file
   copy:
-    src: backup.timer
+    src: backup@.timer
     dest: /etc/systemd/system/
+  notify:
+    - systemd changed
 
 - name: Start backup script timer
   systemd:
-    name: backup.timer
+    name: "backup@{{ borg_repo_name }}.timer"
     enabled: true
     state: started

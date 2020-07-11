@@ -1,0 +1,7 @@
+[Unit]
+Description="Backup to repo %I"
+
+[Service]
+ExecStart=/usr/local/bin/backup.sh
+
+EnvironmentFile=/usr/local/etc/borg/%i.env

@@ -1,5 +1,0 @@
-[Unit]
-Description="A script to run borgbackup"
-
-[Service]
-ExecStart=sudo /bin/bash /usr/local/bin/backup/backup.sh
