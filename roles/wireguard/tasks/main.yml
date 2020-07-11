@@ -6,7 +6,9 @@
 
 - name: Install wireguard
   apt:
-    name: wireguard
+    pkg:
+      - linux-headers-cloud-amd64  # HACK: `cloud-amd` should be gathered as a fact
+      - wireguard
     update_cache: true
     state: present
 

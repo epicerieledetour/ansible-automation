@@ -16,21 +16,26 @@
     state: present
     key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC6CEiSkgXyxDd5GYUl/e7MsgTdXwBXBE7hLO145wXZoak5c6CUyRDs0iTJhqVEI4HO/TcngtC44vApSNYH3RkeHmPiSDwukqTfBh4bvmrtpGTTaYT2Iz0sM14Ey1O47puBb5nuXQc2T1u7P1YxV9IqNRPQ8ZWIR7HoOioZazAaGUK0+WI+RICmDW6lY3ViJXZfxKH12C9b+QHSfpg/pzFCLx5KEKTB509+eSq7kfrwh/JrZ2K7NMy9HSWMYL/G3KLByWU8H5fooLvpeq6v5+gyrKYgflXLzP722YA90Tt6RQj+0zcQulgacrhEFuGt1I2CMNy9kwR1/sx3ZKlxcvi+Q9gHhBq5YQiP3Cci10QqgAwA+ErVtV3VsnBSbhbypkeVh7UEBdMPnx4eV/Z24Uiy/MQkrtmenOkqp/diD2aTFWZam8xsIAuT//hgnbkMdEL5T//yG/cNc4tpTRZVRwP/y6I766afXLZ6O3ZFYa40HHMQK7W3QK08ndVsYRG70l1zHeuTskyszeVqdDG2Fas8UF1ajazIXf1XO/QCMXFxs6k4g0Bl5PWXDe2mCf2uRSf8T4COq3jxhNhIb693e9nz1ziiad/IekgrvAKdigE+zIpb102AJcivbSyvID5BXzUcyxbNDGFv2KAHNBKsNwBrgIkggel8678fbmRgIiRJ4Q==
 
-- name: Upgrade all packages
+- name: Update apt cache
   apt:
-    name: "*"
-    state: latest
+    update_cache: yes
 
+# We install common packages before an upgrade as unattended-upgrades
+# may set /var/run/reboot-required, which will be needed in case the
+# upgrade installs a new kernel
 - name: Install common packages
   apt:
     pkg:
       - aptitude
       - fail2ban
-      - "linux-image-4.19.0-9-{{ architecture }}"
       - python3
       - unattended-upgrades
       - ufw
       - vim
+
+- name: Upgrade all packages
+  apt:
+    upgrade: dist
 
       # - debconf-utils
       # - git
@@ -40,6 +45,16 @@
       # - adduser
       # - libfontconfig1
       # - net-tools
+
+- name: Check if a reboot is required
+  register: rebootrequired
+  stat:
+    path: /var/run/reboot-required
+    get_md5: no
+
+- name: Reboot if /var/run/reboot-required exists
+  reboot:
+  when: rebootrequired.stat.exists == true
 
 - name: Activate unattended-upgrades
   block:
