@@ -3,7 +3,7 @@ Description="Call the gdrive-sync.service every 24h"
 
 [Timer]
 OnBootSec=1min
-OnUnitActiveSec=24h
+OnCalendar=*-*-* 6:00:00  # 1:00 / 2:00 Montreal time
 Unit=gdrive-sync.service
 
 [Install]
