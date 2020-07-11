@@ -31,7 +31,7 @@ borg create                         \
     /usr/local                      \
     /var                            \
                                     \
-    > /var/log/borg.log 2>&1
+    >> /var/log/borg.log 2>&1
 
 backup_exit=$?
 
