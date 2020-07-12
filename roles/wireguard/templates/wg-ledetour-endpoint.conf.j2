@@ -5,7 +5,11 @@ ListenPort = {{ wireguard_endpoint_port }}
 
 PostUp = sysctl -w net.ipv4.ip_forward=1
 PostUp = sysctl -w net.ipv6.conf.all.forwarding=1
+PostUp = iptables -A FORWARD -i %i -j ACCEPT
+PostUp = ip6tables -A FORWARD -i %i -j ACCEPT
 
+PreDown = ip6tables -D FORWARD -i %i -j ACCEPT
+PreDown = iptables -D FORWARD -i %i -j ACCEPT
 PreDown = sysctl -w net.ipv6.conf.all.forwarding=0
 PreDown = sysctl -w net.ipv4.ip_forward=0
 
