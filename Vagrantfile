@@ -100,7 +100,8 @@ Vagrant.configure("2") do |config|
       ansible.playbook = "playbook.yml"
       ansible.groups = {
         "webservers": ["vps"],
-        "backuphead": ["vps"],
+        "dataproxies": ["laptopserver"],
+        "backuphead": ["vps", "laptopserver"],
         "borgstores": ["laptopserver", "b7server"]
       }
       ansible.host_vars = {

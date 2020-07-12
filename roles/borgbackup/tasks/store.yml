@@ -3,6 +3,7 @@
     user: "{{ borg_store_user }}"
     key: "{{ borg_ssh.public_key }}"
     state: present
+  when: borg_store_is_remote | bool
   delegate_to: "{{ borg_store_name }}"
 
 - name: Instanciate borg environment for repo {{ borg_store_name }} {{ borg_repo }}

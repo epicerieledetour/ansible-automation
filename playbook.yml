@@ -7,15 +7,21 @@
 
 - name: "Setup web applications"
   hosts: webservers
+
+- name: Setup dataproxies
+  hosts: dataproxies
+  become: true
+  roles:
+    - gdrivesync
+
 - name: Setup borg repository stores
   hosts: borgstores
   become: true
   roles:
     - borgstore
 
-- name: "Setup data proxies"
+- name: "Setup hosts to backup"
   hosts: "backuphead"
   become: true
   roles:
-    - gdrivesync
     - borgbackup
