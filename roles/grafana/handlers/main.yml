@@ -3,3 +3,9 @@
     name: nginx
     state: reloaded
   listen: "nginx changed"
+
+- name: Reload telegraf
+  systemd:
+    name: telegraf
+    state: reloaded
+  listen: "telegraf changed"

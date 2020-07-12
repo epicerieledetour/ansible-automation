@@ -91,6 +91,13 @@
       - telegraf
       - grafana
 
+- name: Install telegraf.conf
+  copy:
+    src: telegraf.conf
+    dest: /etc/telegraf/
+  notify:
+    - "telegraf changed"
+
 - name: Start InfluxDB
   systemd:
       name: influxdb
