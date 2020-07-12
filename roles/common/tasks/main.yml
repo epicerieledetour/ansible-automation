@@ -1,3 +1,7 @@
+- name: Ensure hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
 - name: Setup charlesfleches keys
   authorized_key:
     user: "{{ ansible_user }}"
