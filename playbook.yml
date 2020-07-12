@@ -7,6 +7,9 @@
 
 - name: "Setup web applications"
   hosts: webservers
+  become: true
+  roles:
+    - grafana
 
 - name: Setup dataproxies
   hosts: dataproxies

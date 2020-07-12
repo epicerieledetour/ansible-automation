@@ -1,3 +1,38 @@
+# nginx
+
+- name: Install borg packages
+  apt:
+    pkg:
+      - nginx
+
+- name: Open port 80 for nginx
+  ufw:
+    rule: allow
+    port: http
+
+- name: Remove Nginx default server config
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify:
+    - "nginx changed"
+
+- name: Copy grafana's nginx configuration file
+  copy:
+    src: nginx/grafana.conf  # TODO: move to files
+    dest: /etc/nginx/sites-available/
+  notify:
+    - "nginx changed"
+
+- name: Enable grafana's nginx configuration file
+  file:
+    src: /etc/nginx/sites-available/grafana.conf
+    dest: /etc/nginx/sites-enabled/grafana.conf
+    state: link
+  notify:
+    - "nginx changed"
+
+
 # This guide has been useful in setting up InfluxDB / telegraf / grafaana
 # https://www.howtoforge.com/tutorial/how-to-install-tig-stack-telegraf-influxdb-and-grafana-on-ubuntu-1804/
 
@@ -74,11 +109,6 @@
       enabled: true
       state: started
 
-- name: Open port 3000 for Grafana
-  ufw:
-    rule: allow
-    port: '3000'
-
 
 # Loki
 
@@ -90,6 +120,7 @@
 - name: Loki Download
   get_url:
       url: "https://github.com/grafana/loki/releases/download/v1.5.0/loki-linux-amd64.zip"
+      checksum: sha256:00b4f134d8e54ce4dfb1ce71ffff3e5505202fa13625ec96cec75d44b816ed34
       dest: /tmp/loki-v1.5.0-linux-amd64.zip
 
 - name: Unzip Loki
@@ -122,6 +153,7 @@
 - name: Promtail Download
   get_url:
       url: "https://github.com/grafana/loki/releases/download/v1.5.0/promtail-linux-amd64.zip"
+      checksum: sha256:6695ea8d0c831c0ccab3abfac9e3bdf065e83887d540583b8e28644168ca038c
       dest: /tmp/promtail-v1.5.0-linux-amd64.zip
 
 - name: Unzip Promtail
