@@ -3,5 +3,9 @@ vps ansible_host=vps-65c98ca9.vps.ovh.ca ansible_user=debian wireguard_endpoint_
 [webservers]
 vps
 
+[borgstores]
+
+[dataproxies]
+
 [backuphead]
 vps
