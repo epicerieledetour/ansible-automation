@@ -1,0 +1,7 @@
+{% for drive in google_drives %}
+[{{ drive.name }}]
+type = drive
+scope = drive
+service_account_file = /usr/local/etc/rclone/drive-sync-on-ovh-server-50a335a0b68b.json
+team_drive = {{ drive.id }}
+{% endfor %}

@@ -1,0 +1,12 @@
+[Unit]
+Description="Synchronise a Google Drive rclone remote %I"
+
+[Service]
+Type=oneshot
+ExecStart=rclone                                   \
+  --verbose                                        \
+  --config "/usr/local/etc/rclone/rclone.conf"     \
+  --drive-impersonate charles@epicerieledetour.org \
+  sync                                             \
+  %i:                                              \
+  /srv/rclone/%i

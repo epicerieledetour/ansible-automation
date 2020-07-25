@@ -1,5 +1,5 @@
 [Unit]
-Description="Call the gdrive-sync.service every 24h"
+Description="Call the Google Drive rclone sync %I every 24H"
 
 [Timer]
 # 1:00 / 2:00 Montreal time

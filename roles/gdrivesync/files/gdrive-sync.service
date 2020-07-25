@@ -1,6 +1,0 @@
-[Unit]
-Description="A script to copy the google drive data to the server"
-
-[Service]
-ExecStart=/usr/local/bin/gdrive-sync.sh
-Type=oneshot

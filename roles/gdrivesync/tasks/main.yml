@@ -3,41 +3,43 @@
     pkg:
       - rclone
 
-- name: Copying Google Drive sync script
-  copy:
-    src: gdrive-sync.sh
-    dest: /usr/local/bin
-    mode: a+x
-
 - name: Copying google drive sync script systemd service
   copy:
-    src: gdrive-sync.service
+    src: rclone-drive@.service
     dest: /etc/systemd/system/
 
 - name: Copying google drive sync script systemd timer
   copy:
-    src: gdrive-sync.timer
+    src: rclone-drive@.timer
     dest: /etc/systemd/system/
 
-- name: Copying rclone configuration
-  copy:
-    src: rclone.conf
-    dest: /usr/local/etc/rclone/
-
-- name: Copying auth
-  copy:
-    src: credentials.json
-    dest:  /usr/local/etc/rclone/
-    mode: 0400
-
-- name: Make /srv/rclone/gdrive-sync directory
+- name: Make/usr/local/etc/rclone directory
   file:
-    path: /srv/rclone/gdrive-sync
+    path: /usr/local/etc/rclone
     state: directory
     mode: 0700
 
-- name: Start Google drive backup script
+- name: Instanciate rclone config
+  template:
+    src: rclone.conf.j2
+    dest: /usr/local/etc/rclone/rclone.conf
+    mode: 0400
+
+- name: Copying auth
+  copy:
+    src: drive-sync-on-ovh-server-50a335a0b68b.json
+    dest:  /usr/local/etc/rclone/
+    mode: 0400
+
+- name: Make /srv/rclone directory
+  file:
+    path: /srv/rclone
+    state: directory
+    mode: 0700
+
+- name: Register Drive sync timers
   systemd:
-      name: gdrive-sync.timer
+      name: "rclone-drive@{{ item.name }}.timer"
       enabled: true
       state: started
+  loop: "{{ google_drives }}"
