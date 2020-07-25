@@ -1,5 +1,5 @@
 - name: "Setup common tools and VPN"
-  hosts: all
+  hosts: servers
   become: true
   roles:
     - common

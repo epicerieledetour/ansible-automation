@@ -1,9 +1,17 @@
 vps ansible_host=vps-65c98ca9.vps.ovh.ca ansible_user=debian wireguard_endpoint_address=vps-65c98ca9.vps.ovh.ca
+b7server ansible_host=192.168.211.30 ansible_user=debian
+
+charles-xps15
+
+[servers]
+vps
+b7server
 
 [webservers]
 vps
 
 [borgstores]
+b7server
 
 [dataproxies]
 
