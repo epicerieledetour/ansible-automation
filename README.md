@@ -31,17 +31,11 @@ ansible-vault decrypt secret.yml
 A [Vagrant](https://vagrantup.com) virtual machine can be used during development to safely test new configurations without modifying the production servers.
 
 ```sh
-# Creates and run the virtual machine
+# Creates and run the virtual machines
 vagrant up
 
-# Export the ssh configuration to the development virtual machine
-vagrant ssh-config --host vagrant > .ssh.config
-
-# Test the ssh connection
-ssh -F .ssh.config vagrant lsb_release -a
-
 # Run the Ansible playbook on the Vagrant virtual machine
-ansible-playbook --inventory hosts-dev --ssh-extra-args='-F .ssh.config' --vault-id @prompt secret.yml playbook.yml
+vagrant provision
 ```
 
 ### Get ssh logging info
@@ -60,8 +54,8 @@ vagrant  pts/0    10.0.2.2         12:41    1.00s  0.07s  0.00s w
 ### Wordpress backup info
 
 The plugin used for backups of the wordpress documents and databases is
-[UpDraftPlus](https://wordpress.org/plugins/updraftplus/). To change the google drive recipient 
-account of the wordpress backups. You may go to the 
+[UpDraftPlus](https://wordpress.org/plugins/updraftplus/). To change the google drive recipient
+account of the wordpress backups. You may go to the
 [settings](https://epicerieledetour.org/wp-admin/options-general.php?page=updraftplus) page.
 
 Go to the `settings` tab showed below
