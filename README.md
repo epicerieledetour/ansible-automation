@@ -13,6 +13,17 @@ ansible-galaxy install -r requirements.yml
 ansible-playbook --vault-id @prompt secret.yml playbook.yml
 ```
 
+## First setup of a production machine
+
+1. Install debian 10 (buster)
+2. Full disk encryption
+3. Add a single user `debian`
+4. Ensure openssh server is running
+5. `ssh-copy-id` for the user / machine ansible will be ran from
+6. Configure user `debian` for passwordless sudo. Create a new file `/etc/sudoers.d/admin` with this content: `debian ALL = NOPASSWD: ALL`
+7. Run ansible against a first time with the LAN IP of the machine. This will bootstrap the Wireguard connection that will be used by default next time: `ansible-playbook -e "ansible_host=[LAN IP]" playbook.yml --limit [hostname]`, for example `ansible-playbook -e "ansible_host=192.168.1.42" playbook.yml --limit laptopserver`
+8. The machine is likely to reboot on first ansible run: be ready to enter disk decryption keys
+
 ## Encrypt Sensitive Files
 
 ```sh
