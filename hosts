@@ -14,6 +14,8 @@ vps
 b7server
 
 [dataproxies]
+b7server
 
 [backuphead]
 vps
+b7server
