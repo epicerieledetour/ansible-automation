@@ -14,6 +14,11 @@
     state: present
     key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDUP3E8D6oMeIAYllmkz3/WoK6MtupfojMijxXzbEe/FdIBgI/Vdt350LWaQUDmXlbqIBMQwe0TLYQ4DYBktEmAntYGo/YkJI/MxEzXvwkKYKz9zT7RSL/fP0GMPUuJpR6VXSgI9M4mHBwSaCSaFELe5dVdv3veEs0cHUTenMkitrJmDoXTXmqfppplRqfUBXCFH3u6/TOsdZMh2797iru9efVhJsvwFEogc153yIyVdPM7unhKLGN4mKJ/eq7ZBr4hifMNfV4pk+Qf4TmNpw/mMvXUTqaEQRTSYk2TtAGSprsRk5lqJHx2jamtfqbH4AR/ydJISeyKuGToUIf7HVEQ7OuC9KmWVilp3a4o2dRH0lrCJcW9A/qC1SPr317jyQWFUMbjVDT3AXdyCTrxv6DsJ6SaoTgq2BzkGIQz71EuzUqWfug5KM8rOwLBsvtIdkkc06kUJWcyggDst6/oICi87vh8+S1GGxCCKfoMZgJD39cLX/pLN7Car9WgmnaHS6BFWJxV+TG4txIrxNTa+wleuD9Yb6Pk2f+1iaBIc48QEFccHpgI3TKmuM1UDSYFlZc6TM5+502hgvifXDLIdAqYrkLZDv22rrl1odA2z52eG4fGgMLVbsQtbu2kC1KygSPeUFn/rwCglCdhAHrWEU5n0wAsX5qUmt6T/nQ5cISVFw==
 
+- name: Prevent grub from being upgraded
+  dpkg_selections:
+    name: grub2-common
+    selection: hold
+
 - name: Update apt cache
   apt:
     update_cache: yes
