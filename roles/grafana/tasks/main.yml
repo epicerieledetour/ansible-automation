@@ -1,22 +1,5 @@
 # nginx
 
-- name: Install borg packages
-  apt:
-    pkg:
-      - nginx
-
-- name: Open port 80 for nginx
-  ufw:
-    rule: allow
-    port: http
-
-- name: Remove Nginx default server config
-  file:
-    path: /etc/nginx/sites-enabled/default
-    state: absent
-  notify:
-    - "nginx changed"
-
 - name: Copy grafana's nginx configuration file
   copy:
     src: nginx/grafana.conf  # TODO: move to files
@@ -29,9 +12,6 @@
     src: /etc/nginx/sites-available/grafana.conf
     dest: /etc/nginx/sites-enabled/grafana.conf
     state: link
-  notify:
-    - "nginx changed"
-
 
 # This guide has been useful in setting up InfluxDB / telegraf / grafaana
 # https://www.howtoforge.com/tutorial/how-to-install-tig-stack-telegraf-influxdb-and-grafana-on-ubuntu-1804/

@@ -9,6 +9,7 @@
   hosts: webservers
   become: true
   roles:
+    - nginx
     - grafana
 
 - name: Setup dataproxies

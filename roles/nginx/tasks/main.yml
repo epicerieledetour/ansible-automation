@@ -1,0 +1,16 @@
+- name: Install nginx
+  apt:
+    pkg:
+      - nginx
+
+- name: Open http port 80 for nginx
+  ufw:
+    rule: allow
+    port: http
+
+- name: Remove Nginx default server config
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify:
+    - "nginx changed"
