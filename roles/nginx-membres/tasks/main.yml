@@ -1,12 +1,42 @@
+- name: Install git
+  apt:
+    pkg:
+      - git
+
+- name: Git checkout membres.epicerieledetour.org
+  git:
+    repo: 'https://github.com/epicerieledetour/ledetour-membres.git'
+    dest: /var/www/ledetour-membres
+
 - name: Copy membres.epicerieledetour.org nginx configuration file
   copy:
-    src: nginx/membres.epicerieledetour.org.conf
+    src: nginx/ledetour-membres.conf
     dest: /etc/nginx/sites-available/
   notify:
     - "nginx changed"
 
 - name: Enable membres.epicerieledetour.org nginx configuration file
   file:
-    src: /etc/nginx/sites-available/membres.epicerieledetour.org.conf
-    dest: /etc/nginx/sites-enabled/membres.epicerieledetour.org.conf
+    src: /etc/nginx/sites-available/ledetour-membres.conf
+    dest: /etc/nginx/sites-enabled/ledetour-membres.conf
     state: link
+
+- name: Copying membres.epicerieledetour.org membres.json update systemd service file
+  copy:
+    src: systemd/update-ledetour-membres-data.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
+- name: Copying membres.epicerieledetour.org membres.json update systemd timer file
+  copy:
+    src: systemd/update-ledetour-membres-data.timer
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
+- name: Enable membres.epicerieledetour.org membres.json update systemd timer
+  systemd:
+    name: update-ledetour-membres-data.timer
+    state: started
+    enabled: yes

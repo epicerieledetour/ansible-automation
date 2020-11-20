@@ -1,0 +1,9 @@
+[Unit]
+Description=Update members.json file of ledetour-membres every hour
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1h
+
+[Install]
+WantedBy=timers.target

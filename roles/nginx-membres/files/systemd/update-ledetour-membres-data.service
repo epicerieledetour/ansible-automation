@@ -1,0 +1,6 @@
+[Unit]
+Description=Update members.json file of ledetour-membres
+
+[Service]
+Type=oneshot
+ExecStart=/var/www/ledetour-membres/scripts/get-members-json.sh /var/www/ledetour-membres/src/members.json
