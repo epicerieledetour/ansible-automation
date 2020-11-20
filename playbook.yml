@@ -10,6 +10,7 @@
   become: true
   roles:
     - nginx
+    - nginx-membres
     - grafana
 
 - name: Setup dataproxies

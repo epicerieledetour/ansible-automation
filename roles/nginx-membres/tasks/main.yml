@@ -1,0 +1,12 @@
+- name: Copy membres.epicerieledetour.org nginx configuration file
+  copy:
+    src: nginx/membres.epicerieledetour.org.conf
+    dest: /etc/nginx/sites-available/
+  notify:
+    - "nginx changed"
+
+- name: Enable membres.epicerieledetour.org nginx configuration file
+  file:
+    src: /etc/nginx/sites-available/membres.epicerieledetour.org.conf
+    dest: /etc/nginx/sites-enabled/membres.epicerieledetour.org.conf
+    state: link
