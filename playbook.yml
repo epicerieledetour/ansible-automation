@@ -2,6 +2,7 @@
   hosts: servers
   become: true
   roles:
+    - systemd
     - common
     - wireguard
 
@@ -9,6 +10,7 @@
   hosts: webservers
   become: true
   roles:
+    - systemd
     - nginx
     - nginx-membres
     - grafana
