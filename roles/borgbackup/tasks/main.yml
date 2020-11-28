@@ -38,7 +38,7 @@
     path: /usr/local/etc/borg/id_ssh_rsa
     comment: "{{ inventory_hostname }} borg"
     mode: 0400
-  register: borg_ssh
+  register: borg_repo_ssh
 
 - name: "Configure borg backup stores"
   include_tasks:

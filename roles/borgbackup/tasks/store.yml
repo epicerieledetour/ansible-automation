@@ -1,18 +1,31 @@
-- name: "Set ssh key for repo {{ borg_repo }}"
+- name: "Repo {{ borg_repo }}, store {{ borg_store_user }}@{{ borg_store_name }}: add public ssh key of repo to authorized_key"
   authorized_key:
     user: "{{ borg_store_user }}"
-    key: "{{ borg_ssh.public_key }}"
+    key: "{{ borg_repo_ssh.public_key }}"
     state: present
   when: borg_store_is_remote | bool
   delegate_to: "{{ borg_store_name }}"
 
-- name: Instanciate borg environment for repo {{ borg_store_name }} {{ borg_repo }}
+- name: "Repo {{ borg_repo }}, store {{ borg_store_user }}@{{ borg_store_name }}: gather store's ssh public keys"
+  command: "ssh-keyscan {{ borg_store_host }}"
+  register: borg_store_host_public_keys
+
+- name: "Repo {{ borg_repo }}, store {{ borg_store_user }}@{{ borg_store_name }}: register borg store hosts ssh public keys"
+  lineinfile:
+    dest: ~/.ssh/known_hosts
+    line: "{{ stdout_line }}"
+    create: true
+  with_items: "{{ borg_store_host_public_keys.stdout_lines }}"
+  loop_control:
+    loop_var: stdout_line
+
+- name: "Repo {{ borg_repo }}, store {{ borg_store_user }}@{{ borg_store_name }}: Instanciate borg environment on store"
   template:
     src: env.j2
     dest: "/usr/local/etc/borg/{{ borg_store_name }}.env"
     mode: 0400
 
-- name: Setup backup repository {{ borg_repo }}
+- name: "Repo {{ borg_repo }}, store {{ borg_store_user }}@{{ borg_store_name }}: Init backup repository"
   command: borg init --encryption=repokey
   register: borg_init
   changed_when: borg_init.rc == 0
@@ -21,9 +34,9 @@
     # TODO: this replicates env.j2
     BORG_PASSPHRASE: "{{ borg_passphrase }}"
     BORG_REPO: "{{ borg_repo }}"
-    BORG_RSH: "ssh -i {{ borg_ssh.filename }}"
+    BORG_RSH: "ssh -i {{ borg_repo_ssh.filename }}"
 
-- name: Start backup script timer
+- name: "Repo {{ borg_repo }}, store {{ borg_store_user }}@{{ borg_store_name }}: start backup script systemd timer"
   systemd:
     name: "backup@{{ borg_store_name }}.timer"
     enabled: true
