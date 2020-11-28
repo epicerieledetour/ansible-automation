@@ -2,11 +2,24 @@
   apt:
     pkg:
       - nginx
+      - ssl-cert  # For self-signed certificate
 
 - name: Open http port 80 for nginx
   ufw:
     rule: allow
     port: http
+
+- name: Open https port 443 for nginx
+  ufw:
+    rule: allow
+    port: https
+
+- name: Setup Nginx redirection HTTP -> HTTPS
+  copy:
+    src: always-https.conf
+    dest: /etc/nginx/conf.d/always-https.conf
+  notify:
+    - systemd changed
 
 - name: Remove Nginx default server config
   file:
