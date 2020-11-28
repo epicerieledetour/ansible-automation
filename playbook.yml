@@ -31,4 +31,5 @@
   hosts: "backuphead"
   become: true
   roles:
+    - systemd
     - borgbackup
