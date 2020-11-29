@@ -1,16 +1,24 @@
 # ansible-automation
 Automation of IT related tasks
 
+## The vault password file
+
+This playbook uses [Ansible Vaults](https://docs.ansible.com/ansible/latest/user_guide/vault.html). The password file, shared amongst Le Détour admins by an out-of-band mean of communication, is expected to be named `.vault-password.txt` in this cloned repo root folder.
+
 ## Install required roles
 
 ```sh
-ansible-galaxy install -r requirements.yml
+ansible-galaxy collection install -r requirements.yml
+ansible-galaxy role install -r requirements.yml
+
+# TODO: When Ansible 2.10 is released, this should be enough
+# ansible-galaxy install -r requirements.yml
 ```
 
 ## Production mode
 
 ```sh
-ansible-playbook --vault-id @prompt secret.yml playbook.yml
+ansible-playbook playbook.yml
 ```
 
 ## First setup of a production machine
