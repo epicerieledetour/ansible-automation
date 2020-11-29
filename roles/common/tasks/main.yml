@@ -2,6 +2,11 @@
   hostname:
     name: "{{ inventory_hostname }}"
 
+- name: Ensure hostname points to 127.0.0.1 in /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "127.0.0.1\t{{ inventory_hostname }}"
+
 - name: Setup charlesfleches keys
   authorized_key:
     user: "{{ ansible_user }}"
