@@ -19,11 +19,11 @@
     src: always-https.conf
     dest: /etc/nginx/conf.d/always-https.conf
   notify:
-    - systemd changed
+    - nginx changed
 
 - name: Remove Nginx default server config
   file:
     path: /etc/nginx/sites-enabled/default
     state: absent
   notify:
-    - "nginx changed"
+    - nginx changed
