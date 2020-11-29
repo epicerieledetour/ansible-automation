@@ -14,6 +14,12 @@
     rule: allow
     port: https
 
+- name: Allow TLSv1.2 and TLSv1.3 only. See https://blog.qualys.com/product-tech/2018/11/19/grade-change-for-tls-1-0-and-tls-1-1-protocols
+  lineinfile:
+    path: /etc/nginx/nginx.conf
+    regexp: '^\t*ssl_protocols'
+    line: "\tssl_protocols TLSv1.2 TLSv1.3;  # Set by Ansible"
+
 - name: Setup Nginx redirection HTTP -> HTTPS
   copy:
     src: always-https.conf
