@@ -1,1 +1,9 @@
-- name: cloudalchemy.grafana
+---
+roles:
+  - name: cloudalchemy.grafana
+    version: 0.18.0
+
+collections:
+  - name: community.general
+    version: 1.3.0
+    source: https://galaxy.ansible.com
