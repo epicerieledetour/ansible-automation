@@ -5,17 +5,17 @@ charles-xps15
 
 [servers]
 vps
-b7server
+# b7server
 
 [webservers]
 vps
 
 [borgstores]
-b7server
+# b7server
 
 [dataproxies]
-b7server
+# b7server
 
 [backuphead]
 vps
-b7server
+# b7server

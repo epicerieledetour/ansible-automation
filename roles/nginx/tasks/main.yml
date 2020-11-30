@@ -2,7 +2,10 @@
   apt:
     pkg:
       - nginx
-      - ssl-cert  # For self-signed certificate
+
+- name: "Configure ssl by including ssl-cert{{ deployment_suffix }}.yml"
+  include_tasks:
+    file: "ssl-cert{{ deployment_suffix }}.yml"
 
 - name: Open http port 80 for nginx
   ufw:

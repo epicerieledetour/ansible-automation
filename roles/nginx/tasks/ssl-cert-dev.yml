@@ -1,0 +1,4 @@
+- name: Install ssl-cert for self-signed certificate
+  apt:
+    pkg:
+      - ssl-cert

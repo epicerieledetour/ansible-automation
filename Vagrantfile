@@ -111,6 +111,9 @@ Vagrant.configure("2") do |config|
           "wireguard_endpoint_address" => "192.168.1.11"
         }
       }
+      ansible.extra_vars = {
+        "deployment_is_vagrant": true
+      }
     end
   end
 end

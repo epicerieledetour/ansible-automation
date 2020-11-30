@@ -1,3 +1,16 @@
+- name: "Setting deployment_suffix: -dev"
+  set_fact:
+    deployment_suffix: "-dev"
+  when: (deployment_is_vagrant is defined) and (deployment_is_vagrant|bool)
+
+- name: "Setting deployment_suffix: -prod"
+  set_fact:
+    deployment_suffix: "-prod"
+  when: deployment_is_vagrant is undefined
+
+- debug:
+    var: deployment_suffix
+
 - name: Ensure hostname
   hostname:
     name: "{{ inventory_hostname }}"

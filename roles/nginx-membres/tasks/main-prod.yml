@@ -1,0 +1,16 @@
+- set_fact:
+    membres_ssl_snippet_conf: certbot-membres.epicerieledetour.org.conf
+    membres_server_fqdn: membres.epicerieledetour.org
+
+- name: Generate membres certbot SSL certificate
+  command:
+    cmd: "/snap/bin/certbot certonly --agree-tos -n --nginx -m contact@epicerieledetour.org -d {{ membres_server_fqdn }}"
+    creates: "/etc/letsencrypt/live/{{ membres_server_fqdn }}/fullchain.pem"
+
+- name: Instanciate membres nginx SSL config
+  template:
+    src: certbot.conf.j2
+    dest: "/etc/nginx/snippets/{{ membres_ssl_snippet_conf }}"
+    mode: u=r,g=r,o=r
+  notify:
+    - "nginx changed"

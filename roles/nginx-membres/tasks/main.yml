@@ -8,17 +8,21 @@
     repo: 'https://github.com/epicerieledetour/ledetour-membres.git'
     dest: /var/www/ledetour-membres
 
-- name: Copy membres.epicerieledetour.org nginx configuration file
-  copy:
-    src: nginx/ledetour-membres.conf
-    dest: /etc/nginx/sites-available/
+- include_tasks:
+    file: "main{{ deployment_suffix }}.yml"
+
+- name: Instanciate membres nginx config
+  template:
+    src: membres.conf.j2
+    dest: /etc/nginx/sites-available/membres.conf
+    mode: u=r,g=r,o=r
   notify:
     - "nginx changed"
 
 - name: Enable membres.epicerieledetour.org nginx configuration file
   file:
-    src: /etc/nginx/sites-available/ledetour-membres.conf
-    dest: /etc/nginx/sites-enabled/ledetour-membres.conf
+    src: /etc/nginx/sites-available/membres.conf
+    dest: /etc/nginx/sites-enabled/membres.conf
     state: link
 
 - name: Copying membres.epicerieledetour.org membres.json update systemd service file

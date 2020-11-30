@@ -1,9 +1,13 @@
 # nginx
 
-- name: Copy grafana's nginx configuration file
-  copy:
-    src: nginx/grafana.conf  # TODO: move to files
-    dest: /etc/nginx/sites-available/
+- include_tasks:
+    file: "main{{ deployment_suffix }}.yml"
+
+- name: Instanciate grafana nginx config
+  template:
+    src: grafana.conf.j2
+    dest: /etc/nginx/sites-available/grafana.conf
+    mode: u=r,g=r,o=r
   notify:
     - "nginx changed"
 
@@ -13,7 +17,7 @@
     dest: /etc/nginx/sites-enabled/grafana.conf
     state: link
 
-# This guide has been useful in setting up InfluxDB / telegraf / grafaana
+# This guide has been useful in setting up InfluxDB / telegraf / grafana
 # https://www.howtoforge.com/tutorial/how-to-install-tig-stack-telegraf-influxdb-and-grafana-on-ubuntu-1804/
 
 # Grafana

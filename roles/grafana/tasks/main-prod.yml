@@ -1,0 +1,16 @@
+- set_fact:
+    grafana_ssl_snippet_conf: certbot-grafana.epicerieledetour.org.conf
+    grafana_server_fqdn: grafana.epicerieledetour.org
+
+- name: Generate grafana certbot SSL certificate
+  command:
+    cmd: "/snap/bin/certbot certonly --agree-tos -n --nginx -m contact@epicerieledetour.org -d {{ grafana_server_fqdn }}"
+    creates: "/etc/letsencrypt/live/{{ grafana_server_fqdn }}/fullchain.pem"
+
+- name: Instanciate grafana nginx SSL config
+  template:
+    src: certbot.conf.j2
+    dest: "/etc/nginx/snippets/{{ grafana_ssl_snippet_conf }}"
+    mode: u=r,g=r,o=r
+  notify:
+    - "nginx changed"

@@ -1,0 +1,15 @@
+- name: Production deployment, install snapd
+  apt:
+    pkg:
+      - snapd
+
+- name: Production deployment, refresh snapd core
+  community.general.snap:
+    name:
+      - core
+
+- name: Production deployment, install certbot
+  community.general.snap:
+    name:
+      - certbot
+    classic: true

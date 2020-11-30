@@ -2,9 +2,9 @@ server {
   listen 443 ssl http2;
   listen [::]:443 ssl http2;
 
-  include snippets/snakeoil.conf;
+  include snippets/{{ membres_ssl_snippet_conf }};
 
-  server_name membres.*;
+  server_name {{ membres_server_fqdn }};
 
   root /var/www/ledetour-membres/src;
   index index.html;

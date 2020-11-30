@@ -2,9 +2,9 @@ server {
   listen 443 ssl http2;
   listen [::]:443 ssl http2;
 
-  include snippets/snakeoil.conf;
+  include snippets/{{ grafana_ssl_snippet_conf }};
 
-  server_name grafana.*;
+  server_name {{ grafana_server_fqdn }};
 
   location / {
     proxy_pass http://localhost:3000/;
