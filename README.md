@@ -3,7 +3,7 @@ Automation of IT related tasks
 
 ## The vault password file
 
-This playbook uses [Ansible Vaults](https://docs.ansible.com/ansible/latest/user_guide/vault.html). The password file, shared amongst Le Détour admins by an out-of-band mean of communication, is expected to be named `.vault-password.txt` in this cloned repo root folder.
+This playbook uses [Ansible Vaults](https://docs.ansible.com/ansible/latest/user_guide/vault.html). The password file, GPG encryped and shared amongst Le Détour admins by an out-of-band mean of communication, is expected to be named `.vault_password.gpg` in this cloned repo root folder.
 
 ## Install required roles
 

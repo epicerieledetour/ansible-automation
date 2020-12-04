@@ -3,7 +3,7 @@
 .vagrant
 
 # Ansible
-.vault-password.txt
+.vault_password.gpg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
