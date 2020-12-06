@@ -7,17 +7,18 @@ mauriandres-workstation
 
 [servers]
 vps
-laptopserver
+#laptopserver
 
 [webservers]
 vps
 
 [borgstores]
-laptopserver
+#laptopserver
 
 [dataproxies]
-laptopserver
+#laptopserver
 
 [backuphead]
 vps
-laptopserver
+#laptopserver
+
