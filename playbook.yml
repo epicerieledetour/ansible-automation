@@ -6,21 +6,6 @@
     - common
     - wireguard
 
-- name: "Setup web applications"
-  hosts: webservers
-  become: true
-  roles:
-    - systemd
-    - nginx
-    - nginx-membres
-    - grafana
-
-- name: Setup dataproxies
-  hosts: dataproxies
-  become: true
-  roles:
-    - gdrivesync
-
 - name: Setup borg repository stores
   hosts: borgstores
   become: true
@@ -33,3 +18,19 @@
   roles:
     - systemd
     - borgbackup
+
+- name: Setup dataproxies
+  hosts: dataproxies
+  become: true
+  roles:
+    - systemd
+    - gdrivesync
+
+- name: "Setup web applications"
+  hosts: webservers
+  become: true
+  roles:
+    - systemd
+    - nginx
+    - nginx-membres
+    - grafana

@@ -3,16 +3,6 @@
     pkg:
       - rclone
 
-- name: Copying google drive sync script systemd service
-  copy:
-    src: rclone-drive@.service
-    dest: /etc/systemd/system/
-
-- name: Copying google drive sync script systemd timer
-  copy:
-    src: rclone-drive@.timer
-    dest: /etc/systemd/system/
-
 - name: Make/usr/local/etc/rclone directory
   file:
     path: /usr/local/etc/rclone
@@ -36,6 +26,20 @@
     path: /srv/rclone
     state: directory
     mode: 0700
+
+- name: Copying google drive sync script systemd service
+  copy:
+    src: rclone-drive@.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
+- name: Copying google drive sync script systemd timer
+  copy:
+    src: rclone-drive@.timer
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
 
 - name: Register Drive sync timers
   systemd:
