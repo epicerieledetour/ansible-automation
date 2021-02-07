@@ -8,9 +8,6 @@
     deployment_suffix: "-prod"
   when: deployment_is_vagrant is undefined
 
-- debug:
-    var: deployment_suffix
-
 - name: Ensure hostname
   hostname:
     name: "{{ inventory_hostname }}"
