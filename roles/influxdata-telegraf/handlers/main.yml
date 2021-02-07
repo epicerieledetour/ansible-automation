@@ -2,4 +2,4 @@
   systemd:
     name: telegraf
     state: reloaded
-  listen: "telegraf changed"
+  listen: telegraf-changed

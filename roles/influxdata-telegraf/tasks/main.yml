@@ -1,0 +1,26 @@
+- name: Install telegraf
+  apt:
+    pkg:
+      - telegraf
+
+- name: Build the initial empty list of influxdb urls
+  set_fact:
+    influxdb_urls: []
+
+- name: Build the list of influxdb urls
+  set_fact:
+    influxdb_urls: "{{ influxdb_urls }} + [ 'http://{{ hostvars[item].wireguard_address }}:8086' ]"
+  with_items: "{{ groups['webservers'] }}"
+
+- name: Install telegraf.conf
+  template:
+    src: telegraf.conf.j2
+    dest: /etc/telegraf/telegraf.conf
+  notify:
+    - telegraf-changed
+
+- name: Start telegraf
+  systemd:
+      name: telegraf
+      enabled: true
+      state: started

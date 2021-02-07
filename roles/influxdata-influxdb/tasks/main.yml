@@ -1,0 +1,16 @@
+- name: Install influxdb
+  apt:
+    pkg:
+      - influxdb
+
+- name: Open port 8086 for influxdb on wireguard network
+  ufw:
+    rule: allow
+    port: "8086"
+    from_ip: 192.168.211.0/24
+
+- name: Start InfluxDB
+  systemd:
+      name: influxdb
+      enabled: true
+      state: started

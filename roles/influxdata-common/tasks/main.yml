@@ -1,0 +1,13 @@
+- name: Add influxdata repository key
+  apt_key:
+      url: 'https://repos.influxdata.com/influxdb.key'
+      state: present
+
+- name:  Add influxdata repository
+  apt_repository:
+      repo: 'deb https://repos.influxdata.com/debian buster stable'
+      state: present
+
+- name: Update apt cache for influxdata repository
+  apt:
+    update_cache: yes
