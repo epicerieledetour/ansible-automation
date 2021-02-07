@@ -38,7 +38,7 @@
     path: /usr/local/etc/borg/id_ssh_rsa
     comment: "{{ inventory_hostname }} borg"
     mode: 0400
-  register: borg_repo_ssh
+  register: borg_head_ssh
 
 - name: "Configure borg backup stores"
   include_tasks:
@@ -47,7 +47,7 @@
   vars:
     borg_store_host: "{{ hostvars[item].wireguard_address }}"
     borg_store_is_remote: "{{ borg_store_host != wireguard_address }}"
-    borg_store_name: "{{ item }}"
+    borg_store_inventory_hostname: "{{ item }}"
     borg_store_user: "{{ hostvars[item].ansible_user }}"
-    borg_repo_name: "{{ inventory_hostname }}"
     borg_repo: "{% if borg_store_is_remote | bool %}{{ borg_store_user }}@{{ borg_store_host }}:{% endif %}/srv/borg/{{ inventory_hostname }}"
+    borg_task_name_prefix: "borg store {{ borg_store_inventory_hostname }}"
