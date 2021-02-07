@@ -45,6 +45,7 @@
   apt:
     pkg:
       - aptitude
+      - ca-certificates
       - fail2ban
       - python3
       - unattended-upgrades
