@@ -37,7 +37,7 @@ Vagrant.configure("2") do |config|
     # using a specific IP.
     # config.vm.network "private_network", ip: "192.168.33.10"
     # vps.vm.network "private_network", ip: "192.168.2.10", virtualbox__intnet: "laptopserver-internet"
-    # vps.vm.network "private_network", ip: "192.168.3.10", virtualbox__intnet: "b7server-internet"
+    # vps.vm.network "private_network", ip: "192.168.3.10", virtualbox__intnet: "raspberrypi-internet"
 
     vps.vm.network "private_network", ip: "192.168.1.11"
 
@@ -87,24 +87,24 @@ Vagrant.configure("2") do |config|
     laptopserver.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
-  config.vm.define "b7server" do |b7server|
-    b7server.vm.hostname = "b7server"
-    b7server.vm.box = "debian/buster64"
-    b7server.vm.network "private_network", ip: "192.168.1.13"
-    b7server.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.define "raspberrypi" do |raspberrypi|
+    raspberrypi.vm.hostname = "raspberrypi"
+    raspberrypi.vm.box = "debian/buster64"
+    raspberrypi.vm.network "private_network", ip: "192.168.1.13"
+    raspberrypi.vm.synced_folder ".", "/vagrant", disabled: true
 
     # Provision is defined in last machine so Ansible runs once
     # all machines are defined
     # https://www.vagrantup.com/docs/provisioning/ansible.html#ansible-parallel-execution
-    b7server.vm.provision "ansible" do |ansible|
+    raspberrypi.vm.provision "ansible" do |ansible|
       ansible.limit = "all"
       ansible.playbook = "playbook.yml"
       ansible.groups = {
-        "servers": ["vps", "laptopserver", "b7server"],
+        "servers": ["vps", "laptopserver", "raspberrypi"],
         "webservers": ["vps"],
         "dataproxies": ["laptopserver"],
         "backuphead": ["vps", "laptopserver"],
-        "borgstores": ["laptopserver", "b7server"]
+        "borgstores": ["laptopserver", "raspberrypi"]
       }
       ansible.host_vars = {
         "vps" => {
