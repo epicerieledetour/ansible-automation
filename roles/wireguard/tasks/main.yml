@@ -20,14 +20,14 @@
   notify:
     - reload wireguard
 
-- name: Start wireguard systemd service wg-quick@wg-ledetour.service
-  systemd:
-    name: wg-quick@wg-ledetour.service
-    enabled: yes
-    state: started
-
 - name: Open wireguard port
   ufw:
     rule: allow
     proto: udp
     port: '"{{ wireguard_endpoint_port }}"'
+
+- name: Start wireguard systemd service wg-quick@wg-ledetour.service
+  systemd:
+    name: wg-quick@wg-ledetour.service
+    enabled: yes
+    state: started
