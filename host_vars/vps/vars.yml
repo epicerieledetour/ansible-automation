@@ -1,4 +1,3 @@
-architecture: cloud-amd64
 borg_passphrase: "{{ vault_borg_passphrase }}"
 wireguard_type: endpoint
 wireguard_address: 192.168.211.10
