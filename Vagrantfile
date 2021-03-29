@@ -102,13 +102,16 @@ Vagrant.configure("2") do |config|
       ansible.groups = {
         "servers": ["vps", "laptopserver", "raspberrypi"],
         "webservers": ["vps"],
-        "dataproxies": ["laptopserver"],
-        "backuphead": ["vps", "laptopserver"],
-        "borgstores": ["laptopserver", "raspberrypi"]
+        "dataproxies": ["laptopserver", "raspberrypi"],
+        "backuphead": ["vps", "raspberrypi"],
+        "borgstores": ["raspberrypi"]
       }
       ansible.host_vars = {
         "vps" => {
           "wireguard_endpoint_address" => "192.168.1.11"
+        },
+        "raspberrypi" => {
+          "is_raspberry_pi_os" => false
         }
       }
       ansible.extra_vars = {

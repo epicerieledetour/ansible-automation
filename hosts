@@ -8,16 +8,18 @@ mauriandres-workstation
 [servers]
 vps
 laptopserver
+raspberrypi
 
 [webservers]
 vps
 
 [borgstores]
-laptopserver
+raspberrypi
 
 [dataproxies]
 laptopserver
+raspberrypi
 
 [backuphead]
 vps
-laptopserver
+raspberrypi

@@ -1,9 +1,9 @@
 # TODO: use apt_repository
-- name: Copy /etc/apt/sources.list.d/buster-backports.list
+- name: Copy /etc/apt/sources.list.d/buster-backports.list if OS is debian, but not Raspberry PI OS
   copy:
     src: buster-backports.list
     dest: /etc/apt/sources.list.d
-  when: ansible_hostname != "raspberrypi"
+  when: is_raspberry_pi_os is undefined
 
 - name: Install wireguard
   apt:
