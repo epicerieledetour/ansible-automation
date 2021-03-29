@@ -3,6 +3,7 @@
   copy:
     src: buster-backports.list
     dest: /etc/apt/sources.list.d
+  when: ansible_hostname != "raspberrypi"
 
 - name: Install wireguard
   apt:
