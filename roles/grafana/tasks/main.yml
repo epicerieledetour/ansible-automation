@@ -79,26 +79,32 @@
 
 - name: Loki Download
   get_url:
-      url: "https://github.com/grafana/loki/releases/download/v1.5.0/loki-linux-amd64.zip"
-      checksum: sha256:00b4f134d8e54ce4dfb1ce71ffff3e5505202fa13625ec96cec75d44b816ed34
-      dest: /tmp/loki-v1.5.0-linux-amd64.zip
+      url: "https://github.com/grafana/loki/releases/download/v2.2.0/loki-linux-amd64.zip"
+      checksum: sha256:3d06f27e1e2ac5fa15261918bd14bb5da24988981634ea09855f8c67a3ba9ae3
+      dest: /tmp/loki-v2.2.0-linux-amd64.zip
 
 - name: Unzip Loki
   unarchive:
-      src: /tmp/loki-v1.5.0-linux-amd64.zip
+      src: /tmp/loki-v2.2.0-linux-amd64.zip
       dest: /usr/local/bin/
       remote_src: yes
       mode: "a+x"
+  notify:
+    - loki changed
 
 - name: Copying Loki systemd service config
   copy:
       src: loki.service
       dest: /etc/systemd/system/
+  notify:
+    - loki changed
 
 - name: Copying Loki config
   copy:
       src: config-loki.yml
       dest: /usr/local/bin/
+  notify:
+    - loki changed
 
 - name: Start Loki
   systemd:
@@ -112,26 +118,32 @@
 
 - name: Promtail Download
   get_url:
-      url: "https://github.com/grafana/loki/releases/download/v1.5.0/promtail-linux-amd64.zip"
-      checksum: sha256:6695ea8d0c831c0ccab3abfac9e3bdf065e83887d540583b8e28644168ca038c
-      dest: /tmp/promtail-v1.5.0-linux-amd64.zip
+      url: "https://github.com/grafana/loki/releases/download/v2.2.0/promtail-linux-amd64.zip"
+      checksum: sha256:8a0e1020381873b0111d7f6951c904e427271d4a9342adaa643c1580e23d31ec
+      dest: /tmp/promtail-v2.2.0-linux-amd64.zip
 
 - name: Unzip Promtail
   unarchive:
-      src: /tmp/promtail-v1.5.0-linux-amd64.zip
+      src: /tmp/promtail-v2.2.0-linux-amd64.zip
       dest: /usr/local/bin/
       remote_src: yes
       mode: "a+x"
+  notify:
+    - promtail changed
 
 - name: Copying Promtail service config
   copy:
       src: promtail.service
       dest: /etc/systemd/system/
+  notify:
+    - promtail changed
 
 - name: Copying promtail config
   copy:
       src: config-promtail.yml
       dest: /usr/local/bin/
+  notify:
+    - promtail changed
 
 - name: Start promtail
   systemd:

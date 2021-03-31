@@ -1,0 +1,11 @@
+- name: Reload loki
+  systemd:
+    name: loki
+    state: restarted
+  listen: "loki changed"
+
+- name: Reload promtail
+  systemd:
+    name: promtail
+    state: restarted
+  listen: "promtail changed"
