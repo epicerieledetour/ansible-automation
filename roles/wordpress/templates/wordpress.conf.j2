@@ -1,0 +1,51 @@
+# Upstream to abstract backend connection(s) for php
+upstream php {
+  server unix:/tmp/php-cgi.socket;
+  server 127.0.0.1:9000;
+}
+
+server {
+  listen 443 ssl http2;
+  listen [::]:443 ssl http2;
+
+  include snippets/{{ wordpress_ssl_snippet_conf }};
+
+  ## Your website name goes here.
+  server_name {{ wordpress_server_fqdn }};
+  ## Your only path reference.
+  root /srv/www/wordpress-5.7/wordpress;
+  ## This should be in your http block and if it is, it's not needed here.
+  index index.php;
+
+  location = /favicon.ico {
+    log_not_found off;
+    access_log off;
+  }
+
+  location = /robots.txt {
+    allow all;
+    log_not_found off;
+    access_log off;
+  }
+
+  location / {
+    # This is cool because no php is touched for static content.
+    # include the "?$args" part so non-default permalinks doesn't break when using query string
+    try_files $uri $uri/ /index.php?$args;
+  }
+
+  location ~ \.php$ {
+    # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+    include snippets/fastcgi-php.conf;
+    fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+  }
+
+  location ~ /\.ht {
+    deny all;
+  }
+
+  location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+    expires max;
+    log_not_found off;
+  }
+}

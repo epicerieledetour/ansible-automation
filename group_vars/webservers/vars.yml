@@ -1,0 +1,11 @@
+google_auth_client_id: 666389311813-bkam02fjjruohg1hb6qt4mc61qf6rhn6.apps.googleusercontent.com
+google_auth_client_secret: "{{ vault_google_auth_client_secret }}"
+wordpress_db_password: "{{ vault_wordpress_db_password }}"
+wordpress_auth_key: "{{ vault_wordpress_auth_key }}"
+wordpress_secure_auth_key: "{{ vault_wordpress_secure_auth_key }}"
+wordpress_logged_in_key: "{{ vault_wordpress_logged_in_key }}"
+wordpress_nonce_key: "{{ vault_wordpress_nonce_key }}"
+wordpress_auth_salt: "{{ vault_wordpress_auth_salt }}"
+wordpress_secure_auth_salt: "{{ vault_wordpress_secure_auth_salt }}"
+wordpress_logged_in_salt: "{{ vault_wordpress_logged_in_salt }}"
+wordpress_nonce_salt: "{{ vault_wordpress_nonce_salt }}"

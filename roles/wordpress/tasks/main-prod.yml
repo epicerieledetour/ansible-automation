@@ -1,0 +1,16 @@
+- set_fact:
+    wordpress_ssl_snippet_conf: certbot-wordpress.epicerieledetour.org.conf
+    wordpress_server_fqdn: wordpress.epicerieledetour.org
+
+- name: Generate wordpress certbot SSL certificate
+  command:
+    cmd: "/snap/bin/certbot certonly --agree-tos -n --nginx -m contact@epicerieledetour.org -d {{ wordpress_server_fqdn }}"
+    creates: "/etc/letsencrypt/live/{{ wordpress_server_fqdn }}/fullchain.pem"
+
+- name: Instanciate wordpress nginx SSL config
+  template:
+    src: certbot.conf.j2
+    dest: "/etc/nginx/snippets/{{ wordpress_ssl_snippet_conf }}"
+    mode: u=r,g=r,o=r
+  notify:
+    - nginx changed

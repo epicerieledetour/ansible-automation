@@ -1,0 +1,10 @@
+vault_google_auth_client_secret: OH6y46id0uLCao8ao07epSzi
+vault_wordpress_db_password: keethoshiej5AiNeidahsizaiceo1pho9gaeZai1yae4IeGhoe2fa8eaxooroo8i
+vault_wordpress_auth_key: "h|Uds:b?l Reffw>,AP_=9[1G&CTG=Gd!?-#P1.OY|kEq<[%GZ*wci5JO;[!9%]7"
+vault_wordpress_secure_auth_key: "8(v&rs)qJ7(rvT{4:8@%d-CFS>i+<X9#}=2XH|V|GsFZ[us++F%VfiB+8?WXpNw>"
+vault_wordpress_logged_in_key: "-bAba0IAaS$0UG6c=4.90zM6X2YL`w+}62VEwk*=Dpa6Bt8uBnz+fY+9c1Z9{D`E"
+vault_wordpress_nonce_key: "q,^,pj-TGqu<W}u4,<!g^eM}_/bPlC1ca0/`|$9Swomz(/(~Gli&1KLDzWvr{ 9u"
+vault_wordpress_auth_salt: "*VeO1#LQ4^~VzLv,kx6i|]]1eJ}tv 7UZs<3]&L6o@=l`L*6Phlk` F)^z}h/jsi"
+vault_wordpress_secure_auth_salt: "BCo5/A;B|P:dH_wDkRF0AnGl~JC$avuC4Q/#VEKF#9TT5(c9Gq,1hP*:*G-b5?5g"
+vault_wordpress_logged_in_salt: "*ui;%R2=FhHW:$.S8:`I{WE^ajd9l,Xc6RMsBR7Pb<ib>?L*-C-jiw11aW2+ IX="
+vault_wordpress_nonce_salt: "/J$W.-.JF|KM&*zU#-6{_7(y-xK(?Z]$Y*uH7ybWW`RS{=[(_5~YsG_fEQ3+QV~~"

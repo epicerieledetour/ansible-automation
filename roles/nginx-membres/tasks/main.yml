@@ -17,7 +17,7 @@
     dest: /etc/nginx/sites-available/membres.conf
     mode: u=r,g=r,o=r
   notify:
-    - "nginx changed"
+    - nginx changed
 
 - name: Enable membres.epicerieledetour.org nginx configuration file
   file:

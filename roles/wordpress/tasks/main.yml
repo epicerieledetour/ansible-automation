@@ -1,0 +1,82 @@
+# MariaDB
+
+- name: Install MariaDB and PHP
+  apt:
+    pkg:
+      - mariadb-server
+      - php-fpm
+      - php-mysql
+      - python3-pymysql  # For the community.mysql.* modules
+
+- name: Create a new database with name 'wordpress'
+  community.mysql.mysql_db:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    name: wordpress
+    state: present
+
+- name: Removes all MariaDB anonymous user accounts
+  community.mysql.mysql_user:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    name: ''
+    host_all: yes
+    state: absent
+
+- name: Create MariaDB Wordpress user
+  community.mysql.mysql_user:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    state: present
+    name: wordpress
+    password: "{{ wordpress_db_password }}"
+    priv:
+      'wordpress.*': 'ALL,GRANT'
+
+# Wordpress
+
+- name: Download Wordpress 5.7 tarball
+  get_url:
+      url: "https://wordpress.org/wordpress-5.7.tar.gz"
+      checksum: sha1:76d1332cfcbc5f8b17151b357999d1f758faf897
+      dest: /tmp/wordpress-5.7.tar.gz
+
+- name: Make directory /srv/www/wordpress-5.7
+  file:
+    path: /srv/www/wordpress-5.7
+    state: directory
+
+- name: Unzip Wordpress
+  unarchive:
+      src: /tmp/wordpress-5.7.tar.gz
+      dest: /srv/www/wordpress-5.7
+      creates: /srv/www/wordpress-5.7/wordpress
+      remote_src: yes
+      mode: "a+x"
+
+- name: Remove wp-config-sample.php
+  file:
+    path: /srv/www/wordpress-5.7/wordpress/wp-config-sample.php
+    state: absent
+
+- name: Instanciate Wordpress wp-config.php
+  template:
+    src: wp-config.php.j2
+    dest: /srv/www/wordpress-5.7/wordpress/wp-config.php
+    mode: u=rw,g=r,o=r
+
+# Nginx
+
+- include_tasks:
+    file: "main{{ deployment_suffix }}.yml"
+
+- name: Instanciate Wordpress nginx config
+  template:
+    src: wordpress.conf.j2
+    dest: /etc/nginx/sites-available/wordpress.conf
+    mode: u=r,g=r,o=r
+  notify:
+    - nginx changed
+
+- name: Enable wordpress.epicerieledetour.org nginx config
+  file:
+    src: /etc/nginx/sites-available/wordpress.conf
+    dest: /etc/nginx/sites-enabled/wordpress.conf
+    state: link

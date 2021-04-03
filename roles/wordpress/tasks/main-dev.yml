@@ -1,0 +1,3 @@
+- set_fact:
+    wordpress_ssl_snippet_conf: snakeoil.conf
+    wordpress_server_fqdn: "wordpress.*"
