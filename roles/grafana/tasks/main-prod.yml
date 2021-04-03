@@ -9,7 +9,7 @@
 
 - name: Instanciate grafana nginx SSL config
   template:
-    src: certbot.conf.j2
+    src: nginx/certbot.conf.j2
     dest: "/etc/nginx/snippets/{{ grafana_ssl_snippet_conf }}"
     mode: u=r,g=r,o=r
   notify:

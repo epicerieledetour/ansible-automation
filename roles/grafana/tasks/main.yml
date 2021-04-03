@@ -5,7 +5,7 @@
 
 - name: Instanciate grafana nginx config
   template:
-    src: grafana.conf.j2
+    src: nginx/grafana.conf.j2
     dest: /etc/nginx/sites-available/grafana.conf
     mode: u=r,g=r,o=r
   notify:
@@ -22,31 +22,6 @@
 
 # Grafana
 
-- name: Copying grafana logs dashboard
-  copy:
-    src: logs.json
-    dest: /var/lib/grafana/dashboards/
-
-- name: Execute cloudalchemy.grafana role
-  include_role:
-    name: cloudalchemy.grafana
-  vars:
-    grafana_security:
-      admin_user: admin
-      admin_password: admin  # TODO: replace and encrypt
-    grafana_datasources:
-      - name: telegraf
-        type: influxdb
-        url: 'http://localhost:8086'
-        database: telegraf
-      - name: loki
-        type: loki
-        url: 'http://localhost:3100'
-    grafana_dashboards:
-      - dashboard_id: 5955
-        revision_id: 1
-        datasource: telegraf
-
 - name: Add Grafana repository key
   apt_key:
       url: 'https://packages.grafana.com/gpg.key'
@@ -62,6 +37,35 @@
     update_cache: yes
     pkg:
       - grafana
+
+- name: Instanciate grafana config
+  template:
+    src: grafana/grafana.ini.j2
+    dest: /etc/grafana/grafana.ini
+    mode: u=rw,g=r
+  notify:
+    - "grafana changed"
+
+- name: Copy grafana dashboards
+  copy:
+    src: grafana/dashboards/
+    dest: /var/lib/grafana/dashboards/
+    owner: root
+    group: grafana
+    mode: u=rw,g=r
+  notify:
+    - grafana changed
+
+- name: Copy grafana provisioning files
+  copy:
+    src: grafana/provisioning/
+    dest: /etc/grafana/provisioning/
+    owner: root
+    group: grafana
+    mode: u=rw,g=r
+    directory_mode: u=rwx,g=rx,o=rx
+  notify:
+    - grafana changed
 
 - name: Start Grafana
   systemd:
@@ -94,14 +98,14 @@
 
 - name: Copying Loki systemd service config
   copy:
-      src: loki.service
+      src: loki/loki.service
       dest: /etc/systemd/system/
   notify:
     - loki changed
 
 - name: Copying Loki config
   copy:
-      src: config-loki.yml
+      src: loki/config-loki.yml
       dest: /usr/local/bin/
   notify:
     - loki changed
@@ -133,14 +137,14 @@
 
 - name: Copying Promtail service config
   copy:
-      src: promtail.service
+      src: promtail/promtail.service
       dest: /etc/systemd/system/
   notify:
     - promtail changed
 
 - name: Copying promtail config
   copy:
-      src: config-promtail.yml
+      src: promtail/config-promtail.yml
       dest: /usr/local/bin/
   notify:
     - promtail changed

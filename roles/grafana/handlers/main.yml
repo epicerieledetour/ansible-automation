@@ -1,3 +1,9 @@
+- name: Reload grafana
+  systemd:
+    name: grafana-server
+    state: restarted
+  listen: "grafana changed"
+
 - name: Reload loki
   systemd:
     name: loki
