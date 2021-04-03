@@ -2,6 +2,7 @@
   hosts: servers
   become: true
   roles:
+    - common-facts
     - systemd
     - common
     - wireguard

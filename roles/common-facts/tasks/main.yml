@@ -1,0 +1,17 @@
+- name: "Setting deployment_is_vagrant"
+  set_fact:
+    deployment_is_vagrant: "{{ deployment_is_vagrant | default(False) }}"
+    deployment_is_prod: "{{ not (deployment_is_vagrant | default(False)) }}"
+    deployment_suffix: "{{ '-dev' if deployment_is_vagrant | default(False) else '-prod' }}"
+
+- name: "Fact: deployment_is_vagrant"
+  debug:
+    var: deployment_is_vagrant
+
+- name: "Fact: deployment_is_prod"
+  debug:
+    var: deployment_is_prod
+
+- name: "Fact: deployment_suffix"
+  debug:
+    var: deployment_suffix
