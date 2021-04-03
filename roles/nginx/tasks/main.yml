@@ -1,3 +1,13 @@
+- name: Add Nginx repository key
+  apt_key:
+      url: 'https://nginx.org/keys/nginx_signing.key'
+      state: present
+
+- name: Add Nginx mainline repository
+  apt_repository:
+      repo: deb https://nginx.org/packages/mainline/debian buster nginx
+      state: present
+
 - name: Install nginx
   apt:
     pkg:
