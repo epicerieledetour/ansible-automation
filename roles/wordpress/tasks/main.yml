@@ -4,6 +4,7 @@
   apt:
     pkg:
       - mariadb-server
+      - php-curl  # For wordpress plugin miniOrange OAuth Single Sign On
       - php-fpm
       - php-mysql
       - python3-pymysql  # For the community.mysql.* modules
