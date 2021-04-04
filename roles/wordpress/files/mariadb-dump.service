@@ -1,0 +1,6 @@
+[Unit]
+Description="Dump all MariaDB databases"
+
+[Service]
+ExecStart=mysqldump --skip-dump-date --all-databases --result-file=/srv/mariadb-dump.sql
+Type=oneshot

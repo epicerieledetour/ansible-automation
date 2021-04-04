@@ -1,0 +1,10 @@
+[Unit]
+Description="Run dumping all MariaDB databases every night"
+
+[Timer]
+# 2:00 / 3:00 Montreal time
+OnCalendar=*-*-* 7:00:00
+Unit=mariadb-dump.service
+
+[Install]
+WantedBy=multi-user.target

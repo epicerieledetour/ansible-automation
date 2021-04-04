@@ -31,6 +31,20 @@
     priv:
       'wordpress.*': 'ALL,GRANT'
 
+- name: Copying MariaDB dump systemd service file
+  copy:
+    src: mariadb-dump.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
+- name: Copying MariaDB dump systemd timer file
+  copy:
+    src: mariadb-dump.timer
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
 # Wordpress
 
 - name: Download Wordpress 5.7 tarball
