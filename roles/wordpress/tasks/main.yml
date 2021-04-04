@@ -49,6 +49,7 @@
       src: /tmp/wordpress-5.7.tar.gz
       dest: /srv/www/wordpress-5.7
       creates: /srv/www/wordpress-5.7/wordpress
+      owner: www-data
       remote_src: yes
       mode: "a+x"
 
