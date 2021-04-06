@@ -3,7 +3,7 @@
   copy:
     src: buster-backports.list
     dest: /etc/apt/sources.list.d
-  when: is_raspberry_pi_os | default(False)
+  when: not (is_raspberry_pi_os|default(False))
 
 - name: Install wireguard
   apt:
