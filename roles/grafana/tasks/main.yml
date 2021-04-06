@@ -83,13 +83,13 @@
 
 - name: Loki Download
   get_url:
-      url: "https://github.com/grafana/loki/releases/download/v2.2.0/loki-linux-amd64.zip"
-      checksum: sha256:3d06f27e1e2ac5fa15261918bd14bb5da24988981634ea09855f8c67a3ba9ae3
-      dest: /tmp/loki-v2.2.0-linux-amd64.zip
+      url: "https://github.com/grafana/loki/releases/download/v2.2.1/loki-linux-amd64.zip"
+      checksum: sha256:dacfb229dbc7064b1d6390173ea6963eb3c85f60dc2336081b0113476405c5aa
+      dest: /tmp/loki-v2.2.1-linux-amd64.zip
 
 - name: Unzip Loki
   unarchive:
-      src: /tmp/loki-v2.2.0-linux-amd64.zip
+      src: /tmp/loki-v2.2.1-linux-amd64.zip
       dest: /usr/local/bin/
       remote_src: yes
       mode: "a+x"
@@ -122,13 +122,13 @@
 
 - name: Promtail Download
   get_url:
-      url: "https://github.com/grafana/loki/releases/download/v2.2.0/promtail-linux-amd64.zip"
-      checksum: sha256:8a0e1020381873b0111d7f6951c904e427271d4a9342adaa643c1580e23d31ec
-      dest: /tmp/promtail-v2.2.0-linux-amd64.zip
+      url: "https://github.com/grafana/loki/releases/download/v2.2.1/promtail-linux-amd64.zip"
+      checksum: sha256:40d8d414b44baa78c5010cb7575d74eea035b6b00adb78e9676a045d6730a16f
+      dest: /tmp/promtail-v2.2.1-linux-amd64.zip
 
 - name: Unzip Promtail
   unarchive:
-      src: /tmp/promtail-v2.2.0-linux-amd64.zip
+      src: /tmp/promtail-v2.2.1-linux-amd64.zip
       dest: /usr/local/bin/
       remote_src: yes
       mode: "a+x"
