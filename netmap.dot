@@ -1,0 +1,118 @@
+digraph D {
+  compound=true;
+  rankdir=LR;
+  node [shape=none]
+
+  subgraph cluster_mau {
+    label = "Mauricio"
+
+    LaptopServer [
+      label=<
+        <TABLE>
+          <TR><TD align="text" border="0"><B>LaptopServer</B><br align="left" /></TD></TR>
+          <TR><TD align="text" port="vpnclient">VPN Client<br align="right" /></TD></TR>
+          <TR><TD align="text" port="monitoring">Monitoring<br align="right" /></TD></TR>
+          <TR><TD align="text" port="dataproxy">Data Proxy<br align="right" /></TD></TR>
+          <TR><TD align="text" port="backuppush">Backup Push<br align="right" /></TD></TR>
+          <TR><TD align="text" port="backupstore">Backup Store<br align="right" /></TD></TR>
+        </TABLE>
+      >
+    ]
+  }
+  subgraph cluster_b7 {
+    label = "B7"
+
+    BestPOS [
+      label=<
+        <TABLE>
+          <TR><TD align="text" border="0"><B>BestPOS</B><br align="left" /></TD></TR>
+          <TR><TD align="text" port="db">Database<br align="right" /></TD></TR>
+        </TABLE>
+      >
+    ]
+    B7Server [
+      label=<
+        <TABLE>
+          <TR><TD align="text" border="0"><B>B7Server</B><br align="left" /></TD></TR>
+          <TR><TD align="text" port="vpnclient">VPN Client<br align="right" /></TD></TR>
+          <TR><TD align="text" port="monitoring">Monitoring<br align="right" /></TD></TR>
+          <TR><TD align="text" port="backupstore">Backup store<br align="right" /></TD></TR>
+        </TABLE>
+      >
+    ]
+  }
+  subgraph cluster_ovh {
+    label = "OVH"
+
+    VPS [
+      label=<
+        <TABLE>
+          <TR><TD align="text" border="0"><B>VPS</B><br align="left" /></TD></TR>
+          <TR><TD align="text" port="vpnserver">VPN Server<br align="right" /></TD></TR>
+          <TR><TD align="text" port="monitoring">Monitoring<br align="right" /></TD></TR>
+          <TR><TD align="text" port="backuppush">Backup Push<br align="right" /></TD></TR>
+          <TR><TD align="text">Public: Grafana UI<br align="right" /></TD></TR>
+          <TR><TD align="text">Public: Web Apps<br align="right" /></TD></TR>
+        </TABLE>
+      >
+    ]
+  }
+  subgraph cluster_gregoire {
+    label = "Grégoire"
+
+    ManagedWordpress [
+      label=<
+        <TABLE>
+          <TR><TD align="text" border="0"><B>ManagedWordpress</B><br align="left" /></TD></TR>
+          <TR><TD align="text" port="db">Wordpress DB<br align="right" /></TD></TR>
+          <TR><TD align="text">Public: Wordpress<br align="right" /></TD></TR>
+        </TABLE>
+      >
+    ]
+  }
+  subgraph cluster_google {
+    label = "Google"
+
+    Drives [
+      label=<
+        <TABLE>
+          <TR><TD align="text" border="0"><B>Drives</B><br align="left" /></TD></TR>
+          <TR><TD align="text" port="documents">Documents<br align="right" /></TD></TR>
+          <TR><TD align="text" port="bestpos">BestPOS<br align="right" /></TD></TR>
+        </TABLE>
+      >
+    ]
+  }
+
+  # VPN
+
+  edge [color="lightblue"]
+
+  LaptopServer:vpnclient -> VPS:vpnserver
+  B7Server:vpnclient -> VPS:vpnserver
+
+  # Backups
+
+  edge [color="orange"]
+
+  LaptopServer:backuppush -> LaptopServer:backupstore
+  LaptopServer:backuppush -> B7Server:backupstore
+  VPS:backuppush -> LaptopServer:backupstore
+  VPS:backuppush -> B7Server:backupstore
+
+  # Monitoring
+
+  edge [color="darkkhaki"]
+
+  LaptopServer:monitoring -> VPS:monitoring
+  B7Server:monitoring -> VPS:monitoring
+
+  # Drives and pull
+
+  edge [color = "mediumpurple"]
+
+  BestPOS:db -> Drives:bestpos
+  ManagedWordpress:db -> LaptopServer:dataproxy
+  Drives:documents -> LaptopServer:dataproxy
+  Drives:bestpos -> LaptopServer:dataproxy
+}

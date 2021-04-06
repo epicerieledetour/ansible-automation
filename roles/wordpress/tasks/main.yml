@@ -45,6 +45,12 @@
   notify:
     - systemd changed
 
+- name: "Start MariaDB backup script systemd timer"
+  systemd:
+    name: mariadb-dump.timer
+    enabled: true
+    state: started
+
 # Wordpress
 
 - name: Download Wordpress 5.7 tarball
