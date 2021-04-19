@@ -11,7 +11,7 @@ server {
   include snippets/{{ wordpress_ssl_snippet_conf }};
 
   ## Your website name goes here.
-  server_name {{ wordpress_server_fqdn }};
+  server_name {{ wordpress_server_fqdn }} epicerieledetour.org;
   ## Your only path reference.
   root /srv/www/wordpress-5.7/wordpress;
   ## This should be in your http block and if it is, it's not needed here.
