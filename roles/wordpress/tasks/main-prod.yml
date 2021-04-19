@@ -4,7 +4,7 @@
 
 - name: Generate wordpress certbot SSL certificate
   command:
-    cmd: "/snap/bin/certbot certonly --agree-tos -n --nginx -m contact@epicerieledetour.org -d {{ wordpress_server_fqdn }}"
+    cmd: "/snap/bin/certbot certonly --agree-tos -n --nginx -m contact@epicerieledetour.org -d {{ wordpress_server_fqdn }} -d epicerieledetour.org"
     creates: "/etc/letsencrypt/live/{{ wordpress_server_fqdn }}/fullchain.pem"
 
 - name: Instanciate wordpress nginx SSL config
