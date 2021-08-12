@@ -2,6 +2,7 @@ vps ansible_host=vps-65c98ca9.vps.ovh.ca ansible_user=debian wireguard_endpoint_
 laptopserver ansible_host=192.168.211.20 ansible_user=debian
 raspberrypi ansible_host=192.168.211.30 ansible_user=pi
 
+[workstations]
 charles-xps15
 mauriandres-workstation
 

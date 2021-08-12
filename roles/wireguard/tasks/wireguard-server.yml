@@ -1,0 +1,33 @@
+# TODO: use apt_repository
+- name: Copy /etc/apt/sources.list.d/buster-backports.list if OS is debian, but not Raspberry PI OS
+  copy:
+    src: buster-backports.list
+    dest: /etc/apt/sources.list.d
+  when: not (is_raspberry_pi_os|default(False))
+
+- name: Install wireguard
+  apt:
+    pkg:
+      - wireguard
+    update_cache: true
+    state: present
+
+- name: Instanciate wireguard config wg-ledetour.conf-{{ ansible_host }}
+  template:
+    src: wg-ledetour-{{ wireguard_type }}.conf.j2
+    dest: /etc/wireguard/wg-ledetour.conf
+    mode: u=r,g=,o=
+  notify:
+    - reload wireguard
+
+- name: Open wireguard port
+  ufw:
+    rule: allow
+    proto: udp
+    port: '"{{ wireguard_endpoint_port }}"'
+
+- name: Start wireguard systemd service wg-quick@wg-ledetour.service
+  systemd:
+    name: wg-quick@wg-ledetour.service
+    enabled: yes
+    state: started

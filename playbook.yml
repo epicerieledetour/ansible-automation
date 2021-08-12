@@ -1,10 +1,19 @@
-- name: "Setup common tools and VPN"
+- name: "Setup common facts for all machines in the inventory"
+  hosts: all
+  roles:
+    - common-facts
+
+- name: "Setup common tools"
   hosts: servers
   become: true
   roles:
-    - common-facts
     - systemd
     - common
+  
+- name: "Setup Wireguard"
+  hosts: all
+  roles:
+    - systemd
     - wireguard
 
 - name: Setup borg repository stores
