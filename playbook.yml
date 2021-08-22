@@ -9,9 +9,10 @@
   roles:
     - systemd
     - common
-  
+
 - name: "Setup Wireguard"
   hosts: all
+  become: true
   roles:
     - systemd
     - wireguard
