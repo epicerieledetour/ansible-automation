@@ -7,6 +7,7 @@
     state: present
   when: borg_store_is_remote | bool
   delegate_to: "{{ borg_store_inventory_hostname }}"
+  ignore_unreachable: yes
 
 # Pre-register borg store public ssh keys to borg head so no user input is asked
 # the first time the bord head connects to the borg store
@@ -43,6 +44,7 @@
     BORG_PASSPHRASE: "{{ borg_passphrase }}"
     BORG_REPO: "{{ borg_repo }}"
     BORG_RSH: "ssh -i {{ borg_head_ssh.filename }}"
+  ignore_errors: yes
 
 - name: "{{ borg_task_name_prefix }}: start backup script systemd timer"
   systemd:
