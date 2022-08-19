@@ -37,7 +37,7 @@ Vagrant.configure("2") do |config|
     # using a specific IP.
     # config.vm.network "private_network", ip: "192.168.33.10"
 
-    vps.vm.network "private_network", ip: "192.168.1.10"
+    vps.vm.network "private_network", ip: "192.168.56.10"
 
     # Create a public network, which generally matched to bridged network.
     # Bridged networks make the machine appear as another physical device on
@@ -81,14 +81,14 @@ Vagrant.configure("2") do |config|
   config.vm.define "pi1" do |pi1|
     pi1.vm.hostname = "pi1"
     pi1.vm.box = "debian/buster64"
-    pi1.vm.network "private_network", ip: "192.168.1.11"
+    pi1.vm.network "private_network", ip: "192.168.56.11"
     pi1.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
   config.vm.define "pi2" do |pi2|
     pi2.vm.hostname = "pi2"
     pi2.vm.box = "debian/buster64"
-    pi2.vm.network "private_network", ip: "192.168.1.12"
+    pi2.vm.network "private_network", ip: "192.168.56.12"
     pi2.vm.synced_folder ".", "/vagrant", disabled: true
 
     # Provision is defined in last machine so Ansible runs once
@@ -106,7 +106,7 @@ Vagrant.configure("2") do |config|
       }
       ansible.host_vars = {
         "vps" => {
-          "wireguard_endpoint_address" => "192.168.1.10"
+          "wireguard_endpoint_address" => "192.168.56.10"
         },
         "pi1" => {
           "is_raspberry_pi_os" => false
