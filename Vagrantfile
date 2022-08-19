@@ -36,10 +36,8 @@ Vagrant.configure("2") do |config|
     # Create a private network, which allows host-only access to the machine
     # using a specific IP.
     # config.vm.network "private_network", ip: "192.168.33.10"
-    # vps.vm.network "private_network", ip: "192.168.2.10", virtualbox__intnet: "laptopserver-internet"
-    # vps.vm.network "private_network", ip: "192.168.3.10", virtualbox__intnet: "raspberrypi-internet"
 
-    vps.vm.network "private_network", ip: "192.168.1.11"
+    vps.vm.network "private_network", ip: "192.168.56.10"
 
     # Create a public network, which generally matched to bridged network.
     # Bridged networks make the machine appear as another physical device on
@@ -80,37 +78,40 @@ Vagrant.configure("2") do |config|
     # end
   end
 
-  config.vm.define "laptopserver" do |laptopserver|
-    laptopserver.vm.hostname = "laptopserver"
-    laptopserver.vm.box = "debian/buster64"
-    laptopserver.vm.network "private_network", ip: "192.168.1.12"
-    laptopserver.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.define "pi1" do |pi1|
+    pi1.vm.hostname = "pi1"
+    pi1.vm.box = "debian/buster64"
+    pi1.vm.network "private_network", ip: "192.168.56.11"
+    pi1.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
-  config.vm.define "raspberrypi" do |raspberrypi|
-    raspberrypi.vm.hostname = "raspberrypi"
-    raspberrypi.vm.box = "debian/buster64"
-    raspberrypi.vm.network "private_network", ip: "192.168.1.13"
-    raspberrypi.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.define "pi2" do |pi2|
+    pi2.vm.hostname = "pi2"
+    pi2.vm.box = "debian/buster64"
+    pi2.vm.network "private_network", ip: "192.168.56.12"
+    pi2.vm.synced_folder ".", "/vagrant", disabled: true
 
     # Provision is defined in last machine so Ansible runs once
     # all machines are defined
     # https://www.vagrantup.com/docs/provisioning/ansible.html#ansible-parallel-execution
-    raspberrypi.vm.provision "ansible" do |ansible|
+    pi2.vm.provision "ansible" do |ansible|
       ansible.limit = "all"
       ansible.playbook = "playbook.yml"
       ansible.groups = {
-        "servers": ["vps", "laptopserver", "raspberrypi"],
+        "servers": ["vps", "pi1", "pi2"],
         "webservers": ["vps"],
-        "dataproxies": ["laptopserver", "raspberrypi"],
-        "backuphead": ["vps", "raspberrypi"],
-        "borgstores": ["raspberrypi"]
+        "dataproxies": ["pi1", "pi2"],
+        "backuphead": ["vps", "pi2"],
+        "borgstores": ["pi2"]
       }
       ansible.host_vars = {
         "vps" => {
-          "wireguard_endpoint_address" => "192.168.1.11"
+          "wireguard_endpoint_address" => "192.168.56.10"
         },
-        "raspberrypi" => {
+        "pi1" => {
+          "is_raspberry_pi_os" => false
+        },
+        "pi2" => {
           "is_raspberry_pi_os" => false
         }
       }
