@@ -17,6 +17,20 @@
     name: ledetour-vouchers.service
     state: stopped
 
+- name: Create www-data owned /var/www/ledetour-vouchers
+  ansible.builtin.file:
+    path: /var/www/ledetour-vouchers
+    owner: www-data
+    group: www-data
+    state: directory
+
+- name: Create www-data owned /var/run/ledetour-vouchers
+  ansible.builtin.file:
+    path: /var/run/ledetour-vouchers
+    owner: www-data
+    group: www-data
+    state: directory
+
 - name: Install vouchers.epicerieledetour.org
   ansible.builtin.pip:
     name: git+https://github.com/epicerieledetour/ledetour-vouchers.git

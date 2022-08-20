@@ -3,8 +3,9 @@ Description=Run ledetour-vouchers
 
 [Service]
 Type=simple
+User=www-data
 Environment="LDTVOUCHERS_DB_PATH=/var/www/ledetour-vouchers/ledetour-vouchers.sqlite3"
-ExecStart=/var/www/ledetour-vouchers/venv-py37/bin/uvicorn app.main:app
+ExecStart=/var/www/ledetour-vouchers/venv-py37/bin/uvicorn app.main:app --uds /var/run/ledetour-vouchers/ledetour-vouchers.sock
 
 [Install]
 WantedBy=default.target
