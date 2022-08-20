@@ -1,0 +1,10 @@
+[Unit]
+Description=Run ledetour-vouchers
+
+[Service]
+Type=simple
+Environment="LDTVOUCHERS_DB_PATH=/var/www/ledetour-vouchers/ledetour-vouchers.sqlite3"
+ExecStart=/var/www/ledetour-vouchers/venv-py37/bin/uvicorn app.main:app
+
+[Install]
+WantedBy=default.target

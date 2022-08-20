@@ -58,5 +58,6 @@
     - systemd
     - nginx
     - nginx-membres
+    - nginx-vouchers
     - grafana
     - wordpress

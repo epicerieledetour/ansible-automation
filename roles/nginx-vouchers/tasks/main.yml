@@ -1,0 +1,48 @@
+- name: Install vouchers.epicerieledetour.org dependencies
+  apt:
+    pkg:
+      - git
+      - python3.7
+      - virtualenv
+
+- name: Copying vouchers.epicerieledetour.org systemd service file
+  copy:
+    src: systemd/ledetour-vouchers.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
+- name: Stop vouchers.epicerieledetour.org systemd service
+  systemd:
+    name: ledetour-vouchers.service
+    state: stopped
+
+- name: Install vouchers.epicerieledetour.org
+  ansible.builtin.pip:
+    name: git+https://github.com/epicerieledetour/ledetour-vouchers.git
+    virtualenv_python: python3.7
+    virtualenv: /var/www/ledetour-vouchers/venv-py37
+    state: forcereinstall
+
+- include_tasks:
+    file: "main{{ deployment_suffix }}.yml"  
+
+- name: Instanciate vouchers nginx config
+  template:
+    src: vouchers.conf.j2
+    dest: /etc/nginx/sites-available/vouchers.conf
+    mode: u=r,g=r,o=r
+  notify:
+    - nginx changed
+
+- name: Enable vouchers.epicerieledetour.org nginx configuration file
+  file:
+    src: /etc/nginx/sites-available/vouchers.conf
+    dest: /etc/nginx/sites-enabled/vouchers.conf
+    state: link
+
+- name: Enable vouchers.epicerieledetour.org systemd service
+  systemd:
+    name: ledetour-vouchers.service
+    state: started
+    enabled: yes

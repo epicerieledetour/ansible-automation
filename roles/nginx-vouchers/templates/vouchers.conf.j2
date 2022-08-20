@@ -1,0 +1,56 @@
+{#
+server {
+  listen 443 ssl http2;
+  listen [::]:443 ssl http2;
+
+  include snippets/{{ vouchers_ssl_snippet_conf }};
+
+  server_name {{ vouchers_server_fqdn }};
+
+  root /var/www/ledetour-vouchers/static;
+  index index.html;
+
+  location / {
+    try_files $uri $uri/ =404;
+  }
+}
+#}
+
+server {
+  listen 443 ssl http2;
+  listen [::]:443 ssl http2;
+
+  client_max_body_size 10k;
+
+  include snippets/{{ vouchers_ssl_snippet_conf }};
+
+  server_name {{ vouchers_server_fqdn }};
+
+  index index.html;
+
+  location / {
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    proxy_redirect off;
+    proxy_buffering off;
+    proxy_pass http://uvicorn;
+  }
+
+  location /static {
+    # path for static files
+    root /var/www/ledetour-vouchers/venv-py37/lib/python3.7/site-packages/app/static;
+  }
+}
+
+map $http_upgrade $connection_upgrade {
+  default upgrade;
+  '' close;
+}
+
+upstream uvicorn {
+  {# server unix:/tmp/uvicorn.sock; #}
+  server localhost:8000;
+}
