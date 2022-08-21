@@ -1,0 +1,6 @@
+[Unit]
+Description="Backup ledetour-vouchers database"
+
+[Service]
+ExecStart=sqlite3 /var/www/ledetour-vouchers/ledetour-vouchers.sqlite3 ".backup /srv/ledetour-vouchers.sqlite3.bak"
+Type=oneshot

@@ -3,11 +3,26 @@
     pkg:
       - git
       - python3.7
+      - sqlite3
       - virtualenv
 
 - name: Copying vouchers.epicerieledetour.org systemd service file
   copy:
-    src: systemd/ledetour-vouchers.service
+    src: ledetour-vouchers.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
+- name: Copying vouchers.epicerieledetour.org backup systemd service file
+  copy:
+    src: ledetour-vouchers-backup.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
+- name: Copying vouchers.epicerieledetour.org backup timer file
+  copy:
+    src: ledetour-vouchers-backup.timer
     dest: /etc/systemd/system/
   notify:
     - systemd changed
@@ -58,5 +73,11 @@
 - name: Enable vouchers.epicerieledetour.org systemd service
   systemd:
     name: ledetour-vouchers.service
+    state: started
+    enabled: yes
+
+- name: Enable vouchers.epicerieledetour.org backup systemd timer
+  systemd:
+    name: ledetour-vouchers-backup.timer
     state: started
     enabled: yes
