@@ -1,9 +1,8 @@
-- name: Install gdrivesync packages
+- name: Install rclone
   apt:
-    pkg:
-      - rclone
+    deb: https://downloads.rclone.org/v1.59.2/rclone-v1.59.2-linux-arm64.deb
 
-- name: Make/usr/local/etc/rclone directory
+- name: Make /usr/local/etc/rclone directory
   file:
     path: /usr/local/etc/rclone
     state: directory
@@ -43,7 +42,13 @@
 
 - name: Register Drive sync timers
   systemd:
-      name: "rclone-drive@{{ item.name }}.timer"
-      enabled: true
-      state: started
+    name: "rclone-drive@{{ item.name }}.timer"
+    enabled: true
+    state: started
   loop: "{{ google_drives }}"
+
+- name: Register B7-NEXTCLOUD sync timers
+  systemd:
+    name: "rclone-drive@B7-NEXTCLOUD.timer"
+    enabled: true
+    state: started

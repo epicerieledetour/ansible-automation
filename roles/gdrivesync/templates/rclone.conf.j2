@@ -1,3 +1,10 @@
+[B7-NEXTCLOUD]
+type = webdav
+url = https://cloud.batiment7.org/remote.php/dav/files/charles.fleche/
+vendor = nextcloud
+user = charles.fleche@batiment7.org
+pass = {{ rclone_b7_nextcloud_pass }}
+
 {% for drive in google_drives %}
 [{{ drive.name }}]
 type = drive

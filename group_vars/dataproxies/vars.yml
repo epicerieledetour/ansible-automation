@@ -1,1 +1,2 @@
 google_drives: "{{ vault_google_drives }}"
+rclone_b7_nextcloud_pass: "{{ vault_rclone_b7_nextcloud_pass }}"

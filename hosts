@@ -1,6 +1,6 @@
 vps ansible_host=vps-65c98ca9.vps.ovh.ca ansible_user=debian wireguard_endpoint_address=vps-65c98ca9.vps.ovh.ca
 pi1 ansible_host=192.168.211.30 ansible_user=pi  # Charles
-pi2 ansible_host=192.168.211.20 ansible_user=pi  # Mauricio
+;pi2 ansible_host=192.168.211.20 ansible_user=pi  # Mauricio
 
 [workstations]
 charles-xps15
@@ -9,7 +9,7 @@ mauriandres-workstation
 [servers]
 vps
 pi1
-pi2
+;pi2
 
 [webservers]
 vps
@@ -19,7 +19,7 @@ pi1
 
 [dataproxies]
 pi1
-pi2
+;pi2
 
 [backuphead]
 vps
