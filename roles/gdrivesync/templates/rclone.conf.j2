@@ -9,7 +9,7 @@ pass = {{ rclone_b7_nextcloud_pass }}
 [{{ drive.name }}]
 type = drive
 scope = drive
-service_account_file = /usr/local/etc/rclone/drive-sync-on-ovh-server-50a335a0b68b.json
+service_account_file = {{ rclone_etc_dir }}/drive-sync-on-ovh-server-50a335a0b68b.json
 impersonate = {{ drive.impersonate }}
 
 {% if "team_drive" in drive %}

@@ -17,7 +17,7 @@
 - name: Copying auth
   copy:
     src: drive-sync-on-ovh-server-50a335a0b68b.json
-    dest:  /usr/local/etc/rclone/
+    dest: "{{ rclone_etc_dir }}"
     mode: 0400
 
 - name: Make /srv/rclone directory
