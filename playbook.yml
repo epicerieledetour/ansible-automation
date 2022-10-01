@@ -3,61 +3,61 @@
   roles:
     - common-facts
 
-# - name: "Setup common tools"
-#   hosts: servers
-#   become: true
-#   roles:
-#     - systemd
-#     - common
+- name: "Setup common tools"
+  hosts: servers
+  become: true
+  roles:
+    - systemd
+    - common
 
-# - name: "Setup Wireguard"
-#   hosts: all
-#   become: true
-#   roles:
-#     - systemd
-#     - wireguard
+- name: "Setup Wireguard"
+  hosts: all
+  become: true
+  roles:
+    - systemd
+    - wireguard
 
-# - name: Setup borg repository stores
-#   hosts: borgstores
-#   become: true
-#   roles:
-#     - borgstore
+- name: Setup borg repository stores
+  hosts: borgstores
+  become: true
+  roles:
+    - borgstore
 
-# - name: "Setup hosts to backup"
-#   hosts: "backuphead"
-#   become: true
-#   roles:
-#     - systemd
-#     - borgbackup
+- name: "Setup hosts to backup"
+  hosts: "backuphead"
+  become: true
+  roles:
+    - systemd
+    - borgbackup
 
-# - name: Setup dataproxies
-#   hosts: dataproxies
-#   become: true
-#   roles:
-#     - systemd
-#     - gdrivesync
+- name: Setup dataproxies
+  hosts: dataproxies
+  become: true
+  roles:
+    - systemd
+    - gdrivesync
 
-# - name: Setup influxdb
-#   hosts: webservers
-#   become: true
-#   roles:
-#     - influxdata-common
-#     - influxdata-influxdb
+- name: Setup influxdb
+  hosts: webservers
+  become: true
+  roles:
+    - influxdata-common
+    - influxdata-influxdb
 
-# - name: Setup telegraf
-#   hosts: servers
-#   become: true
-#   roles:
-#     - influxdata-common
-#     - influxdata-telegraf
+- name: Setup telegraf
+  hosts: servers
+  become: true
+  roles:
+    - influxdata-common
+    - influxdata-telegraf
 
 - name: "Setup web applications"
   hosts: webservers
   become: true
   roles:
     - systemd
-    # - nginx
-    # - nginx-membres
+    - nginx
+    - nginx-membres
     - nginx-vouchers
-    # - grafana
-    # - wordpress
+    - grafana
+    - wordpress
