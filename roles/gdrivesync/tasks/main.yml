@@ -14,9 +14,15 @@
     dest: /usr/local/etc/rclone/rclone.conf
     mode: 0400
 
-- name: Copying auth
+- name: Copying auth key for Le Détours Google Drives 
   copy:
     src: drive-sync-on-ovh-server-50a335a0b68b.json
+    dest: "{{ rclone_etc_dir }}"
+    mode: 0400
+
+- name: Copying auth key for Bâtiment 7
+  copy:
+    src: batiment7-714ee10f03d6.json
     dest: "{{ rclone_etc_dir }}"
     mode: 0400
 
@@ -26,29 +32,22 @@
     state: directory
     mode: 0700
 
-- name: Copying google drive sync script systemd service
+- name: Copying rclone sync systemd service
   copy:
-    src: rclone-drive@.service
+    src: rclone-alldrives.service
     dest: /etc/systemd/system/
   notify:
     - systemd changed
 
-- name: Copying google drive sync script systemd timer
+- name: Copying rclone sync systemd timer
   copy:
-    src: rclone-drive@.timer
+    src: rclone-alldrives.timer
     dest: /etc/systemd/system/
   notify:
     - systemd changed
 
-- name: Register Drive sync timers
+- name: Register rclone sync timers
   systemd:
-    name: "rclone-drive@{{ item.name }}.timer"
-    enabled: true
-    state: started
-  loop: "{{ google_drives }}"
-
-- name: Register B7-NEXTCLOUD sync timers
-  systemd:
-    name: "rclone-drive@B7-NEXTCLOUD.timer"
+    name: rclone-alldrives.timer
     enabled: true
     state: started

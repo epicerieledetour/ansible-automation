@@ -1,5 +1,5 @@
 [Unit]
-Description="Synchronise a Google Drive rclone remote %I"
+Description="rclone sync all drives"
 
 [Service]
 Type=oneshot
@@ -7,5 +7,5 @@ ExecStart=rclone                                      \
   --verbose                                           \
   --config "/usr/local/etc/rclone/rclone.conf"        \
   sync                                                \
-  %i:                                                 \
-  /srv/rclone/%i
+  AllDrives:                                          \
+  /srv/rclone
