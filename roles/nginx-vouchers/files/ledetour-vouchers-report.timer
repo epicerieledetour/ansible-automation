@@ -1,0 +1,10 @@
+[Unit]
+Description="Send ledetour-vouchers reports every day"
+
+[Timer]
+# 21:00 / 22:00 Montreal time
+OnCalendar=*-*-* 2:00:00
+Unit=ledetour-vouchers-report.service
+
+[Install]
+WantedBy=multi-user.target

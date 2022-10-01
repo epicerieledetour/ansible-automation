@@ -27,6 +27,21 @@
   notify:
     - systemd changed
 
+- name: Instanciating vouchers.epicerieledetour.org report systemd service file
+  template:
+    src: ledetour-vouchers-report.service.j2
+    dest: /etc/systemd/system/ledetour-vouchers-report.service
+    mode: u=r,g=r,o=
+  notify:
+    - systemd changed
+
+- name: Copying vouchers.epicerieledetour.org report systemd timer file
+  copy:
+    src: ledetour-vouchers-report.timer
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
 - name: Stop vouchers.epicerieledetour.org systemd service
   systemd:
     name: ledetour-vouchers.service
@@ -79,5 +94,11 @@
 - name: Enable vouchers.epicerieledetour.org backup systemd timer
   systemd:
     name: ledetour-vouchers-backup.timer
+    state: started
+    enabled: yes
+
+- name: Enable vouchers.epicerieledetour.org report systemd timer
+  systemd:
+    name: ledetour-vouchers-report.timer
     state: started
     enabled: yes
