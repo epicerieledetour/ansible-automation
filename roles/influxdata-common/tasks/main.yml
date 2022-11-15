@@ -1,12 +1,13 @@
-- name: Add influxdata repository key
-  apt_key:
-      url: 'https://repos.influxdata.com/influxdb.key'
-      state: present
+- name: Install InfluxDB key
+  get_url:
+    url:  https://repos.influxdata.com/influxdb.key
+    dest: /etc/apt/trusted.gpg.d/influxdb.asc
 
-- name:  Add influxdata repository
+- name:  Add InfluxDB repository
   apt_repository:
-      repo: 'deb https://repos.influxdata.com/debian buster stable'
-      state: present
+    repo:  "deb [signed-by=/etc/apt/trusted.gpg.d/influxdb.asc] https://repos.influxdata.com/debian stable main"
+    state: present
+    update_cache: yes
 
 - name: Update apt cache for influxdata repository
   apt:

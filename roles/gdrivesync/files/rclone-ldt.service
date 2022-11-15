@@ -1,0 +1,11 @@
+[Unit]
+Description="rclone sync all drives"
+
+[Service]
+Type=oneshot
+ExecStart=rclone                                      \
+  --verbose                                           \
+  --config "/usr/local/etc/rclone/rclone-ldt.conf"    \
+  sync                                                \
+  AllDrives:                                          \
+  /srv/rclone

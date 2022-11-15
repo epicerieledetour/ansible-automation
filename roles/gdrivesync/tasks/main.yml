@@ -1,28 +1,22 @@
 - name: Install rclone
   apt:
-    deb: https://downloads.rclone.org/v1.59.2/rclone-v1.59.2-linux-arm64.deb
+    deb: https://downloads.rclone.org/v1.60.0/rclone-v1.60.0-linux-arm64.deb
 
-- name: Make /usr/local/etc/rclone directory
+- name: Make {{ rclone_etc_dir }} directory
   file:
-    path: /usr/local/etc/rclone
+    path: "{{ rclone_etc_dir }}"
     state: directory
     mode: 0700
 
 - name: Instanciate rclone config
   template:
-    src: rclone.conf.j2
-    dest: /usr/local/etc/rclone/rclone.conf
+    src: rclone-ldt.conf.j2
+    dest: "{{ rclone_etc_dir }}/rclone-ldt.conf"
     mode: 0400
 
 - name: Copying auth key for Le Détours Google Drives 
   copy:
     src: drive-sync-on-ovh-server-50a335a0b68b.json
-    dest: "{{ rclone_etc_dir }}"
-    mode: 0400
-
-- name: Copying auth key for Bâtiment 7
-  copy:
-    src: batiment7-714ee10f03d6.json
     dest: "{{ rclone_etc_dir }}"
     mode: 0400
 
@@ -34,20 +28,20 @@
 
 - name: Copying rclone sync systemd service
   copy:
-    src: rclone-alldrives.service
+    src: rclone-ldt.service
     dest: /etc/systemd/system/
   notify:
     - systemd changed
 
 - name: Copying rclone sync systemd timer
   copy:
-    src: rclone-alldrives.timer
+    src: rclone-ldt.timer
     dest: /etc/systemd/system/
   notify:
     - systemd changed
 
 - name: Register rclone sync timers
   systemd:
-    name: rclone-alldrives.timer
+    name: rclone-ldt.timer
     enabled: true
     state: started

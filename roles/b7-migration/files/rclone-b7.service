@@ -1,11 +1,12 @@
 [Unit]
-Description="rclone sync all drives"
+Description="rclone sync B7 Google Drives"
 
 [Service]
 Type=oneshot
 ExecStart=rclone                                      \
   --verbose                                           \
-  --config "/usr/local/etc/rclone/rclone.conf"        \
+  --config "/usr/local/etc/rclone/rclone-b7.conf"     \
   sync                                                \
-  AllDrives:                                          \
-  /srv/rclone
+  /srv/rclone/B7                                      \
+  AllDrives:
+

@@ -1,0 +1,25 @@
+[B7-BASE]
+type = drive
+scope = drive
+service_account_file = {{ rclone_etc_dir }}/batiment7-714ee10f03d6.json
+impersonate = informatique.admin@batiment7.org
+
+[B7-COMPTA]
+type = alias
+remote = B7-BASE,team_drive=0AE0bJfYJFByrUk9PVA,root_folder_id=:
+
+[B7-CONFLITS]
+type = alias
+remote = B7-BASE,team_drive=0ACrgC8CKQ1_rUk9PVA,root_folder_id=:
+
+[B7-MEMBRES]
+type = alias
+remote = B7-BASE,team_drive=0AEvnQypw8DRbUk9PVA,root_folder_id=:
+
+[B7-RH]
+type = alias
+remote = B7-BASE,team_drive=0ACXHbpD0U7rYUk9PVA,root_folder_id=:
+
+[AllDrives]
+type = combine
+upstreams = "B7-COMPTA=B7-COMPTA:" "B7-CONFLITS=B7-CONFLITS:" "B7-MEMBRES=B7-MEMBRES:" "B7-RH=B7-RH:"

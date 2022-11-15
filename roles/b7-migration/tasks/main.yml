@@ -1,0 +1,31 @@
+- name: Instanciate rclone config
+  template:
+    src: rclone-b7.conf.j2
+    dest: "{{ rclone_etc_dir }}/rclone-b7.conf"
+    mode: 0400
+
+- name: Copying auth key for Bâtiment 7
+  copy:
+    src: batiment7-714ee10f03d6.json
+    dest: "{{ rclone_etc_dir }}"
+    mode: 0400
+
+- name: Copying rclone sync systemd service
+  copy:
+    src: rclone-b7.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
+- name: Copying rclone sync systemd timer
+  copy:
+    src: rclone-b7.timer
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
+- name: Register rclone sync timers
+  systemd:
+    name: rclone-b7.timer
+    enabled: true
+    state: started

@@ -4,7 +4,7 @@ Description="Call rclone sync all drives every 24H"
 [Timer]
 # 1:00 / 2:00 Montreal time
 OnCalendar=*-*-* 6:00:00
-Unit=rclone-alldrives.service
+Unit=rclone-ldt.service
 
 [Install]
 WantedBy=multi-user.target

@@ -1,0 +1,33 @@
+[DETOUR-BASE]
+type = drive
+scope = drive
+service_account_file = {{ rclone_etc_dir }}/drive-sync-on-ovh-server-50a335a0b68b.json
+impersonate = automation@epicerieledetour.org
+
+[DETOUR_COMITES]
+type = alias
+remote = DETOUR-BASE,team_drive=0AIbKzNjsqMGbUk9PVA,root_folder_id=:
+
+[DETOUR_OUTILS]
+type = alias
+remote = DETOUR-BASE,team_drive=0APLBOQvuKXQSUk9PVA,root_folder_id=:
+
+[DETOUR_PRIVE]
+type = alias
+remote = DETOUR-BASE,team_drive=0AOpT9lroN3tEUk9PVA,root_folder_id=:
+
+[DETOUR_PROXY_BEST]
+type = alias
+remote = DETOUR-BASE,team_drive=0ABjNTA0P2IuGUk9PVA,root_folder_id=:
+
+[DETOUR_PUBLIC]
+type = alias
+remote = DETOUR-BASE,team_drive=0AIRTPc0aV9ZUUk9PVA,root_folder_id=:
+
+[DETOUR_RH]
+type = alias
+remote = DETOUR-BASE,team_drive=0AJNAgHH-NjYbUk9PVA,root_folder_id=:
+
+[AllDrives]
+type = combine
+upstreams = "DETOUR_COMITES=DETOUR_COMITES:" "DETOUR_OUTILS=DETOUR_OUTILS:" "DETOUR_PRIVE=DETOUR_PRIVE:" "DETOUR_PROXY_BEST=DETOUR_PROXY_BEST:" "DETOUR_PUBLIC=DETOUR_PUBLIC:" "DETOUR_RH=DETOUR_RH:"
