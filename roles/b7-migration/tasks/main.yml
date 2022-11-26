@@ -29,3 +29,24 @@
     name: rclone-b7.timer
     enabled: true
     state: started
+
+- name: Copying rsync nextcloud systemd service
+  copy:
+    src: rsync-b7-nextcloud.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
+- name: Copying rsync nextcloud systemd timer
+  copy:
+    src: rsync-b7-nextcloud.timer
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+
+- name: Register rsync sync timers
+  systemd:
+    name: rsync-b7-nextcloud.timer
+    enabled: true
+    state: started
+

@@ -1,0 +1,9 @@
+[Unit]
+Description="Call rsync-b7-nextcloud every hour"
+
+[Timer]
+OnCalendar=hourly
+Unit=rsync-b7-nextcloud.service
+
+[Install]
+WantedBy=multi-user.target
