@@ -38,6 +38,7 @@
     - systemd changed
 
 - name: Copying rsync nextcloud systemd timer
+  become: false
   copy:
     src: rsync-b7-nextcloud.timer
     dest: /etc/systemd/system/
@@ -45,8 +46,27 @@
     - systemd changed
 
 - name: Register rsync sync timers
+  become: false
   systemd:
     name: rsync-b7-nextcloud.timer
     enabled: true
     state: started
+
+# nextcloud to gdrive migration
+
+- name: Make migration scripts directory
+  ansible.builtin.file:
+    path: /home/pi/nc2gd/bin
+    state: directory
+    mode: '0755'
+
+- name: Copy nc2gd.py
+  ansible.builtin.copy:
+    src: nc2gd.py
+    dest: /home/pi/nc2gd/bin/nc2gd.py
+
+- name: Copy nc2gd.sh
+  ansible.builtin.copy:
+    src: nc2gd.sh
+    dest: /home/pi/nc2gd/bin/nc2gd.sh
 
