@@ -21,6 +21,10 @@ server {
     proxy_pass http://uvicorn;
   }
 
+  location ~ ^/reports {
+    root /var/www/ledetour-vouchers;
+  }
+
   location / {
     root /var/www/ledetour-vouchers/venv-py37/lib/python3.7/site-packages/app/static;
   }
