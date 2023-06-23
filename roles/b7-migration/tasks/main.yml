@@ -49,8 +49,7 @@
   become: false
   systemd:
     name: rsync-b7-nextcloud.timer
-    enabled: true
-    state: started
+    enabled: false
 
 # nextcloud to gdrive migration
 

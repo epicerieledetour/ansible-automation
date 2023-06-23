@@ -7,6 +7,6 @@ ExecStart=rclone                                      \
   --verbose                                           \
   --config "/usr/local/etc/rclone/rclone-b7.conf"     \
   sync                                                \
-  /srv/rclone/B7                                      \
-  AllDrives:
+  AllDrives:                                          \
+  /srv/rclone/B7
 
