@@ -30,6 +30,13 @@
   notify:
     - nginx changed
 
+- name: Setup Nginx TLS settings
+  copy:
+    src: tls-settings.conf
+    dest: /etc/nginx/conf.d/tls-settings.conf
+  notify:
+    - nginx changed
+
 - name: Remove Nginx default server config
   file:
     path: /etc/nginx/sites-enabled/default
