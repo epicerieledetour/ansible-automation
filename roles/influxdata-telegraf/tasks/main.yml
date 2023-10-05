@@ -9,8 +9,12 @@
 
 - name: Build the list of influxdb urls
   set_fact:
-    influxdb_urls: "{{ influxdb_urls }} + [ 'http://{{ hostvars[item].wireguard_address }}:8086' ]"
+    influxdb_urls: "{{ influxdb_urls + [ 'http://{{ hostvars[item].wireguard_address }}:8086' ] }}"
   with_items: "{{ groups['webservers'] }}"
+
+- name: Debug InfluxDB URL
+  debug:
+    var: influxdb_urls
 
 - name: Install telegraf.conf
   template:

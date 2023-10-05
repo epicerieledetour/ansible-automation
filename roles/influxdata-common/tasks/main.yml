@@ -1,11 +1,11 @@
 - name: Install InfluxDB key
   get_url:
-    url:  https://repos.influxdata.com/influxdb.key
-    dest: /etc/apt/trusted.gpg.d/influxdb.asc
+    url:  https://repos.influxdata.com/influxdata-archive_compat.key
+    dest: /etc/apt/trusted.gpg.d/influxdata-archive_compat.asc
 
 - name:  Add InfluxDB repository
   apt_repository:
-    repo:  "deb [signed-by=/etc/apt/trusted.gpg.d/influxdb.asc] https://repos.influxdata.com/debian stable main"
+    repo:  "deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.asc] https://repos.influxdata.com/debian stable main"
     state: present
     update_cache: yes
 
