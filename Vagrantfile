@@ -110,11 +110,11 @@ Vagrant.configure("2") do |config|
           "ansible_user" => "vagrant"
         },
         "pi1" => {
-          "is_raspberry_pi_os" => "",
+          "is_raspberry_pi_os" => "false",
 	  "ansible_user" => "vagrant"
        },
         "pi2" => {
-          "is_raspberry_pi_os" => "",
+          "is_raspberry_pi_os" => "false",
 	  "ansible_user" => "vagrant"
         }
       }

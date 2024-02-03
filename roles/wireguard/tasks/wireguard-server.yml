@@ -1,7 +1,3 @@
-- name: Debug Wireguard repo package
-  ansible.builtin.debug:
-    var: is_raspberry_pi_os
-
 # TODO: use apt_repository
 - name: Copy /etc/apt/sources.list.d/buster-backports.list if OS is Debian, but not Raspberry Pi OS
   copy:

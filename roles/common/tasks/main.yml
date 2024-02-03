@@ -24,9 +24,9 @@
     name: grub2-common
     selection: hold
 
-# - name: Update apt cache
-#  apt:
-#    update_cache: yes
+- name: Update apt cache
+  apt:
+    update_cache: yes
 
 # We install common packages before an upgrade as unattended-upgrades
 # may set /var/run/reboot-required, which will be needed in case the
