@@ -107,16 +107,13 @@ Vagrant.configure("2") do |config|
       # ansible.tags= ["common", "nginx"]
       ansible.host_vars = {
         "vps" => {
-          "wireguard_endpoint_address" => "192.168.56.10",
-          "ansible_user" => "vagrant"
+          "wireguard_endpoint_address" => "191.168.56.10",
         },
         "pi1" => {
           "is_raspberry_pi_os" => "false",
-	  "ansible_user" => "vagrant"
        },
         "pi2" => {
           "is_raspberry_pi_os" => "false",
-	  "ansible_user" => "vagrant"
         }
       }
       ansible.extra_vars = {
