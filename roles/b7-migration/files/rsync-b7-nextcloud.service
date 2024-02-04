@@ -1,8 +1,0 @@
-[Unit]
-Description="rsync B7 nextcloud drive"
-
-[Service]
-Type=oneshot
-User=pi
-ExecStart=rsync --archive romeo@nc.batiment7.org:/srv/nc-data /srv/rsync/nc.batiment7.org/srv
-

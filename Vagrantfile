@@ -106,18 +106,18 @@ Vagrant.configure("2") do |config|
       }
       ansible.host_vars = {
         "vps" => {
-          "wireguard_endpoint_address" => "192.168.56.10"
+          "wireguard_endpoint_address" => "192.168.56.10",
         },
         "pi1" => {
-          "is_raspberry_pi_os" => false
-        },
+          "is_raspberry_pi_os" => false,
+       },
         "pi2" => {
-          "is_raspberry_pi_os" => false
+          "is_raspberry_pi_os" => false,
         }
       }
       ansible.extra_vars = {
         "deployment_is_vagrant": true
       }
+     end
     end
-  end
 end

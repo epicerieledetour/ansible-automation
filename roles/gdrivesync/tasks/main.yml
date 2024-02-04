@@ -1,6 +1,6 @@
-- name: Install rclone
+- name: Install rclone for Raspberry Pi OS
   apt:
-    deb: https://downloads.rclone.org/v1.60.0/rclone-v1.60.0-linux-arm64.deb
+    deb: "https://downloads.rclone.org/v1.60.0/rclone-v1.60.0-linux-{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}.deb"
 
 - name: Make {{ rclone_etc_dir }} directory
   file:
@@ -14,7 +14,7 @@
     dest: "{{ rclone_etc_dir }}/rclone-ldt.conf"
     mode: 0400
 
-- name: Copying auth key for Le Détours Google Drives 
+- name: Copying auth key for Le Détour Google Drives 
   copy:
     src: drive-sync-on-ovh-server-50a335a0b68b.json
     dest: "{{ rclone_etc_dir }}"
