@@ -10,7 +10,7 @@
 - name: Build the list of influxdb urls
   set_fact:
     influxdb_urls: "{{ influxdb_urls + [ 'http://192.168.211.10:8086' ] }}"
-  loop: "{{ groups['webservers'] }}"
+  # loop: "{{ groups['webservers'] }}"
 
 - name: Install telegraf.conf
   template:
