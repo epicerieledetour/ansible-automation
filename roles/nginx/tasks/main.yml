@@ -2,8 +2,8 @@
   apt:
     pkg:
       - nginx
-    tags:
-     - nginx   
+  tags:
+    - nginx   
 
 - name: "Configure ssl by including ssl-cert{{ deployment_suffix }}.yml"
   include_tasks:
@@ -16,14 +16,14 @@
     rule: allow
     port: http
   tags:
-   - nginx
+    - nginx
 
 - name: Open https port 443 for nginx
   ufw:
     rule: allow
     port: https
   tags:
-   - nginx
+    - nginx
 
 - name: Allow TLSv1.2 and TLSv1.3 only. See https://blog.qualys.com/product-tech/2018/11/19/grade-change-for-tls-1-0-and-tls-1-1-protocols
   lineinfile:
@@ -31,7 +31,7 @@
     regexp: '^\t*ssl_protocols'
     line: "\tssl_protocols TLSv1.2 TLSv1.3;  # Set by Ansible"
   tags:
-   - nginx
+    - nginx
 
 - name: Setup Nginx redirection HTTP -> HTTPS
   copy:
@@ -40,7 +40,7 @@
   notify:
     - nginx changed
   tags:
-   - nginx  
+    - nginx  
 
 - name: Setup Nginx TLS settings
   copy:
@@ -49,7 +49,7 @@
   notify:
     - nginx changed
   tags:
-   - nginx
+    - nginx
 
 - name: Remove Nginx default server config
   file:
@@ -58,4 +58,4 @@
   notify:
     - nginx changed
   tags:
-   - nginx
+    - nginx

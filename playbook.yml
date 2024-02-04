@@ -36,7 +36,6 @@
   roles:
     - systemd
     - gdrivesync
-    - b7-migration # Needs to be define after gdrivesync
 
 - name: Setup influxdb
   hosts: webservers

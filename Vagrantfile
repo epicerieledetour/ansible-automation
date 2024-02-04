@@ -104,6 +104,7 @@ Vagrant.configure("2") do |config|
         "backuphead": ["vps", "pi2"],
         "borgstores": ["pi2"]
       }
+      # ansible.tags= ["common", "nginx"]
       ansible.host_vars = {
         "vps" => {
           "wireguard_endpoint_address" => "192.168.56.10",

@@ -41,6 +41,7 @@
       - unattended-upgrades
       - ufw
       - vim
+      - gpg
 
 - name: Upgrade all packages
   apt:
@@ -50,7 +51,7 @@
   register: rebootrequired
   stat:
     path: /var/run/reboot-required
-    get_md5: no
+    get_checksum: no
 
 - name: Reboot if /var/run/reboot-required exists
   reboot:
