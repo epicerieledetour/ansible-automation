@@ -90,8 +90,6 @@
         question: 'unattended-upgrades/enable_auto_updates'
         value: 'true'
         vtype: 'boolean'
-  tags:
-    - common
 
     - name: Reconfigure dpkg
       command: dpkg-reconfigure -f noninteractive unattended-upgrades creates=/etc/apt/apt.conf.d/20auto-upgrades
