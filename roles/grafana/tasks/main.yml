@@ -22,6 +22,11 @@
 
 # Grafana
 
+- name: Install gpg
+  apt:
+    pkg:
+      - gpg
+
 - name: Add Grafana repository key
   apt_key:
       url: 'https://packages.grafana.com/gpg.key'
