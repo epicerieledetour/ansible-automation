@@ -54,18 +54,18 @@
   tags:
     - nginx-membres
 
-- name: "Create {{ membres_etc_dir }}"
-  ansible.builtin.file:
-    path: "{{ membres_etc_dir }}"
-    state: directory
-  tags:
-    - nginx-membres
-
 - name: "Create {{ membres_var_dir }}"
   ansible.builtin.file:
     path: "{{ membres_var_dir }}"
     state: directory
     mode: u=rwx,g=rx,o=rx
+  tags:
+    - nginx-membres
+
+- name: "Create {{ membres_etc_dir }}"
+  ansible.builtin.file:
+    path: "{{ membres_etc_dir }}"
+    state: directory
   tags:
     - nginx-membres
 
@@ -77,7 +77,15 @@
   tags:
     - nginx-membres
 
-- name: Copying membres.epicerieledetour.org database update systemd service file
+- name: Instanciate membres.epicerieledetour.org database update systemd env file
+  ansible.builtin.copy:
+    src: ledetour-membres-ca.crt
+    dest: "{{ membres_etc_dir }}"
+    mode: u=r,g=,o=
+  tags:
+    - nginx-membres
+
+- name: Linking membres.epicerieledetour.org database update systemd service file
   ansible.builtin.file:
     src: "{{ membres_www_dir }}/systemd/update-ledetour-membres-data.service"
     dest: /etc/systemd/system/update-ledetour-membres-data.service
@@ -87,7 +95,7 @@
   tags:
     - nginx-membres
 
-- name: Copying membres.epicerieledetour.org membres.json update systemd timer file
+- name: Linking membres.epicerieledetour.org membres.json update systemd timer file
   ansible.builtin.file:
     src: "{{ membres_www_dir }}/systemd/update-ledetour-membres-data.timer"
     dest: /etc/systemd/system/update-ledetour-membres-data.timer
