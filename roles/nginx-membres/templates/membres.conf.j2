@@ -9,6 +9,8 @@ server {
   root /var/www/ledetour-membres/src;
   index index.html;
 
+  include snippets/{{ membres_ssl_clients_snippet_conf }};
+
   location / {
     try_files $uri $uri/ =404;
   }

@@ -1,15 +1,39 @@
+- set_fact:
+    membres_ssl_clients_snippet_conf: ledetour-membres-ssl-clients.conf
+    membres_etc_dir: /etc/ledetour-membres
+    membres_var_dir: /var/lib/ledetour-membres
+    membres_www_dir: /var/www/ledetour-membres
+  tags:
+    - nginx-membres
+
 - name: Install git
   apt:
     pkg:
       - git
+  tags:
+    - nginx-membres
 
 - name: Git checkout membres.epicerieledetour.org
   git:
     repo: 'https://github.com/epicerieledetour/ledetour-membres.git'
-    dest: /var/www/ledetour-membres
+    dest: "{{ membres_www_dir }}"
+  tags:
+    - nginx-membres
 
 - include_tasks:
     file: "main{{ deployment_suffix }}.yml"
+  tags:
+    - nginx-membres
+
+- name: Link membres.epicerieledetour.org ssl clients nginx snippet
+  ansible.builtin.file:
+    src: "{{ membres_www_dir }}/nginx/{{ membres_ssl_clients_snippet_conf }}"
+    dest: "/etc/nginx/snippets/{{ membres_ssl_clients_snippet_conf }}"
+    state: link
+  notify:
+    - systemd changed
+  tags:
+    - nginx-membres
 
 - name: Instanciate membres nginx config
   template:
@@ -18,29 +42,72 @@
     mode: u=r,g=r,o=r
   notify:
     - nginx changed
+  tags:
+    - nginx-membres
 
 - name: Enable membres.epicerieledetour.org nginx configuration file
   file:
     src: /etc/nginx/sites-available/membres.conf
     dest: /etc/nginx/sites-enabled/membres.conf
     state: link
+  tags:
+    - nginx-membres
 
-- name: Copying membres.epicerieledetour.org membres.json update systemd service file
-  copy:
-    src: systemd/update-ledetour-membres-data.service
-    dest: /etc/systemd/system/
+- name: "Create {{ membres_var_dir }}"
+  ansible.builtin.file:
+    path: "{{ membres_var_dir }}"
+    state: directory
+    mode: u=rwx,g=rx,o=rx
+  tags:
+    - nginx-membres
+
+- name: "Create {{ membres_etc_dir }}"
+  ansible.builtin.file:
+    path: "{{ membres_etc_dir }}"
+    state: directory
+  tags:
+    - nginx-membres
+
+- name: Instanciate membres.epicerieledetour.org database update systemd env file
+  ansible.builtin.template:
+    src: ledetour-membres.env.j2
+    dest: "{{ membres_etc_dir }}/ledetour-membres.env"
+    mode: u=r,g=,o=
+  tags:
+    - nginx-membres
+
+- name: Instanciate membres.epicerieledetour.org database update systemd env file
+  ansible.builtin.copy:
+    src: ledetour-membres-ca.crt
+    dest: "{{ membres_etc_dir }}"
+    mode: u=r,g=,o=
+  tags:
+    - nginx-membres
+
+- name: Linking membres.epicerieledetour.org database update systemd service file
+  ansible.builtin.file:
+    src: "{{ membres_www_dir }}/systemd/update-ledetour-membres-data.service"
+    dest: /etc/systemd/system/update-ledetour-membres-data.service
+    state: link
   notify:
     - systemd changed
+  tags:
+    - nginx-membres
 
-- name: Copying membres.epicerieledetour.org membres.json update systemd timer file
-  copy:
-    src: systemd/update-ledetour-membres-data.timer
-    dest: /etc/systemd/system/
+- name: Linking membres.epicerieledetour.org membres.json update systemd timer file
+  ansible.builtin.file:
+    src: "{{ membres_www_dir }}/systemd/update-ledetour-membres-data.timer"
+    dest: /etc/systemd/system/update-ledetour-membres-data.timer
+    state: link
   notify:
     - systemd changed
+  tags:
+    - nginx-membres
 
 - name: Enable membres.epicerieledetour.org membres.json update systemd timer
   systemd:
     name: update-ledetour-membres-data.timer
     state: started
     enabled: yes
+  tags:
+    - nginx-membres
