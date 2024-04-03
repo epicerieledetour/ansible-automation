@@ -17,7 +17,6 @@
   git:
     repo: 'https://github.com/epicerieledetour/ledetour-membres.git'
     dest: "{{ membres_www_dir }}"
-    version: dev/private
   tags:
     - nginx-membres
 
