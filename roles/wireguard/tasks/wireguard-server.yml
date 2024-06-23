@@ -1,9 +1,9 @@
 # TODO: use apt_repository
-- name: Copy /etc/apt/sources.list.d/buster-backports.list if OS is Debian, but not Raspberry Pi OS
+- name: Copy /etc/apt/sources.list.d/buster-backports.list if OS is Debian buster
   copy:
     src: buster-backports.list
     dest: /etc/apt/sources.list.d
-  when: not (is_raspberry_pi_os|default(False))
+  when: ansible_distribution == "Debian" and ansible_distribution_release == "buster"
 
 - name: Install wireguard
   apt:
@@ -12,13 +12,15 @@
     update_cache: true
     state: present
 
-- name: Instanciate wireguard config wg-ledetour.conf-{{ ansible_host }}
+- name: Instanciate wireguard config wg-ledetour.conf
   template:
     src: wg-ledetour-{{ wireguard_type }}.conf.j2
     dest: /etc/wireguard/wg-ledetour.conf
     mode: u=r,g=,o=
   notify:
     - reload wireguard
+  tags:
+    - wireguard
 
 - name: Open wireguard port
   ufw:

@@ -1,0 +1,89 @@
+- name: Setup kiosk
+  become: true
+  block:
+  - name: Install kiosk packages
+    apt:
+      pkg:
+        - alacritty
+        - firefox
+        - greetd
+        - swaybg
+        - wayfire
+    tags:
+      - kiosk
+
+  - name: Copy NetworkManager wifi config
+    ansible.builtin.copy:
+      src: preconfigured.nmconnection
+      dest: /etc/NetworkManager/system-connections/preconfigured.nmconnection
+      mode: "u=rw,g=,o="
+    tags:
+      - kiosk
+
+  - name: Copy /etc/profile.d/firefox-wayland.sh
+    ansible.builtin.copy:
+      src: firefox-wayland.sh
+      dest: /etc/profile.d/firefox-wayland.sh
+    tags:
+      - kiosk
+
+  - name: Create kiosk user
+    ansible.builtin.user:
+      name: kiosk
+      create_home: yes
+      groups: adm,dialout,cdrom,audio,video,plugdev,games,users,input,render,netdev,spi,i2c,gpio
+      append: yes
+    tags:
+      - kiosk
+
+  - name: Setup greetd autologin
+    ansible.builtin.blockinfile:
+      dest: /etc/greetd/config.toml
+      block: |
+        [initial_session]
+        command = "wayfire"
+        user = "kiosk"
+    tags:
+      - kiosk
+
+  - name: "Get current systemd default target"
+    ansible.builtin.command: "systemctl get-default"
+    changed_when: false
+    register: systemddefaulttarget
+    tags:
+      - kiosk
+
+  - name: "Set default to graphical target"
+    ansible.builtin.command: "systemctl set-default graphical.target"
+    when: "'graphical' not in systemddefaulttarget.stdout"
+    changed_when: true
+    tags:
+      - kiosk
+
+  - name: Copy kiosk wallpaper
+    ansible.builtin.copy:
+      src: kiosk-wallpaper.svg
+      dest: /home/kiosk/.kiosk-wallpaper.svg
+      owner: kiosk
+      group: kiosk
+    tags:
+      - kiosk
+
+  - name: Ensure ~/.config
+    ansible.builtin.file:
+      path: /home/kiosk/.config
+      state: directory
+      mode: 'u=rwx,g=,o='
+      owner: kiosk
+      group: kiosk
+    tags:
+      - kiosk
+
+  - name: Copy wayfire config
+    ansible.builtin.copy:
+      src: wayfire.ini
+      dest: /home/kiosk/.config/wayfire.ini
+      owner: kiosk
+      group: kiosk
+    tags:
+      - kiosk

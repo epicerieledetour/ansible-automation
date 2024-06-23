@@ -61,3 +61,8 @@
     - nginx-vouchers
     - grafana
     - wordpress
+
+- name: Setup kiosks
+  hosts: kiosks
+  roles:
+    - kiosk

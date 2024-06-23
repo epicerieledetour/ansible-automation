@@ -5,28 +5,28 @@
     deployment_suffix: "{{ '-dev' if deployment_is_vagrant | default(False) else '-prod' }}"
     group_suffix: "{{ '-workstation' if 'workstations' in hostvars[inventory_hostname].group_names | default(False) else '-server' }}"
   tags:
-     - common
+     - common-facts
 
 - name: "Fact: deployment_is_vagrant"
   debug:
     var: deployment_is_vagrant
   tags:
-     - common
+     - common-facts
 
 - name: "Fact: deployment_is_prod"
   debug:
     var: deployment_is_prod
   tags:
-    - common
+    - common-facts
 
 - name: "Fact: deployment_suffix"
   debug:
     var: deployment_suffix
   tags:
-    - common
+    - common-facts
 
 - name: "Fact: group_suffix"
   debug:
     var: group_suffix
   tags:
-    - common
+    - common-facts
