@@ -1,15 +1,19 @@
 vps ansible_host=vps.epicerieledetour.org ansible_user=debian wireguard_endpoint_address=vps.epicerieledetour.org
-pi1 ansible_host=192.168.211.30 ansible_user=pi is_raspberry_pi_os=true # Charles
-;pi2 ansible_host=192.168.211.20 ansible_user=pi is_raspberry_pi_os=true # Mauricio
+pi1 ansible_host=192.168.211.30 ansible_user=pi # Charles
+;pi2 ansible_host=192.168.211.20 ansible_user=pi # Mauricio
+
+srv1 ansible_host=192.168.211.60 ansible_user=ldt
 
 [workstations]
 charles-xps15
+charles-ws
 mauriandres-workstation
 
 [servers]
 vps
 pi1
 ;pi2
+srv1
 
 [webservers]
 vps
