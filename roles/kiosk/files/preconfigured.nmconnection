@@ -1,0 +1,17 @@
+[connection]
+id=preconfigured
+uuid=6c08e8d3-61ef-4952-8e57-85491f9799e8
+type=wifi
+[wifi]
+mode=infrastructure
+ssid=B7-Extension
+hidden=false
+[ipv4]
+method=auto
+[ipv6]
+addr-gen-mode=default
+method=auto
+[proxy]
+[wifi-security]
+key-mgmt=wpa-psk
+psk=70c6f7fe0976e5a48273094f5a9749e7beb0c0cf1f83da2dd8d185da6f001f1c
