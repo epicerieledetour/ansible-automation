@@ -3,6 +3,7 @@ pi1 ansible_host=192.168.211.30 ansible_user=pi # Charles
 ;pi2 ansible_host=192.168.211.20 ansible_user=pi # Mauricio
 
 srv1 ansible_host=192.168.211.60 ansible_user=ldt
+
 kiosk1 ansible_host=192.168.211.80 ansible_user=ldt
 
 [workstations]
@@ -30,3 +31,6 @@ pi1
 [backuphead]
 vps
 pi1
+
+[kiosks]
+kiosk1
