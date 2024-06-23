@@ -1,0 +1,6 @@
+borg_passphrase: "{{ vault_borg_passphrase }}"
+wireguard_type: client
+wireguard_address: 192.168.211.80
+wireguard_private_key: "{{ vault_wireguard_private_key }}"
+wireguard_public_key: "/ZRGHxsXJecP1c2rVit4igOk6xtw76Dj9s8rHlJ2iXY="
+wireguard_endpoint_port: 51820
