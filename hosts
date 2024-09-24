@@ -1,6 +1,6 @@
-vps ansible_host=vps.epicerieledetour.org ansible_user=debian wireguard_endpoint_address=vps.epicerieledetour.org
+vps ansible_host=vps-65c98ca9.vps.ovh.ca ansible_user=debian wireguard_endpoint_address=51.222.28.137
+vps2 ansible_host=vps-53fcb87d.vps.ovh.ca ansible_user=debian
 pi1 ansible_host=192.168.211.30 ansible_user=pi # Charles
-;pi2 ansible_host=192.168.211.20 ansible_user=pi # Mauricio
 
 srv1 ansible_host=192.168.211.60 ansible_user=ldt
 
@@ -13,10 +13,13 @@ mauriandres-workstation
 
 [servers]
 vps
+vps2
 pi1
-;pi2
 srv1
 kiosk1
+
+[vouchers]
+vps2
 
 [webservers]
 vps
@@ -26,10 +29,10 @@ pi1
 
 [dataproxies]
 pi1
-;pi2
 
 [backuphead]
 vps
+; vps2
 pi1
 
 [kiosks]

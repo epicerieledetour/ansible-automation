@@ -1,0 +1,93 @@
+- name: Install vouchers2.epicerieledetour.org dependencies
+  apt:
+    pkg:
+      - git
+      - python3.11
+      - python3-virtualenv
+  tags:
+    - vouchers-v2
+
+# Copy systemd services and timers
+
+- name: Copying vouchers2.epicerieledetour.org systemd service file
+  copy:
+    src: ldt-vouchers-v2.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+  tags:
+    - vouchers-v2
+
+- name: Copying vouchers2.epicerieledetour.org backup systemd service file
+  copy:
+    src: ldt-vouchers-v2-backup.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+  tags:
+    - vouchers-v2
+
+- name: Copying vouchers2.epicerieledetour.org backup timer file
+  copy:
+    src: ldt-vouchers-v2-backup.timer
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+  tags:
+    - vouchers-v2
+
+# Stop webapp during upgrade
+
+- name: Stop vouchers2.epicerieledetour.org systemd service
+  systemd:
+    name: ldt-vouchers-v2.service
+    state: stopped
+  tags:
+    - vouchers-v2
+
+# Install webapp code
+
+- name: Make vouchers2.epicerieledetour.org installation folder
+  ansible.builtin.file:
+    path: /srv/www/vouchers2.epicerieledetour.org
+    state: directory
+    mode: "0755"
+    owner: "www-data"
+    group: "www-data"
+  tags:
+    - vouchers-v2
+
+- name: Pip install vouchers2.epicerieledetour.org
+  ansible.builtin.pip:
+    name: git+https://github.com/epicerieledetour/ledetour-vouchers.git@v2
+    virtualenv: /srv/www/vouchers2.epicerieledetour.org/venv
+    state: latest
+  tags:
+    - vouchers-v2
+
+# Enable systemd services and timers
+
+- name: Enable vouchers2.epicerieledetour.org systemd service
+  systemd:
+    name: ldt-vouchers-v2.service
+    state: started
+    enabled: yes
+  tags:
+    - vouchers-v2
+
+- name: Enable vouchers2.epicerieledetour.org backup systemd timer
+  systemd:
+    name: ldt-vouchers-v2-backup.timer
+    state: started
+    enabled: yes
+  tags:
+    - vouchers-v2
+
+- name: Open ufw port tcp 8000 
+  community.general.ufw:
+    rule: allow
+    direction: in
+    port: "8000"
+    interface: "wg-ledetour"
+  tags:
+    - vouchers-v2
