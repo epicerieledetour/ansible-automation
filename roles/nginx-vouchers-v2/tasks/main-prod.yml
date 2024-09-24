@@ -1,0 +1,34 @@
+- set_fact:
+    vouchers2_ssl_snippet_conf: certbot-vouchers2.epicerieledetour.org.conf
+    vouchers2_server_fqdn: vouchers2.epicerieledetour.org
+  tags:
+    - nginx-vouchers-v2
+
+- name: Debug AAA vouchers2_ssl_snippet_conf
+  ansible.builtin.debug:
+    var: vouchers2_ssl_snippet_conf
+  tags:
+    - nginx-vouchers-v2
+
+- name: Debug AAA vouchers2_server_fqdn
+  ansible.builtin.debug:
+    var: vouchers2_server_fqdn
+  tags:
+    - nginx-vouchers-v2
+
+- name: Generate vouchers2 certbot SSL certificate
+  command:
+    cmd: "/snap/bin/certbot certonly --agree-tos -n --nginx -m contact@epicerieledetour.org -d {{ vouchers2_server_fqdn }}"
+    creates: "/etc/letsencrypt/live/{{ vouchers2_server_fqdn }}/fullchain.pem"
+  tags:
+    - nginx-vouchers-v2
+
+- name: Instanciate vouchers2 nginx SSL config
+  template:
+    src: certbot.conf.j2
+    dest: "/etc/nginx/snippets/{{ vouchers2_ssl_snippet_conf }}"
+    mode: u=r,g=r,o=r
+  notify:
+    - nginx changed
+  tags:
+    - nginx-vouchers-v2
