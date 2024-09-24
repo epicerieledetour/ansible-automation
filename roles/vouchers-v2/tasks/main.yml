@@ -2,8 +2,10 @@
   apt:
     pkg:
       - git
+      - libcairo2
       - python3.11
       - python3-virtualenv
+      - sqlite3
   tags:
     - vouchers-v2
 
