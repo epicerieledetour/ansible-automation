@@ -1,6 +1,7 @@
 - name: Install rclone for Raspberry Pi OS
   apt:
-    deb: "https://downloads.rclone.org/v1.60.0/rclone-v1.60.0-linux-{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}.deb"
+    pkg:
+      - rclone
 
 - name: Make {{ rclone_etc_dir }} directory
   file:
