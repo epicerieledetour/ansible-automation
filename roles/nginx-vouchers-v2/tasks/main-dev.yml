@@ -1,5 +1,0 @@
-- set_fact:
-    vouchers2_ssl_snippet_conf: snakeoil.conf
-    vouchers2_server_fqdn: "vouchers2.*"
-  tags:
-    - nginx-vouchers-v2

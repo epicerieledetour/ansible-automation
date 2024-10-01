@@ -1,0 +1,24 @@
+- include_tasks:
+    file: "main{{ deployment_suffix }}.yml"
+  tags:
+    - nginx-vouchers
+
+- name: Instanciate vouchers nginx config
+  template:
+    src: ldt-vouchers.conf.j2
+    dest: /etc/nginx/sites-available/ldt-vouchers.conf
+    mode: u=r,g=r,o=r
+  notify:
+    - nginx changed
+  tags:
+    - nginx-vouchers
+
+- name: Enable vouchers.epicerieledetour.org nginx configuration file
+  file:
+    src: /etc/nginx/sites-available/ldt-vouchers.conf
+    dest: /etc/nginx/sites-enabled/ldt-vouchers.conf
+    state: link
+  notify:
+    - nginx changed
+  tags:
+    - nginx-vouchers

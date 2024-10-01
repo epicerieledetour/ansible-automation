@@ -1,0 +1,22 @@
+- set_fact:
+    vouchers_ssl_snippet_conf: certbot-vouchers.epicerieledetour.org.conf
+    vouchers_server_fqdn: vouchers.epicerieledetour.org
+  tags:
+    - nginx-vouchers
+
+- name: Generate vouchers certbot SSL certificate
+  command:
+    cmd: "/snap/bin/certbot certonly --agree-tos -n --nginx -m contact@epicerieledetour.org -d {{ vouchers_server_fqdn }}"
+    creates: "/etc/letsencrypt/live/{{ vouchers_server_fqdn }}/fullchain.pem"
+  tags:
+    - nginx-vouchers
+
+- name: Instanciate vouchers nginx SSL config
+  template:
+    src: certbot.conf.j2
+    dest: "/etc/nginx/snippets/{{ vouchers_ssl_snippet_conf }}"
+    mode: u=r,g=r,o=r
+  notify:
+    - nginx changed
+  tags:
+    - nginx-vouchers

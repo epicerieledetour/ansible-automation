@@ -1,0 +1,95 @@
+- name: Install vouchers.epicerieledetour.org dependencies
+  apt:
+    pkg:
+      - git
+      - libcairo2
+      - python3.11
+      - python3-virtualenv
+      - sqlite3
+  tags:
+    - vouchers
+
+# Copy systemd services and timers
+
+- name: Copying vouchers.epicerieledetour.org systemd service file
+  copy:
+    src: ldt-vouchers.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+  tags:
+    - vouchers
+
+- name: Copying vouchers.epicerieledetour.org backup systemd service file
+  copy:
+    src: ldt-vouchers-backup.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+  tags:
+    - vouchers
+
+- name: Copying vouchers.epicerieledetour.org backup timer file
+  copy:
+    src: ldt-vouchers-backup.timer
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+  tags:
+    - vouchers
+
+# Stop webapp during upgrade
+
+- name: Stop vouchers.epicerieledetour.org systemd service
+  systemd:
+    name: ldt-vouchers.service
+    state: stopped
+  tags:
+    - vouchers
+
+# Install webapp code
+
+- name: Make vouchers.epicerieledetour.org installation folder
+  ansible.builtin.file:
+    path: /srv/www/vouchers.epicerieledetour.org
+    state: directory
+    mode: "0755"
+    owner: "www-data"
+    group: "www-data"
+  tags:
+    - vouchers
+
+- name: Pip install vouchers.epicerieledetour.org
+  ansible.builtin.pip:
+    name: git+https://github.com/epicerieledetour/ledetour-vouchers.git@v2
+    virtualenv: /srv/www/vouchers.epicerieledetour.org/venv
+    state: latest
+  tags:
+    - vouchers
+
+# Enable systemd services and timers
+
+- name: Enable vouchers.epicerieledetour.org systemd service
+  systemd:
+    name: ldt-vouchers.service
+    state: started
+    enabled: yes
+  tags:
+    - vouchers
+
+- name: Enable vouchers.epicerieledetour.org backup systemd timer
+  systemd:
+    name: ldt-vouchers-backup.timer
+    state: started
+    enabled: yes
+  tags:
+    - vouchers
+
+- name: Open ufw port tcp 8000 on interface wg-ledetour
+  community.general.ufw:
+    rule: allow
+    direction: in
+    port: "8000"
+    interface: "wg-ledetour"
+  tags:
+    - vouchers

@@ -1,0 +1,9 @@
+[Unit]
+Description="Backup ledetour-vouchers database"
+
+[Service]
+Type=oneshot
+User=www-data
+WorkingDirectory=/srv/www/vouchers.epicerieledetour.org
+
+ExecStart=sqlite3 ldt-vouchers.sqlite3 ".backup ldt-vouchers.sqlite3.bak"

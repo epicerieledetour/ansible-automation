@@ -1,0 +1,14 @@
+[Unit]
+Description=Run ledetour-vouchers
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/srv/www/vouchers.epicerieledetour.org
+
+Environment="LDTVOUCHERS_DBPATH=ldt-vouchers.sqlite3"
+
+ExecStart=/srv/www/vouchers.epicerieledetour.org/venv/bin/python -m ldtvouchers server serve --host 0.0.0.0 --port 8000
+
+[Install]
+WantedBy=default.target

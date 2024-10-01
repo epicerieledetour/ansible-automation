@@ -58,7 +58,7 @@
     - systemd
     - nginx
     - nginx-membres
-    - nginx-vouchers-v2
+    - nginx-vouchers
     - grafana
     - wordpress
 
@@ -72,4 +72,4 @@
   become: true
   roles:
     - systemd
-    - vouchers-v2
+    - vouchers
