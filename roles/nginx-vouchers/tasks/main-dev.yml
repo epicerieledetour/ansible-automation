@@ -1,3 +1,0 @@
-- set_fact:
-    vouchers_ssl_snippet_conf: snakeoil.conf
-    vouchers_server_fqdn: "vouchers.*"

@@ -1,9 +1,0 @@
-[Unit]
-Description="Backup ledetour-vouchers database every 15min"
-
-[Timer]
-OnCalendar=*:0/15
-Unit=ledetour-vouchers-backup.service
-
-[Install]
-WantedBy=multi-user.target

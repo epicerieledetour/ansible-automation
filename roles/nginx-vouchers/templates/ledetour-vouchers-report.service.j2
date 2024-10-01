@@ -1,7 +1,0 @@
-[Unit]
-Description="Send report of ledetour-vouchers"
-
-[Service]
-Environment="LDTVOUCHERS_MAIL_PASSWORD={{ ldtvouchers_mail_password }}"
-ExecStart=/var/www/ledetour-vouchers/venv-py37/bin/send_report.sh /var/www/ledetour-vouchers/ledetour-vouchers.sqlite3
-Type=oneshot
