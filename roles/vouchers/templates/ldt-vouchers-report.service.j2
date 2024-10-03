@@ -1,0 +1,12 @@
+[Unit]
+Description=Run ledetour-vouchers
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/srv/www/vouchers.epicerieledetour.org
+
+ExecStart=/srv/www/vouchers.epicerieledetour.org/venv/bin/python -m ldtvouchers --db ldt-vouchers.sqlite3 emissions odsreport files/emissions/{{ hack_vouchers_tmp_emission_token }}/report.ods
+
+[Install]
+WantedBy=default.target

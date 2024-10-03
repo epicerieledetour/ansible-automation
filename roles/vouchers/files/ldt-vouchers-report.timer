@@ -1,0 +1,9 @@
+[Unit]
+Description="Send ldt-vouchers report every day"
+
+[Timer]
+OnCalendar=*-*-* 20:30:00 America/Montreal
+Unit=ldt-vouchers-report.service
+
+[Install]
+WantedBy=multi-user.target

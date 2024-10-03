@@ -9,35 +9,6 @@
   tags:
     - vouchers
 
-# Copy systemd services and timers
-
-- name: Copying vouchers.epicerieledetour.org systemd service file
-  copy:
-    src: ldt-vouchers.service
-    dest: /etc/systemd/system/
-  notify:
-    - systemd changed
-  tags:
-    - vouchers
-
-- name: Copying vouchers.epicerieledetour.org backup systemd service file
-  copy:
-    src: ldt-vouchers-backup.service
-    dest: /etc/systemd/system/
-  notify:
-    - systemd changed
-  tags:
-    - vouchers
-
-- name: Copying vouchers.epicerieledetour.org backup timer file
-  copy:
-    src: ldt-vouchers-backup.timer
-    dest: /etc/systemd/system/
-  notify:
-    - systemd changed
-  tags:
-    - vouchers
-
 # Stop webapp during upgrade
 
 - name: Stop vouchers.epicerieledetour.org systemd service
@@ -67,7 +38,85 @@
   tags:
     - vouchers
 
-# Enable systemd services and timers
+# Copy systemd services and timers
+
+# Backup
+
+- name: Copying vouchers.epicerieledetour.org backup service file
+  copy:
+    src: ldt-vouchers-backup.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+  tags:
+    - vouchers
+
+- name: Copying vouchers.epicerieledetour.org backup timer file
+  copy:
+    src: ldt-vouchers-backup.timer
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+  tags:
+    - vouchers
+
+- name: Enable vouchers.epicerieledetour.org backup timer
+  systemd:
+    name: ldt-vouchers-backup.timer
+    state: started
+    enabled: yes
+  tags:
+    - vouchers
+
+# Report
+
+- name: Create emission files directory
+  ansible.builtin.file:
+    path: "/srv/www/vouchers.epicerieledetour.org/files/emissions/{{ hack_vouchers_tmp_emission_token }}"
+    state: directory
+    mode: '0755'
+    owner: www-data
+    group: www-data
+  tags:
+    - vouchers
+
+- name: Instanciate vouchers.epicerieledetour.org ldt-vouchers-report.service
+  template:
+    src: ldt-vouchers-report.service.j2
+    dest: /etc/systemd/system/ldt-vouchers-report.service
+    mode: u=r,g=r,o=
+  notify:
+    - nginx changed
+  tags:
+    - vouchers
+
+- name: Copying vouchers.epicerieledetour.org report timer file
+  copy:
+    src: ldt-vouchers-report.timer
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+  tags:
+    - vouchers
+
+- name: Enable vouchers.epicerieledetour.org report timer
+  systemd:
+    name: ldt-vouchers-report.timer
+    state: started
+    enabled: yes
+  tags:
+    - vouchers
+
+# Server
+
+- name: Copying vouchers.epicerieledetour.org systemd service file
+  copy:
+    src: ldt-vouchers.service
+    dest: /etc/systemd/system/
+  notify:
+    - systemd changed
+  tags:
+    - vouchers
 
 - name: Enable vouchers.epicerieledetour.org systemd service
   systemd:
@@ -77,13 +126,7 @@
   tags:
     - vouchers
 
-- name: Enable vouchers.epicerieledetour.org backup systemd timer
-  systemd:
-    name: ldt-vouchers-backup.timer
-    state: started
-    enabled: yes
-  tags:
-    - vouchers
+# Firewall ufw
 
 - name: Open ufw port tcp 8000 on interface wg-ledetour
   community.general.ufw:
