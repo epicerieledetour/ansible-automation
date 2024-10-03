@@ -72,7 +72,7 @@
 
 - name: Create emission files directory
   ansible.builtin.file:
-    path: "/srv/www/vouchers.epicerieledetour.org/files/emissions/{{ hack_vouchers_tmp_emission_token }}"
+    path: "/srv/www/vouchers.epicerieledetour.org/files/emissions/{{ ldtvouchers_hack_emissiontoken }}"
     state: directory
     mode: '0755'
     owner: www-data
@@ -86,7 +86,7 @@
     dest: /etc/systemd/system/ldt-vouchers-report.service
     mode: u=r,g=r,o=
   notify:
-    - nginx changed
+    - systemd changed
   tags:
     - vouchers
 

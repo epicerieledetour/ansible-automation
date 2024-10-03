@@ -2,11 +2,23 @@
 Description=Run ledetour-vouchers
 
 [Service]
-Type=simple
+Type=oneshot
 User=www-data
 WorkingDirectory=/srv/www/vouchers.epicerieledetour.org
 
-ExecStart=/srv/www/vouchers.epicerieledetour.org/venv/bin/python -m ldtvouchers --db ldt-vouchers.sqlite3 emissions odsreport files/emissions/{{ hack_vouchers_tmp_emission_token }}/report.ods
+Environment="LDTVOUCHERS_DBPATH=ldt-vouchers.sqlite3"
+Environment="LDTVOUCHERS_EMAILREPORT_HOST={{ ldtvouchers_emailreport_host }}"
+Environment="LDTVOUCHERS_EMAILREPORT_PORT={{ ldtvouchers_emailreport_port }}"
+Environment="LDTVOUCHERS_EMAILREPORT_FROM={{ ldtvouchers_emailreport_from }}"
+Environment="LDTVOUCHERS_EMAILREPORT_TO={{ ldtvouchers_emailreport_to }}"
+Environment="LDTVOUCHERS_EMAILREPORT_USER={{ ldtvouchers_emailreport_user }}"
+Environment="LDTVOUCHERS_EMAILREPORT_PASSWORD={{ ldtvouchers_emailreport_password }}"
+Environment="LDTVOUCHERS_HACK_EMISSIONTOKEN={{ ldtvouchers_hack_emissiontoken }}"
+Environment="LDTVOUCHERS_DBPATH=ldt-vouchers.sqlite3"
+Environment="LDTVOUCHERS_FILESPATH=files"
+
+ExecStart=/srv/www/vouchers.epicerieledetour.org/venv/bin/python -m ldtvouchers --db ldt-vouchers.sqlite3 emissions odsreport files/emissions/{{ ldtvouchers_hack_emissiontoken }}/report.ods
+ExecStart=/srv/www/vouchers.epicerieledetour.org/venv/bin/python -m ldtvouchers --db ldt-vouchers.sqlite3 emissions emailreport
 
 [Install]
 WantedBy=default.target

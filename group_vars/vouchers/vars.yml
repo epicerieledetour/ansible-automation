@@ -1,0 +1,8 @@
+ldtvouchers_emailreport_password: "{{ vault_ldtvouchers_emailreport_password }}"
+ldtvouchers_emailreport_host: "{{ vault_ldtvouchers_emailreport_host }}"
+ldtvouchers_emailreport_port: "{{ vault_ldtvouchers_emailreport_port }}"
+ldtvouchers_emailreport_user: "{{ vault_ldtvouchers_emailreport_user }}"
+ldtvouchers_emailreport_from: "{{ vault_ldtvouchers_emailreport_from }}"
+ldtvouchers_emailreport_to: "{{ vault_ldtvouchers_emailreport_to }}"
+
+ldtvouchers_hack_emissiontoken: "{{ vault_ldtvouchers_hack_emissiontoken }}"
