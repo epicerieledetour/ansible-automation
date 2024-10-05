@@ -38,7 +38,7 @@
   command: borg init --encryption=repokey
   register: borg_init
   changed_when: borg_init.rc == 0
-  failed_when: not (borg_init.rc == 0 or (borg_init.rc == 2 and borg_init.stderr.startswith("A repository already exists")))
+  failed_when: not (borg_init.rc == 0 or (borg_init.rc == 2 and "A repository already exists" in borg_init.stderr))
   environment:
     # TODO: this replicates env.j2
     BORG_PASSPHRASE: "{{ borg_passphrase }}"
