@@ -34,7 +34,7 @@
   ansible.builtin.pip:
     name: git+https://github.com/epicerieledetour/ledetour-vouchers.git@v2
     virtualenv: /srv/www/vouchers.epicerieledetour.org/venv
-    state: latest
+    state: forcereinstall
   tags:
     - vouchers
 
