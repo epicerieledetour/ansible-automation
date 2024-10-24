@@ -1,3 +1,9 @@
+- name: Set timezone to America/Montreal
+  community.general.timezone:
+    name: America/Montreal
+  tags:
+    - common
+
 - name: Ensure hostname
   hostname:
     name: "{{ inventory_hostname }}"
