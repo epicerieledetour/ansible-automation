@@ -2,6 +2,8 @@
   apt:
     pkg:
       - borgbackup
+  tags:
+    - borgbackup
 
 # Static configuration
 
@@ -10,12 +12,16 @@
     src: backup.sh
     dest: /usr/local/bin/
     mode: 0500
+  tags:
+    - borgbackup
 
 - name: Make /usr/local/etc/borg directory
   file:
     path: /usr/local/etc/borg
     state: directory
     mode: 0700
+  tags:
+    - borgbackup
 
 - name: Copying backup script systemd service file
   copy:
@@ -23,6 +29,8 @@
     dest: /etc/systemd/system/
   notify:
     - systemd changed
+  tags:
+    - borgbackup
 
 - name: Copying backup script systemd timer file
   copy:
@@ -30,6 +38,8 @@
     dest: /etc/systemd/system/
   notify:
     - systemd changed
+  tags:
+    - borgbackup
 
 # Dynamic configuration per borgstore host in inventory
 
@@ -39,6 +49,8 @@
     comment: "{{ inventory_hostname }} borg"
     mode: 0400
   register: borg_head_ssh
+  tags:
+    - borgbackup
 
 - name: "Configure borg backup stores"
   include_tasks:
@@ -51,3 +63,5 @@
     borg_store_user: "{{ hostvars[item].ansible_user }}"
     borg_repo: "{% if borg_store_is_remote | bool %}{{ borg_store_user }}@{{ borg_store_host }}:{% endif %}/srv/borg/{{ inventory_hostname }}"
     borg_task_name_prefix: "borg store {{ borg_store_inventory_hostname }}"
+  tags:
+    - borgbackup

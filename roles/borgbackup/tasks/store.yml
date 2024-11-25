@@ -8,6 +8,8 @@
   when: borg_store_is_remote | bool
   delegate_to: "{{ borg_store_inventory_hostname }}"
   ignore_unreachable: yes
+  tags:
+    - borgbackup
 
 # Pre-register borg store public ssh keys to borg head so no user input is asked
 # the first time the bord head connects to the borg store
@@ -16,6 +18,8 @@
   command: "ssh-keyscan {{ borg_store_host }}"
   register: borg_store_host_public_keys
   changed_when: false
+  tags:
+    - borgbackup
 
 - name: "{{ borg_task_name_prefix }}: register borg store hosts ssh public keys"
   lineinfile:
@@ -25,6 +29,8 @@
   with_items: "{{ borg_store_host_public_keys.stdout_lines }}"
   loop_control:
     loop_var: stdout_line
+  tags:
+    - borgbackup
 
 # Configure borg
 
@@ -33,6 +39,8 @@
     src: env.j2
     dest: "/usr/local/etc/borg/{{ borg_store_inventory_hostname }}.env"
     mode: 0400
+  tags:
+    - borgbackup
 
 - name: "{{ borg_task_name_prefix }}: init backup repository"
   command: borg init --encryption=repokey
@@ -45,9 +53,13 @@
     BORG_REPO: "{{ borg_repo }}"
     BORG_RSH: "ssh -i {{ borg_head_ssh.filename }}"
   ignore_errors: yes
+  tags:
+    - borgbackup
 
 - name: "{{ borg_task_name_prefix }}: start backup script systemd timer"
   systemd:
     name: "backup@{{ borg_store_inventory_hostname }}.timer"
     enabled: true
     state: started
+  tags:
+    - borgbackup

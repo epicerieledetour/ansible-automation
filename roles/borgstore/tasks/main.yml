@@ -2,6 +2,8 @@
   apt:
     pkg:
       - borgbackup
+  tags:
+    - borgstore
 
 - name: Make root borg directory /srv/borg
   file:
@@ -9,3 +11,5 @@
     state: directory
     mode: 0700
     owner: "{{ ansible_user }}"
+  tags:
+    - borgstore

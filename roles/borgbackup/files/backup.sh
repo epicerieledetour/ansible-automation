@@ -32,9 +32,7 @@ borg create                         \
     /root                           \
     /srv                            \
     /usr/local                      \
-    /var                            \
-                                    \
-    >> /var/log/borg.log 2>&1
+    /var
 
 backup_exit=$?
 
@@ -68,4 +66,6 @@ else
     info "Backup and/or Prune finished with errors"
 fi
 
+# Allow warnings to not fail
+global_exit=$(( global_exit > 1 ? global_exit : 0 ))
 exit ${global_exit}
