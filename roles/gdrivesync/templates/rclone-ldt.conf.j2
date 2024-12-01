@@ -3,6 +3,8 @@ type = drive
 scope = drive
 service_account_file = {{ rclone_etc_dir }}/drive-sync-on-ovh-server-50a335a0b68b.json
 impersonate = automation@epicerieledetour.org
+skip_shortcuts = true
+skip_dangling_shortcuts = true
 
 [DETOUR_COMITES]
 type = alias
