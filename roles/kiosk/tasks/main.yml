@@ -1,6 +1,20 @@
 - name: Setup kiosk
   become: true
   block:
+  - name: Install extrepo
+    ansible.builtin.apt:
+      pkg:
+        - extrepo
+    tags:
+      - kiosk
+
+  - name: Enable extrepo source mozille
+    ansible.builtin.command: "extrepo enable mozilla"
+    args:
+      creates: "/etc/apt/sources.list.d/extrepo_mozilla.sources"
+    tags:
+      - kiosk
+
   - name: Install kiosk packages
     apt:
       pkg:
@@ -9,6 +23,7 @@
         - greetd
         - swaybg
         - wayfire
+      update_cache: yes
     tags:
       - kiosk
 
