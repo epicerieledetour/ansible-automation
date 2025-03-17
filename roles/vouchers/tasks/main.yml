@@ -15,6 +15,7 @@
   systemd:
     name: ldt-vouchers.service
     state: stopped
+  ignore_errors: true
   tags:
     - vouchers
 
