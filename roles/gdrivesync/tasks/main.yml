@@ -41,8 +41,8 @@
   notify:
     - systemd changed
 
-- name: Register rclone sync timers
-  systemd:
-    name: rclone-ldt.timer
-    enabled: true
-    state: started
+# - name: Register rclone sync timers
+#   systemd:
+#     name: rclone-ldt.timer
+#     enabled: true
+#     state: started
