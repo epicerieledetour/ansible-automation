@@ -21,6 +21,7 @@
         - alacritty
         - firefox
         - greetd
+        - network-manager
         - swaybg
         - wayfire
       update_cache: yes
@@ -46,7 +47,7 @@
     ansible.builtin.user:
       name: kiosk
       create_home: yes
-      groups: adm,dialout,cdrom,audio,video,plugdev,games,users,input,render,netdev,spi,i2c,gpio
+      groups: adm,dialout,cdrom,audio,video,plugdev,games,users,input,render,netdev
       append: yes
     tags:
       - kiosk
