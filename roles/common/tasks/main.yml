@@ -48,6 +48,15 @@
   tags:
     - common
 
+- name: Remove now obsolete buster backports repos
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list
+    regexp: '^(.*backports.*)$'
+    replace: '# \1'
+  when: ansible_distribution == "Debian" and ansible_distribution_release == "buster"
+  tags:
+    - common
+
 - name: Update apt cache
   apt:
     update_cache: yes
@@ -67,6 +76,8 @@
       - unattended-upgrades
       - ufw
       - vim
+  tags:
+    - common
 
 - name: Upgrade all packages
   apt:
