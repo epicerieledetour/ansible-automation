@@ -1,13 +1,21 @@
+# SSH connections
 
-#vps ansible_host=vps-65c98ca9.vps.ovh.ca ansible_user=debian wireguard_endpoint_address=51.222.28.137
-vps ansible_host=192.168.211.10 ansible_user=debian
-#vps2 ansible_host=vps-53fcb87d.vps.ovh.ca ansible_user=debian
-vps2 ansible_host=192.168.211.90 ansible_user=debian wireguard_endpoint_address=vps-53fcb87d.vps.ovh.ca
-pi1 ansible_host=192.168.211.30 ansible_user=debian
-#pi2 ansible_host=192.168.211.20 ansible_user=debian  # Not used anymore
-srv1 ansible_host=192.168.211.60 ansible_user=ldt
+vps ansible_host=vps-65c98ca9.vps.ovh.ca ansible_user=debian
+vps2 ansible_host=vps-53fcb87d.vps.ovh.ca ansible_user=debian wireguard_endpoint_address=vps-53fcb87d.vps.ovh.ca
+pi1 ansible_host=pi ansible_user=debian
+# pi2 ansible_host=192.168.211.20 ansible_user=debian  # Not used anymore
+# srv1 ansible_host=192.168.211.60 ansible_user=ldt  # Unreachable by direct SSH
+kiosk1 ansible_host=192.168.87.27 ansible_user=ldt
 
-kiosk1 ansible_host=192.168.211.80 ansible_user=ldt
+# Wireguard connections
+
+; vps ansible_host=192.168.211.10 ansible_user=debian
+; vps2 ansible_host=192.168.211.90 ansible_user=debian wireguard_endpoint_address=vps-53fcb87d.vps.ovh.ca
+; pi1 ansible_host=192.168.211.30 ansible_user=debian
+# pi2 ansible_host=192.168.211.20 ansible_user=debian  # Not used anymore
+; srv1 ansible_host=192.168.211.60 ansible_user=ldt
+; kiosk1 ansible_host=192.168.211.80 ansible_user=ldt
+
 
 [workstations]
 charles-xps15            # 192.168.211.40
@@ -21,22 +29,22 @@ pi1
 srv1
 kiosk1
 
-[vouchers]
-vps2
+; [vouchers]
+; vps2
 
-[webservers]
-vps
+; [webservers]
+; vps
 
-[borgstores]
-pi1
+; [borgstores]
+; pi1
 
-[dataproxies]
-pi1
+; [dataproxies]
+; pi1
 
-[backuphead]
-vps
-vps2
-pi1
+; [backuphead]
+; vps
+; vps2
+; pi1
 
-[kiosks]
-kiosk1
+; [kiosks]
+; kiosk1

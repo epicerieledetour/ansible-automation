@@ -60,6 +60,7 @@
 - name: Update apt cache
   apt:
     update_cache: yes
+  ignore_errors: true
   tags:
     - common
 
