@@ -1,6 +1,6 @@
 
 #vps ansible_host=vps-65c98ca9.vps.ovh.ca ansible_user=debian wireguard_endpoint_address=51.222.28.137
-vps ansible_host=192.168.211.10 ansible_user=debian
+vps ansible_host=192.168.211.10 ansible_user=debian wireguard_endpoint_address=51.222.28.137
 #vps2 ansible_host=vps-53fcb87d.vps.ovh.ca ansible_user=debian
 vps2 ansible_host=192.168.211.90 ansible_user=debian wireguard_endpoint_address=vps-53fcb87d.vps.ovh.ca
 pi1 ansible_host=192.168.211.30 ansible_user=debian
