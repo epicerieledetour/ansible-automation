@@ -4,6 +4,8 @@
     src: buster-backports.list
     dest: /etc/apt/sources.list.d
   when: ansible_distribution == "Debian" and ansible_distribution_release == "buster"
+  tags:
+    - wireguard
 
 - name: Install wireguard
   apt:
@@ -11,6 +13,8 @@
       - wireguard
     update_cache: true
     state: present
+  tags:
+    - wireguard
 
 - name: Instanciate wireguard config wg-ledetour.conf
   template:
