@@ -1,5 +1,5 @@
 borg_passphrase: "{{ vault_borg_passphrase }}"
-wireguard_type: endpoint
+wireguard_type: client
 wireguard_address: 192.168.211.10
 wireguard_private_key: "{{ vault_wireguard_private_key }}"
 wireguard_public_key: "QexwKXzlcaJtcwJclC3k2D1CD3Pdgmr3R4kkdxRjDl4="
