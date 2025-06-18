@@ -78,7 +78,7 @@
   register: rebootrequired
   stat:
     path: /var/run/reboot-required
-    get_md5: no
+    get_checksum: no
   tags:
     - common
 
