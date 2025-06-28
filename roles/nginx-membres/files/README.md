@@ -21,7 +21,7 @@ Two points are important:
 # Create the CA Key and Certificate for signing Client Certs
 
 openssl genrsa -out ledetour-membres-ca.key 4096
-openssl req -new -x509 -days 365 -key ledetour-membres-ca.key -out ledetour-membres-ca.crt
+openssl req -new -x509 -key ledetour-membres-ca.key -out ledetour-membres-ca.crt
 
 # A few questions are going to be asked.
 # We keep the defaults apart for Organization Name: membres.epicerieledetour.org
@@ -38,7 +38,7 @@ openssl req -new -x509 -days 365 -key ledetour-membres-ca.key -out ledetour-memb
 # Country Name (2 letter code) [AU]:
 # State or Province Name (full name) [Some-State]:
 # Locality Name (eg, city) []:
-# Organization Name (eg, company) [Internet Widgits Pty Ltd]:membres.epicerieledetour.org       
+# Organization Name (eg, company) [Internet Widgits Pty Ltd]:membres.epicerieledetour.org
 # Organizational Unit Name (eg, section) []:
 # Common Name (e.g. server FQDN or YOUR name) []:
 # Email Address []:
