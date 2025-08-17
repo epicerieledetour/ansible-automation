@@ -21,7 +21,7 @@ Two points are important:
 # Create the CA Key and Certificate for signing Client Certs
 
 openssl genrsa -out ledetour-membres-ca.key 4096
-openssl req -new -x509 -key ledetour-membres-ca.key -out ledetour-membres-ca.crt
+openssl req -new -x509 -days 3650 -key ledetour-membres-ca.key -out ledetour-membres-ca.crt
 
 # A few questions are going to be asked.
 # We keep the defaults apart for Organization Name: membres.epicerieledetour.org
@@ -46,7 +46,7 @@ openssl req -new -x509 -key ledetour-membres-ca.key -out ledetour-membres-ca.crt
 # Create the Client Key and CSR
 
 openssl genrsa -out ledetour-membres-client.key 4096
-openssl req -new -key ledetour-membres-client.key -out ledetour-membres-client.csr
+openssl req -new -days 3650 -key ledetour-membres-client.key -out ledetour-membres-client.csr
 
 # A few questions are going to be asked again.
 # We keep the defaults apart for Organization Name: membres.epicerieledetour.org CLIENT
@@ -76,7 +76,7 @@ openssl req -new -key ledetour-membres-client.key -out ledetour-membres-client.c
 
 # Sign the client certificate with our CA cert
 
-openssl x509 -req -days 365 -in ledetour-membres-client.csr -CA ledetour-membres-ca.crt -CAkey ledetour-membres-ca.key -set_serial 01 -out ledetour-membres-client.crt
+openssl x509 -req -days 3650 -in ledetour-membres-client.csr -CA ledetour-membres-ca.crt -CAkey ledetour-membres-ca.key -set_serial 01 -out ledetour-membres-client.crt
 
 # Convert to .p12 so import in OSX works
 # Again, here we don't specify a password. The output should look like:
