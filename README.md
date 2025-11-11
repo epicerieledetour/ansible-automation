@@ -1,6 +1,11 @@
 # ansible-automation
 Automation of IT related tasks
 
+## TODO
+
+- doc python venv / install latest ansible
+- install latest vagran plugin vagrant-libvirt
+
 ## The vault password file
 
 This playbook uses [Ansible Vaults](https://docs.ansible.com/ansible/latest/user_guide/vault.html). The password file, GPG encryped and shared amongst Le Détour admins by an out-of-band mean of communication, is expected to be named `.vault_password.gpg` in this cloned repo root folder.
