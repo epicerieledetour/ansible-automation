@@ -17,8 +17,6 @@
 
 - Current problems
   - Developer setup is broken
-    - Remove dependencies, move to systemd-nspawn ?
-    - Move ansible-vault key management from gpg to ssh pub keys
   - We run old versions of everything
     - OS (Debian Buster)
     - Versions (Wordpress, Grafana)
@@ -45,6 +43,7 @@
     - How can we know the files that are not backuped ?
   - We don't know exactly what is going on our servers
     - Better observability / alerting
+    - Status panel to have an overview of the health of the system
     - Monitor and alert on resources
       - Logs on Slack when a backup finishes for example, with a report
       - Alert when server resources reach a threshold (server fs not full)
