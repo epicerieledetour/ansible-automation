@@ -1,19 +1,4 @@
 - Vision
-  - Document network services with Ansible
-    - Corrolary: no final setup should be done by clicking on user interface, everything config should be in the ansible scripts
-  - Few of use that can run the Ansible scripts
-  - Follow the chaton.org vision
-  - backup / restore scripts
-  - Minimize dependencies to third-party services
-  - All auth comes from an @epicerieledetour.org account
-  - Encryption required
-  - Internal doc is in French (the Détour is a French speaking organization), but external doc (notably, everything on the GitHub) is in English because it is public
-  - Monthly report of IT usage
-  - All network ports closed by default
-    - We open them only when required by a service, from ansible
-
-- describe network topology and what services are hosted on each machine
-  - We don't punch holes in domestic routers: all machines connect within a wireguard star network, with an unique, public machine as the main router
 
 - Current problems
   - Developer setup is broken
