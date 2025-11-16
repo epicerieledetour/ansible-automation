@@ -24,6 +24,7 @@ The Épicerie le Détour is a self-managed organization. It strives on do-it-you
 
 To further minimize dependencies, reduce friction and centralize configuration, third-party SaaS are kept to a minimum, [Slack](https://epicerieledetour.slack.com) and Google Drives being the current exceptions. Al other services are self-hosted and self-maintained.
 
+Servers OS is [Debian](https://debian.org) and workstation setups must allow work on Debian.
 
 ### Centralized authentication
 
