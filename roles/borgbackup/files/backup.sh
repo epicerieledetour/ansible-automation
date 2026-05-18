@@ -22,7 +22,10 @@ borg create                         \
     --exclude-caches                \
     --exclude '/home/*/.cache/*'    \
     --exclude '/srv/borg/*'         \
+    --exclude '/srv/liquidsoap/*'   \
+    --exclude '/srv/media/*'        \
     --exclude '/var/cache/*'        \
+    --exclude '/var/lib/machines/*' \
     --exclude '/var/tmp/*'          \
                                     \
     ::'{hostname}-{now}'            \
