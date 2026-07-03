@@ -1,4 +1,5 @@
-- name: reload wireguard
-  systemd:
+---
+- name: Reload wireguard
+  ansible.builtin.systemd:
     name: wg-quick@wg-ledetour.service
     state: restarted

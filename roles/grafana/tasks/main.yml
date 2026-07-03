@@ -1,10 +1,11 @@
+---
 # nginx
 
-- include_tasks:
+- ansible.builtin.include_tasks:
     file: "main{{ deployment_suffix }}.yml"
 
 - name: Instanciate grafana nginx config
-  template:
+  ansible.builtin.template:
     src: nginx/grafana.conf.j2
     dest: /etc/nginx/sites-available/grafana.conf
     mode: u=r,g=r,o=r
@@ -12,7 +13,7 @@
     - "nginx changed"
 
 - name: Enable grafana's nginx configuration file
-  file:
+  ansible.builtin.file:
     src: /etc/nginx/sites-available/grafana.conf
     dest: /etc/nginx/sites-enabled/grafana.conf
     state: link
@@ -23,28 +24,28 @@
 # Grafana
 
 - name: Install gpg
-  apt:
+  ansible.builtin.apt:
     pkg:
       - gpg
 
 - name: Add Grafana repository key
-  apt_key:
-      url: 'https://packages.grafana.com/gpg.key'
-      state: present
+  ansible.builtin.apt_key:
+    url: "https://packages.grafana.com/gpg.key"
+    state: present
 
 - name: Add Grafana Repository
-  apt_repository:
-      repo: 'deb https://packages.grafana.com/oss/deb stable main'
-      state: present
+  ansible.builtin.apt_repository:
+    repo: "deb https://packages.grafana.com/oss/deb stable main"
+    state: present
 
 - name: Install grafana
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
+    update_cache: true
     pkg:
       - grafana
 
 - name: Instanciate grafana config
-  template:
+  ansible.builtin.template:
     src: grafana/grafana.ini.j2
     dest: /etc/grafana/grafana.ini
     mode: u=rw,g=r
@@ -52,7 +53,7 @@
     - "grafana changed"
 
 - name: Copy grafana dashboards
-  copy:
+  ansible.builtin.copy:
     src: grafana/dashboards/
     dest: /var/lib/grafana/dashboards/
     owner: root
@@ -62,7 +63,7 @@
     - grafana changed
 
 - name: Copy grafana provisioning files
-  copy:
+  ansible.builtin.copy:
     src: grafana/provisioning/
     dest: /etc/grafana/provisioning/
     owner: root
@@ -73,89 +74,86 @@
     - grafana changed
 
 - name: Start Grafana
-  systemd:
-      name: grafana-server
-      enabled: true
-      state: started
-
+  ansible.builtin.systemd:
+    name: grafana-server
+    enabled: true
+    state: started
 
 # Loki
 
 - name: Install unzip
-  apt:
+  ansible.builtin.apt:
     pkg:
       - unzip
 
 - name: Loki Download
-  get_url:
-      url: "https://github.com/grafana/loki/releases/download/v2.2.1/loki-linux-amd64.zip"
-      checksum: sha256:dacfb229dbc7064b1d6390173ea6963eb3c85f60dc2336081b0113476405c5aa
-      dest: /tmp/loki-v2.2.1-linux-amd64.zip
+  ansible.builtin.get_url:
+    url: "https://github.com/grafana/loki/releases/download/v2.2.1/loki-linux-amd64.zip"
+    checksum: sha256:dacfb229dbc7064b1d6390173ea6963eb3c85f60dc2336081b0113476405c5aa
+    dest: /tmp/loki-v2.2.1-linux-amd64.zip
 
 - name: Unzip Loki
-  unarchive:
-      src: /tmp/loki-v2.2.1-linux-amd64.zip
-      dest: /usr/local/bin/
-      remote_src: yes
-      mode: "a+x"
+  ansible.builtin.unarchive:
+    src: /tmp/loki-v2.2.1-linux-amd64.zip
+    dest: /usr/local/bin/
+    remote_src: true
+    mode: "a+x"
   notify:
     - loki changed
 
 - name: Copying Loki systemd service config
-  copy:
-      src: loki/loki.service
-      dest: /etc/systemd/system/
+  ansible.builtin.copy:
+    src: loki/loki.service
+    dest: /etc/systemd/system/
   notify:
     - loki changed
 
 - name: Copying Loki config
-  copy:
-      src: loki/config-loki.yml
-      dest: /usr/local/bin/
+  ansible.builtin.copy:
+    src: loki/config-loki.yml
+    dest: /usr/local/bin/
   notify:
     - loki changed
 
 - name: Start Loki
-  systemd:
-      name: loki
-      enabled: true
-      state: started
-
+  ansible.builtin.systemd:
+    name: loki
+    enabled: true
+    state: started
 
 # Promtail
 
-
 - name: Promtail Download
-  get_url:
-      url: "https://github.com/grafana/loki/releases/download/v2.2.1/promtail-linux-amd64.zip"
-      checksum: sha256:40d8d414b44baa78c5010cb7575d74eea035b6b00adb78e9676a045d6730a16f
-      dest: /tmp/promtail-v2.2.1-linux-amd64.zip
+  ansible.builtin.get_url:
+    url: "https://github.com/grafana/loki/releases/download/v2.2.1/promtail-linux-amd64.zip"
+    checksum: sha256:40d8d414b44baa78c5010cb7575d74eea035b6b00adb78e9676a045d6730a16f
+    dest: /tmp/promtail-v2.2.1-linux-amd64.zip
 
 - name: Unzip Promtail
-  unarchive:
-      src: /tmp/promtail-v2.2.1-linux-amd64.zip
-      dest: /usr/local/bin/
-      remote_src: yes
-      mode: "a+x"
+  ansible.builtin.unarchive:
+    src: /tmp/promtail-v2.2.1-linux-amd64.zip
+    dest: /usr/local/bin/
+    remote_src: true
+    mode: "a+x"
   notify:
     - promtail changed
 
 - name: Copying Promtail service config
-  copy:
-      src: promtail/promtail.service
-      dest: /etc/systemd/system/
+  ansible.builtin.copy:
+    src: promtail/promtail.service
+    dest: /etc/systemd/system/
   notify:
     - promtail changed
 
 - name: Copying promtail config
-  copy:
-      src: promtail/config-promtail.yml
-      dest: /usr/local/bin/
+  ansible.builtin.copy:
+    src: promtail/config-promtail.yml
+    dest: /usr/local/bin/
   notify:
     - promtail changed
 
 - name: Start promtail
-  systemd:
-      name: promtail
-      enabled: true
-      state: started
+  ansible.builtin.systemd:
+    name: promtail
+    enabled: true
+    state: started

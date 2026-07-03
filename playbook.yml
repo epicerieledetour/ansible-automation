@@ -1,3 +1,4 @@
+---
 - name: "Setup common facts for all machines in the inventory"
   hosts: all
   roles:

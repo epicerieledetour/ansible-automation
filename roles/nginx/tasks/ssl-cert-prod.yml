@@ -1,5 +1,6 @@
+---
 - name: Production deployment, install snapd
-  apt:
+  ansible.builtin.apt:
     pkg:
       - snapd
 

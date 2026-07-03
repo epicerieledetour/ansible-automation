@@ -1,26 +1,27 @@
+---
 - name: Install telegraf
-  apt:
+  ansible.builtin.apt:
     pkg:
       - telegraf
 
 - name: Build the initial empty list of influxdb urls
-  set_fact:
+  ansible.builtin.set_fact:
     influxdb_urls: []
 
 - name: Build the list of influxdb urls
-  set_fact:
-    influxdb_urls: "{{ influxdb_urls + [ 'http://192.168.211.10:8086' ] }}"
+  ansible.builtin.set_fact:
+    influxdb_urls: "{{ influxdb_urls + ['http://192.168.211.10:8086'] }}"
   # loop: "{{ groups['webservers'] }}"
 
 - name: Install telegraf.conf
-  template:
+  ansible.builtin.template:
     src: telegraf.conf.j2
     dest: /etc/telegraf/telegraf.conf
   notify:
     - telegraf-changed
 
 - name: Start telegraf
-  systemd:
-      name: telegraf
-      enabled: true
-      state: started
+  ansible.builtin.systemd:
+    name: telegraf
+    enabled: true
+    state: started

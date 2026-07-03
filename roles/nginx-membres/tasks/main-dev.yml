@@ -1,4 +1,5 @@
-- set_fact:
+---
+- ansible.builtin.set_fact:
     membres_ssl_snippet_conf: snakeoil.conf
     membres_server_fqdn: "membres.*"
   tags:

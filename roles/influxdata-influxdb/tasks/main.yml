@@ -1,16 +1,17 @@
+---
 - name: Install influxdb
-  apt:
+  ansible.builtin.apt:
     pkg:
       - influxdb
 
 - name: Open port 8086 for influxdb on wireguard network
-  ufw:
+  community.general.ufw:
     rule: allow
     port: "8086"
     from_ip: 192.168.211.0/24
 
 - name: Start InfluxDB
-  systemd:
-      name: influxdb
-      enabled: true
-      state: started
+  ansible.builtin.systemd:
+    name: influxdb
+    enabled: true
+    state: started

@@ -1,4 +1,5 @@
-- set_fact:
+---
+- ansible.builtin.set_fact:
     membres_ssl_clients_snippet_conf: ledetour-membres-ssl-clients.conf
     membres_etc_dir: /etc/ledetour-membres
     membres_var_dir: /var/lib/ledetour-membres
@@ -7,20 +8,20 @@
     - nginx-membres
 
 - name: Install git
-  apt:
+  ansible.builtin.apt:
     pkg:
       - git
   tags:
     - nginx-membres
 
 - name: Git checkout membres.epicerieledetour.org
-  git:
-    repo: 'https://github.com/epicerieledetour/ledetour-membres.git'
+  ansible.builtin.git:
+    repo: "https://github.com/epicerieledetour/ledetour-membres.git"
     dest: "{{ membres_www_dir }}"
   tags:
     - nginx-membres
 
-- include_tasks:
+- ansible.builtin.include_tasks:
     file: "main{{ deployment_suffix }}.yml"
   tags:
     - nginx-membres
@@ -36,7 +37,7 @@
     - nginx-membres
 
 - name: Instanciate membres nginx config
-  template:
+  ansible.builtin.template:
     src: membres.conf.j2
     dest: /etc/nginx/sites-available/membres.conf
     mode: u=r,g=r,o=r
@@ -46,7 +47,7 @@
     - nginx-membres
 
 - name: Enable membres.epicerieledetour.org nginx configuration file
-  file:
+  ansible.builtin.file:
     src: /etc/nginx/sites-available/membres.conf
     dest: /etc/nginx/sites-enabled/membres.conf
     state: link
@@ -105,9 +106,9 @@
     - nginx-membres
 
 - name: Enable membres.epicerieledetour.org membres.json update systemd timer
-  systemd:
+  ansible.builtin.systemd:
     name: update-ledetour-membres-data.timer
     state: started
-    enabled: yes
+    enabled: true
   tags:
     - nginx-membres
