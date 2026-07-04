@@ -1,6 +1,0 @@
----
-- name: Touch /root/testrole.both.txt
-  ansible.builtin.file:
-    path: "/root/testrole.both.txt"
-    state: touch
-

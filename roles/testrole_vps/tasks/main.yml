@@ -1,6 +1,0 @@
----
-- name: Touch /root/testrole.vps.txt
-  ansible.builtin.file:
-    path: "/root/testrole.vps.txt"
-    state: touch
-

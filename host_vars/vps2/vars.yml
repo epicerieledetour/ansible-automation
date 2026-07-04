@@ -1,4 +1,6 @@
 ---
+ansible_host: vps-53fcb87d.vps.ovh.ca
+ansible_user: debian
 borg_passphrase: "{{ vault_borg_passphrase }}"
 wireguard_type: endpoint
 wireguard_allowed_ips: 192.168.211.0/24
