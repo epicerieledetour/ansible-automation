@@ -1,3 +1,14 @@
-[webservers]
-vagrant	ansible_user=vagrant
+
+srv1 wireguard_endpoint_address=vps-53fcb87d.vps.ovh.ca
+vps2 wireguard_endpoint_address=vps-53fcb87d.vps.ovh.ca
+
+[group_srv]
+srv1
+
+[group_vps]
+vps2
+
+[group_both]
+srv1
+vps2
 

@@ -56,6 +56,22 @@ The Épicerie le Détour is a French speaking organization that is open to the w
 This playbook uses [Ansible Vaults](https://docs.ansible.com/ansible/latest/user_guide/vault.html). The password file, GPG encryped and shared amongst Le Détour admins by an out-of-band mean of communication, is expected to be named `.vault_password.gpg` in this cloned repo root folder.
 
 
+### Install system dependencies
+
+On debian:
+
+```sh
+sudo apt install \
+    cloud-image-utils \  # TODO: why this one ?
+    qemu-kvm \
+    libguestfs-tools \
+    libvirt-daemon-system \
+    libvirt-dev \
+    pkg-config \
+    python3-dev
+```
+
+
 ### Install Ansible dependencies
 
 Install community package for creating and using roles:

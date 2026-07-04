@@ -1,0 +1,19 @@
+---
+- name: "SRV"
+  become: true
+  hosts: group_srv
+  roles:
+    - testrole_srv
+
+- name: "VPS"
+  become: true
+  hosts: group_vps
+  roles:
+    - testrole_vps
+
+- name: "BOTH"
+  become: true
+  hosts: group_both
+  roles:
+    - testrole_both
+
