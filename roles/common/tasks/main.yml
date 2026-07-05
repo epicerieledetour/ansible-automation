@@ -18,34 +18,6 @@
   tags:
     - common
 
-- name: Setup charlesfleches keys
-  authorized_key:
-    user: "{{ ansible_user }}"
-    state: present
-    key: ssh-rsa
-      AAAAB3NzaC1yc2EAAAADAQABAAABAQDXtNPFg0j1Ssd+CwUF0enPqTR3OuEb4WU2DlwNuLsgpTv13dXNFvF44/hnk5d9FxvJOfR/B7buUf4GkVvLgsr25k/nRAU0riY16L1WOM2chjQ8CsByuIzhmkWQEcz2QKvrSLmgU5jNSegUWTjwbKeslHnAptmEMA9QkQaQzCTMTqM6Z6oUx2N72VyG2ZZtXUUUEJL5JzpZV/DoSj/sFuTwegOUjfv6Fn8KXDHPxrigrqKi0ssPPYpUe1U/Xr86/qv1kR3JlDw+zUdn0mV9QzKMOo42kYbM7ShDQg6b61P6I3lJXZGitgkB8rh4wwy/Yz01HutyGAMSdVwtMUt9RSRR
-      charles@charles-xps15
-  tags:
-    - common
-
-- name: Setup mauriandres keys
-  authorized_key:
-    user: "{{ ansible_user }}"
-    state: present
-    key: ssh-rsa
-      AAAAB3NzaC1yc2EAAAADAQABAAACAQDUP3E8D6oMeIAYllmkz3/WoK6MtupfojMijxXzbEe/FdIBgI/Vdt350LWaQUDmXlbqIBMQwe0TLYQ4DYBktEmAntYGo/YkJI/MxEzXvwkKYKz9zT7RSL/fP0GMPUuJpR6VXSgI9M4mHBwSaCSaFELe5dVdv3veEs0cHUTenMkitrJmDoXTXmqfppplRqfUBXCFH3u6/TOsdZMh2797iru9efVhJsvwFEogc153yIyVdPM7unhKLGN4mKJ/eq7ZBr4hifMNfV4pk+Qf4TmNpw/mMvXUTqaEQRTSYk2TtAGSprsRk5lqJHx2jamtfqbH4AR/ydJISeyKuGToUIf7HVEQ7OuC9KmWVilp3a4o2dRH0lrCJcW9A/qC1SPr317jyQWFUMbjVDT3AXdyCTrxv6DsJ6SaoTgq2BzkGIQz71EuzUqWfug5KM8rOwLBsvtIdkkc06kUJWcyggDst6/oICi87vh8+S1GGxCCKfoMZgJD39cLX/pLN7Car9WgmnaHS6BFWJxV+TG4txIrxNTa+wleuD9Yb6Pk2f+1iaBIc48QEFccHpgI3TKmuM1UDSYFlZc6TM5+502hgvifXDLIdAqYrkLZDv22rrl1odA2z52eG4fGgMLVbsQtbu2kC1KygSPeUFn/rwCglCdhAHrWEU5n0wAsX5qUmt6T/nQ5cISVFw==
-  tags:
-    - common
-
-- name: Setup thomaspeslerbe keys
-  authorized_key:
-    user: "{{ ansible_user }}"
-    state: present
-    key: ssh-rsa
-      AAAAB3NzaC1yc2EAAAADAQABAAACAQCwlXYRvJQqV4GCEzQhyOptkYJAql/yBuUwz4TxWcCalIXNACVt+/Tg3eU4T98PacrEjEimKE3JFiL/m8FrsJLQMay1y3soG+UX8HoVv+zT+uNQ9NG9i5HtE13gKVpa2wte3H7xZ9cBrNMU4f6OtBBuCiwDp7gi0Hb7BPsqlmERioNQwLh0SNJobLmBHge/0lhOV1o7Ss57i3qdM4eyILC/N8RVIJfpGEnzZFBzxpe2g+Dg7SXQ5P2D9R1nXXfivUGILSiVvsbA1ydyKP6mXvxb0kdsDODKQGSDLC7LOM8Nj8b4t3+5jkIici5nFqcPdpTIC5clyK1m5DfLH+wfBY6mfJJUs0JAYi/u5JJaHjrDW5kZ58zgph7+3mt4kIENB4r66xjJAHsVDzvZb1xfpDOy4NSQn0Nuwu4yoh6V2UaH46okywiXB3MoBW/ovFIKnyREr913NcR1G/4ueuA10vN8b/+GjDuXXS0AX7el9eUHRhxB6SKlGAArgd8715ZOpEdwEqpjgV5Rg7Ct5oLZXhww9/Lk95/XCh7MrLKXBniTjNRavq5f5O0MVf62zinwCghLvQ2ZAIxw7d65q24t8aNrbEs253aBXDnwCzT+K56FN8Zk31hlZXVPm/z6DpsbTGPgdJqs2Pc5QDmn/ucEdaCIXcSCPuAK8N/QWnZZhtyzSQ==
-      thomas@Thomas-PC
-  tags:
-    - common
 
 - name: Prevent grub from being upgraded
   ansible.builtin.dpkg_selections:

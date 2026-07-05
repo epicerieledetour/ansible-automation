@@ -4,6 +4,8 @@
   roles:
     - role: common-facts
       tags: ["common-facts"]
+    - role: ssh
+      tags: ["ssh"]
 
 # Everything below is the old setup being migrated
 # ---
