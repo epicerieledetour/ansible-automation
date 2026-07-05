@@ -1,21 +1,11 @@
 ---
-
-- name: Bind real inventory groups to Molecule local VMs
+- name: Setup dev environment
   hosts: all
-  gather_facts: false
+  gather_facts: true
   tasks:
     - name: "Set deployment_is_dev to true"
       ansible.builtin.set_fact:
         deployment_is_dev: true
-    - name: Redirect SSH to local Libvirt instances
-      ansible.builtin.set_fact:
-        ansible_host: "{{ hostvars[inventory_hostname]['molecule_ephemeral_buffer']['ansible_host'] }}"
-        ansible_port: "{{ hostvars[inventory_hostname]['molecule_ephemeral_buffer']['ansible_port'] | default(22) }}"
-        ansible_user: "{{ hostvars[inventory_hostname]['molecule_ephemeral_buffer']['ansible_user'] }}"
-        ansible_private_key_file: "{{ hostvars[inventory_hostname]['molecule_ephemeral_buffer']['ansible_private_key_file'] }}"
-      when: hostvars[inventory_hostname]['molecule_ephemeral_buffer'] is defined
-    - ansible.builtin.debug:
-        var: hostvars[inventory_hostname]
 
 - name: Execute the root playbook
   ansible.builtin.import_playbook: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/playbook.yml"

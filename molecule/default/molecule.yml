@@ -1,8 +1,8 @@
 ---
 dependency:
   name: galaxy
-#  options:
-#    requirements-file: requirements.yml
+  options:
+    requirements-file: requirements.yml
 
 driver:
   name: libvirt
@@ -29,5 +29,5 @@ provisioner:
       vault_password_file: "${MOLECULE_PROJECT_DIRECTORY}/vault_password.sh"
   inventory:
     links:
-      hosts: ../../hosts
+      hosts: "${MOLECULE_PROJECT_DIRECTORY}/inventory/groups.yml"
 
