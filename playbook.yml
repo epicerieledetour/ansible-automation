@@ -1,6 +1,19 @@
 ---
+- name: "Generate workstation wireguard config"
+  hosts: workstations
+  connection: local
+  vars:
+    group_suffix: "-workstation"
+  roles:
+    - role: wireguard
+      tags:
+        - wireguard
+        - workstation
+  tags:
+    - never
+
 - name: "Setup common facts for all machines in the inventory"
-  hosts: all
+  hosts: servers
   roles:
     - role: common-facts
       tags: ["common-facts"]
