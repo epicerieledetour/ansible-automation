@@ -85,10 +85,10 @@ ansible-galaxy collection install -r requirements.yml
 
 ### Wireguard on workstations
 
-Servers and workstations are linked together by a wireguard network. To generate a wireguard config for a given workstation, execute ansible on a local connection and set its limit to the targeted workstation:
+Servers and workstations are linked together by a wireguard network. Run the playbook with the `workstation` tag (which is never ran by default) to generate a sample wg-quick confiugration file. **Do not let this file laying around:** it contains private informations that should only be seen by your workstation `root` only. 
 
 ```sh
-ansible-playbook playbook.yml --connection local --limit the-workstation-name
+ansible-playbook playbook.yml --tags workstation
 ```
 
 This will create a `wg-ledetour.conf-the-workstation-name` in the same directy as `playbook.yml`. Check the output for ansible for info on how to use that file:
