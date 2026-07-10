@@ -1,0 +1,8 @@
+- name: "Add authorized key to {{ ansible_user }}"
+  ansible.posix.authorized_key:
+    user: "{{ ansible_user }}"
+    state: present
+    key: "{{ lookup('file', item) }}"
+  with_fileglob:
+    - "{{ playbook_dir }}/keys/*"
+

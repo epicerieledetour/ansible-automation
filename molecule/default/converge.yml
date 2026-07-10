@@ -1,0 +1,12 @@
+---
+- name: Setup dev environment
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: "Set deployment_is_dev to true"
+      ansible.builtin.set_fact:
+        deployment_is_dev: true
+
+- name: Execute the root playbook
+  ansible.builtin.import_playbook: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/playbook.yml"
+

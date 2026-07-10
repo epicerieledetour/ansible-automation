@@ -1,3 +1,4 @@
+---
 ldtvouchers_emailreport_password: "{{ vault_ldtvouchers_emailreport_password }}"
 ldtvouchers_emailreport_host: "{{ vault_ldtvouchers_emailreport_host }}"
 ldtvouchers_emailreport_port: "{{ vault_ldtvouchers_emailreport_port }}"

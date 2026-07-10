@@ -1,17 +1,18 @@
+---
 - name: Reload grafana
-  systemd:
+  ansible.builtin.systemd:
     name: grafana-server
     state: restarted
   listen: "grafana changed"
 
 - name: Reload loki
-  systemd:
+  ansible.builtin.systemd:
     name: loki
     state: restarted
   listen: "loki changed"
 
 - name: Reload promtail
-  systemd:
+  ansible.builtin.systemd:
     name: promtail
     state: restarted
   listen: "promtail changed"

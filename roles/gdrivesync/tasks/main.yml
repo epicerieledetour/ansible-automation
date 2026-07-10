@@ -1,48 +1,49 @@
+---
 - name: Install rclone for Raspberry Pi OS
-  apt:
+  ansible.builtin.apt:
     pkg:
       - rclone
 
 - name: Make {{ rclone_etc_dir }} directory
-  file:
+  ansible.builtin.file:
     path: "{{ rclone_etc_dir }}"
     state: directory
-    mode: 0700
+    mode: "0700"
 
 - name: Instanciate rclone config
-  template:
+  ansible.builtin.template:
     src: rclone-ldt.conf.j2
     dest: "{{ rclone_etc_dir }}/rclone-ldt.conf"
-    mode: 0400
+    mode: "0400"
 
-- name: Copying auth key for Le Détour Google Drives 
-  copy:
+- name: Copying auth key for Le Détour Google Drives
+  ansible.builtin.copy:
     src: drive-sync-on-ovh-server-50a335a0b68b.json
     dest: "{{ rclone_etc_dir }}"
-    mode: 0400
+    mode: "0400"
 
 - name: Make /srv/rclone directory
-  file:
+  ansible.builtin.file:
     path: /srv/rclone
     state: directory
-    mode: 0700
+    mode: "0700"
 
 - name: Copying rclone sync systemd service
-  copy:
+  ansible.builtin.copy:
     src: rclone-ldt.service
     dest: /etc/systemd/system/
   notify:
     - systemd changed
 
 - name: Copying rclone sync systemd timer
-  copy:
+  ansible.builtin.copy:
     src: rclone-ldt.timer
     dest: /etc/systemd/system/
   notify:
     - systemd changed
 
 - name: Register rclone sync timers
-  systemd:
+  ansible.builtin.systemd:
     name: rclone-ldt.timer
     enabled: true
     state: started

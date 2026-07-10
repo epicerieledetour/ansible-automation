@@ -1,5 +1,6 @@
+---
 - name: Install vouchers.epicerieledetour.org dependencies
-  apt:
+  ansible.builtin.apt:
     pkg:
       - git
       - libcairo2
@@ -12,7 +13,7 @@
 # Stop webapp during upgrade
 
 - name: Stop vouchers.epicerieledetour.org systemd service
-  systemd:
+  ansible.builtin.systemd:
     name: ldt-vouchers.service
     state: stopped
   ignore_errors: true
@@ -44,7 +45,7 @@
 # Backup
 
 - name: Copying vouchers.epicerieledetour.org backup service file
-  copy:
+  ansible.builtin.copy:
     src: ldt-vouchers-backup.service
     dest: /etc/systemd/system/
   notify:
@@ -53,7 +54,7 @@
     - vouchers
 
 - name: Copying vouchers.epicerieledetour.org backup timer file
-  copy:
+  ansible.builtin.copy:
     src: ldt-vouchers-backup.timer
     dest: /etc/systemd/system/
   notify:
@@ -62,10 +63,10 @@
     - vouchers
 
 - name: Enable vouchers.epicerieledetour.org backup timer
-  systemd:
+  ansible.builtin.systemd:
     name: ldt-vouchers-backup.timer
     state: started
-    enabled: yes
+    enabled: true
   tags:
     - vouchers
 
@@ -75,14 +76,14 @@
   ansible.builtin.file:
     path: "/srv/www/vouchers.epicerieledetour.org/files/emissions/{{ ldtvouchers_hack_emissiontoken }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
     owner: www-data
     group: www-data
   tags:
     - vouchers
 
 - name: Instanciate vouchers.epicerieledetour.org ldt-vouchers-report.service
-  template:
+  ansible.builtin.template:
     src: ldt-vouchers-report.service.j2
     dest: /etc/systemd/system/ldt-vouchers-report.service
     mode: u=r,g=r,o=
@@ -92,7 +93,7 @@
     - vouchers
 
 - name: Copying vouchers.epicerieledetour.org report timer file
-  copy:
+  ansible.builtin.copy:
     src: ldt-vouchers-report.timer
     dest: /etc/systemd/system/
   notify:
@@ -101,17 +102,17 @@
     - vouchers
 
 - name: Enable vouchers.epicerieledetour.org report timer
-  systemd:
+  ansible.builtin.systemd:
     name: ldt-vouchers-report.timer
     state: started
-    enabled: yes
+    enabled: true
   tags:
     - vouchers
 
 # Server
 
 - name: Copying vouchers.epicerieledetour.org systemd service file
-  copy:
+  ansible.builtin.copy:
     src: ldt-vouchers.service
     dest: /etc/systemd/system/
   notify:
@@ -120,10 +121,10 @@
     - vouchers
 
 - name: Enable vouchers.epicerieledetour.org systemd service
-  systemd:
+  ansible.builtin.systemd:
     name: ldt-vouchers.service
     state: started
-    enabled: yes
+    enabled: true
   tags:
     - vouchers
 

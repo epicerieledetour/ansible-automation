@@ -1,13 +1,14 @@
+---
 # MariaDB
 
 - name: Install MariaDB and PHP
-  apt:
+  ansible.builtin.apt:
     pkg:
       - mariadb-server
-      - php-curl  # For wordpress plugin miniOrange OAuth Single Sign On
+      - php-curl # For wordpress plugin miniOrange OAuth Single Sign On
       - php-fpm
       - php-mysql
-      - python3-pymysql  # For the community.mysql.* modules
+      - python3-pymysql # For the community.mysql.* modules
 
 - name: Create a new database with name 'wordpress'
   community.mysql.mysql_db:
@@ -18,8 +19,8 @@
 - name: Removes all MariaDB anonymous user accounts
   community.mysql.mysql_user:
     login_unix_socket: /var/run/mysqld/mysqld.sock
-    name: ''
-    host_all: yes
+    name: ""
+    host_all: true
     state: absent
 
 - name: Create MariaDB Wordpress user
@@ -29,24 +30,24 @@
     name: wordpress
     password: "{{ wordpress_db_password }}"
     priv:
-      'wordpress.*': 'ALL,GRANT'
+      "wordpress.*": "ALL,GRANT"
 
 - name: Copying MariaDB dump systemd service file
-  copy:
+  ansible.builtin.copy:
     src: mariadb-dump.service
     dest: /etc/systemd/system/
   notify:
     - systemd changed
 
 - name: Copying MariaDB dump systemd timer file
-  copy:
+  ansible.builtin.copy:
     src: mariadb-dump.timer
     dest: /etc/systemd/system/
   notify:
     - systemd changed
 
 - name: "Start MariaDB backup script systemd timer"
-  systemd:
+  ansible.builtin.systemd:
     name: mariadb-dump.timer
     enabled: true
     state: started
@@ -54,43 +55,43 @@
 # Wordpress
 
 - name: Download Wordpress 5.7 tarball
-  get_url:
-      url: "https://wordpress.org/wordpress-5.7.tar.gz"
-      checksum: sha1:76d1332cfcbc5f8b17151b357999d1f758faf897
-      dest: /tmp/wordpress-5.7.tar.gz
+  ansible.builtin.get_url:
+    url: "https://wordpress.org/wordpress-5.7.tar.gz"
+    checksum: sha1:76d1332cfcbc5f8b17151b357999d1f758faf897
+    dest: /tmp/wordpress-5.7.tar.gz
 
 - name: Make directory /srv/www/wordpress-5.7
-  file:
+  ansible.builtin.file:
     path: /srv/www/wordpress-5.7
     state: directory
 
 - name: Unzip Wordpress
-  unarchive:
-      src: /tmp/wordpress-5.7.tar.gz
-      dest: /srv/www/wordpress-5.7
-      creates: /srv/www/wordpress-5.7/wordpress
-      owner: www-data
-      remote_src: yes
-      mode: "a+x"
+  ansible.builtin.unarchive:
+    src: /tmp/wordpress-5.7.tar.gz
+    dest: /srv/www/wordpress-5.7
+    creates: /srv/www/wordpress-5.7/wordpress
+    owner: www-data
+    remote_src: true
+    mode: "a+x"
 
 - name: Remove wp-config-sample.php
-  file:
+  ansible.builtin.file:
     path: /srv/www/wordpress-5.7/wordpress/wp-config-sample.php
     state: absent
 
 - name: Instanciate Wordpress wp-config.php
-  template:
+  ansible.builtin.template:
     src: wp-config.php.j2
     dest: /srv/www/wordpress-5.7/wordpress/wp-config.php
     mode: u=rw,g=r,o=r
 
 # Nginx
 
-- include_tasks:
+- ansible.builtin.include_tasks:
     file: "main{{ deployment_suffix }}.yml"
 
 - name: Instanciate Wordpress nginx config
-  template:
+  ansible.builtin.template:
     src: wordpress.conf.j2
     dest: /etc/nginx/sites-available/wordpress.conf
     mode: u=r,g=r,o=r
@@ -98,7 +99,7 @@
     - nginx changed
 
 - name: Enable wordpress.epicerieledetour.org nginx config
-  file:
+  ansible.builtin.file:
     src: /etc/nginx/sites-available/wordpress.conf
     dest: /etc/nginx/sites-enabled/wordpress.conf
     state: link

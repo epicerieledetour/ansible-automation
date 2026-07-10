@@ -1,5 +1,6 @@
+---
 - name: Install borg packages
-  apt:
+  ansible.builtin.apt:
     pkg:
       - borgbackup
   tags:
@@ -8,23 +9,23 @@
 # Static configuration
 
 - name: Copying backup script
-  copy:
+  ansible.builtin.copy:
     src: backup.sh
     dest: /usr/local/bin/
-    mode: 0500
+    mode: "0500"
   tags:
     - borgbackup
 
 - name: Make /usr/local/etc/borg directory
-  file:
+  ansible.builtin.file:
     path: /usr/local/etc/borg
     state: directory
-    mode: 0700
+    mode: "0700"
   tags:
     - borgbackup
 
 - name: Copying backup script systemd service file
-  copy:
+  ansible.builtin.copy:
     src: backup@.service
     dest: /etc/systemd/system/
   notify:
@@ -33,7 +34,7 @@
     - borgbackup
 
 - name: Copying backup script systemd timer file
-  copy:
+  ansible.builtin.copy:
     src: backup@.timer
     dest: /etc/systemd/system/
   notify:
@@ -47,13 +48,13 @@
   openssh_keypair:
     path: /usr/local/etc/borg/id_ssh_rsa
     comment: "{{ inventory_hostname }} borg"
-    mode: 0400
+    mode: "0400"
   register: borg_head_ssh
   tags:
     - borgbackup
 
 - name: "Configure borg backup stores"
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: store.yml
   loop: "{{ groups['borgstores'] }}"
   vars:

@@ -47,13 +47,38 @@ However, the Épicerie Le Détour tries to stick to common sense good practices.
 
 The Épicerie le Détour is a French speaking organization that is open to the world:
 - all internal documentation is written in French
-- as one can't assume the reader known language, all external documentation and code (including this repository) is written in English
+- as one can't assume the reader's known language, all external documentation and code (including this repository) is written in English
 
 ## The Ansible setup
 
 ### The vault password file
 
-This playbook uses [Ansible Vaults](https://docs.ansible.com/ansible/latest/user_guide/vault.html). The password file, GPG encryped and shared amongst Le Détour admins by an out-of-band mean of communication, is expected to be named `.vault_password.gpg` in this cloned repo root folder.
+This playbook uses [Ansible Vaults](https://docs.ansible.com/ansible/latest/user_guide/vault.html). The password file, GPG encryped and shared amongst Le Détour admins by an out-of-band mean of communication, is expected to be named `.vault_password.d/encrypted-vault-password-for-username` in this cloned repo root folder.
+
+To add a new administrator that could run this ansible setup:
+
+1. Add their ssh public key in the `keys` folder. Keep the same key name on their local workstation `~/.ssh` folder, the vault password decryption script uses this name to find the matching private key. For example, if the new administrator public key is `/home/username/.ssh/id_ed25519.pub`, then copy this key as `keys/username-id_ed25519.pub`
+2. Decrypt the vault password and encrypt it using the new admin public key: `./vault_password.sh | age -R keys/username-id_ed25519.pub -o .vault_password.d/encrypted-vault-password-for-username`
+
+
+### Install system dependencies
+
+On debian:
+
+```sh
+sudo apt install \
+    age  # to encrypt and decrypt the vault password
+
+    # Below dependencies are for running the ansible
+    # and molecule virtual machines
+    cloud-image-utils \
+    qemu-kvm \
+    libguestfs-tools \
+    libvirt-daemon-system \
+    libvirt-dev \
+    pkg-config \
+    python3-dev
+```
 
 
 ### Install Ansible dependencies
@@ -69,10 +94,10 @@ ansible-galaxy collection install -r requirements.yml
 
 ### Wireguard on workstations
 
-Servers and workstations are linked together by a wireguard network. To generate a wireguard config for a given workstation, execute ansible on a local connection and set its limit to the targeted workstation:
+Servers and workstations are linked together by a wireguard network. Run the playbook with the `workstation` tag (which is never ran by default) to generate a sample wg-quick confiugration file. **Do not let this file laying around:** it contains private informations that should only be seen by your workstation `root` only. 
 
 ```sh
-ansible-playbook playbook.yml --connection local --limit the-workstation-name
+ansible-playbook playbook.yml --tags workstation
 ```
 
 This will create a `wg-ledetour.conf-the-workstation-name` in the same directy as `playbook.yml`. Check the output for ansible for info on how to use that file:
