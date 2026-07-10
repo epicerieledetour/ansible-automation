@@ -47,13 +47,18 @@ However, the Épicerie Le Détour tries to stick to common sense good practices.
 
 The Épicerie le Détour is a French speaking organization that is open to the world:
 - all internal documentation is written in French
-- as one can't assume the reader known language, all external documentation and code (including this repository) is written in English
+- as one can't assume the reader's known language, all external documentation and code (including this repository) is written in English
 
 ## The Ansible setup
 
 ### The vault password file
 
-This playbook uses [Ansible Vaults](https://docs.ansible.com/ansible/latest/user_guide/vault.html). The password file, GPG encryped and shared amongst Le Détour admins by an out-of-band mean of communication, is expected to be named `.vault_password.gpg` in this cloned repo root folder.
+This playbook uses [Ansible Vaults](https://docs.ansible.com/ansible/latest/user_guide/vault.html). The password file, GPG encryped and shared amongst Le Détour admins by an out-of-band mean of communication, is expected to be named `.vault_password.d/encrypted-vault-password-for-username` in this cloned repo root folder.
+
+To add a new administrator that could run this ansible setup:
+
+1. Add their ssh public key in the `keys` folder. Keep the same key name on their local workstation `~/.ssh` folder, the vault password decryption script uses this name to find the matching private key. For example, if the new administrator public key is `/home/username/.ssh/id_ed25519.pub`, then copy this key as `keys/username-id_ed25519.pub`
+2. Decrypt the vault password and encrypt it using the new admin public key: `./vault_password.sh | age -R keys/username-id_ed25519.pub -o .vault_password.d/encrypted-vault-password-for-username`
 
 
 ### Install system dependencies
@@ -62,7 +67,11 @@ On debian:
 
 ```sh
 sudo apt install \
-    cloud-image-utils \  # TODO: why this one ?
+    age  # to encrypt and decrypt the vault password
+
+    # Below dependencies are for running the ansible
+    # and molecule virtual machines
+    cloud-image-utils \
     qemu-kvm \
     libguestfs-tools \
     libvirt-daemon-system \
