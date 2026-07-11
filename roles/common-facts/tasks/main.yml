@@ -11,14 +11,6 @@
   ansible.builtin.set_fact:
     deployment_suffix: "{{ '-dev' if deployment_is_dev | default(False) else '-prod' }}"
 
-- name: "Setting group_suffix"
-  ansible.builtin.set_fact:
-    group_suffix: "{{ '-workstation' if 'workstations' in hostvars[inventory_hostname].group_names | default(False) else '-server' }}"
-
-- name: "Setting deployment_touched_path"
-  ansible.builtin.set_fact:
-    deployment_touched_path: "/tmp/touched-by-ansible{{ deployment_suffix }}.txt" 
-
 - name: "Fact: deployment_is_dev"
   ansible.builtin.debug:
     var: deployment_is_dev
@@ -30,14 +22,4 @@
 - name: "Fact: deployment_suffix"
   ansible.builtin.debug:
     var: deployment_suffix
-
-- name: "Fact: group_suffix"
-  ansible.builtin.debug:
-    var: group_suffix
-
-- name: "Touching {{ deployment_touched_path }} to make sure the machine is accessible"
-  ansible.builtin.file:
-    path: "{{ deployment_touched_path }}"
-    state: touch
-    mode: "u=r"
 
