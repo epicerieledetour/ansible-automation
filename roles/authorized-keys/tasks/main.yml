@@ -1,4 +1,5 @@
-- name: "Add authorized key to {{ ansible_user }}"
+---
+- name: "Add authorized key to ansible user {{ ansible_user }}"
   ansible.posix.authorized_key:
     user: "{{ ansible_user }}"
     state: present

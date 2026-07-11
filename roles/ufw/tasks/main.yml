@@ -1,0 +1,17 @@
+---
+- name: ufw
+  become: true
+  block:
+  - name: Install ufw and fail2ban
+    ansible.builtin.apt:
+      pkg:
+        - fail2ban
+        - ufw
+
+  - name: Disable all ports but ssh
+    community.general.ufw:
+      state: enabled
+      policy: deny
+      rule: allow
+      port: 22
+

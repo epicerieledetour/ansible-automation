@@ -1,0 +1,11 @@
+---
+- name: Install common packages
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+    pkg:
+      - aptitude
+      - ca-certificates
+      - python3
+      - vim
+

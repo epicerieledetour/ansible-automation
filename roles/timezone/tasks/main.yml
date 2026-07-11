@@ -1,0 +1,6 @@
+---
+- name: Set timezone to America/Montreal
+  become: true
+  community.general.timezone:
+    name: America/Montreal
+

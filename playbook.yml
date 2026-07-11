@@ -17,8 +17,20 @@
   roles:
     - role: common-facts
       tags: ["common-facts"]
-    - role: ssh
-      tags: ["ssh"]
+    - role: authorized-keys
+      tags: ["authorized-keys"]
+    - role: common-packages
+      tags: ["common-packages"]
+    - role: hostname
+      tags: ["hostname"]
+    - role: timezone
+      tags: ["timezone"]
+    - role: upgrade
+      tags: ["upgrade"]
+    - role: ufw
+      tags: ["ufw"]
+  tags:
+    - common
 
 # Everything below is the old setup being migrated
 # ---
