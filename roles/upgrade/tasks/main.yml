@@ -7,37 +7,37 @@
 - name: Upgrade
   become: true
   block:
-  - name: Upgrade all packages
-    ansible.builtin.apt:
-      update_cache: true
-      upgrade: dist
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: dist
 
-  - name: Check if a reboot is required
-    register: rebootrequired
-    ansible.builtin.stat:
-      path: /var/run/reboot-required
-      get_checksum: false
+    - name: Check if a reboot is required
+      register: upgrade_rebootrequired
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+        get_checksum: false
 
-  - name: Reboot if /var/run/reboot-required exists
-    ansible.builtin.reboot:
-    when: rebootrequired.stat.exists == true
+    - name: Reboot if /var/run/reboot-required exists
+      ansible.builtin.reboot:
+      when: upgrade_rebootrequired.stat.exists
 
-  - name: Install unattended-upgrades
-    ansible.builtin.apt:
-      pkg:
-        - unattended-upgrades
+    - name: Install unattended-upgrades
+      ansible.builtin.apt:
+        pkg:
+          - unattended-upgrades
 
-  - name: Update debconf parameters
-    ansible.builtin.debconf:
-      name: "unattended-upgrades"
-      question: "unattended-upgrades/enable_auto_updates"
-      value: "true"
-      vtype: "boolean"
+    - name: Update debconf parameters
+      ansible.builtin.debconf:
+        name: "unattended-upgrades"
+        question: "unattended-upgrades/enable_auto_updates"
+        value: "true"
+        vtype: "boolean"
 
-  - name: Reconfigure dpkg
-    ansible.builtin.command:
-      creates: /etc/apt/apt.conf.d/20auto-upgrades
-      cmd: dpkg-reconfigure -f noninteractive unattended-upgrades
+    - name: Reconfigure dpkg
+      ansible.builtin.command:
+        creates: /etc/apt/apt.conf.d/20auto-upgrades
+        cmd: dpkg-reconfigure -f noninteractive unattended-upgrades
 
   # - name: Remove non-security upgrades
   #   ansible.builtin.lineinfile:

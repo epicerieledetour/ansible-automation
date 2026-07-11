@@ -15,12 +15,12 @@
 - name: "Setup common facts for all machines in the inventory"
   hosts: servers
   roles:
-    - role: common-facts
-      tags: ["common-facts"]
-    - role: authorized-keys
-      tags: ["authorized-keys"]
-    - role: common-packages
-      tags: ["common-packages"]
+    - role: common_facts
+      tags: ["common_facts"]
+    - role: authorized_keys
+      tags: ["authorized_keys"]
+    - role: common_packages
+      tags: ["common_packages"]
     - role: hostname
       tags: ["hostname"]
     - role: timezone
