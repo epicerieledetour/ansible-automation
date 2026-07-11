@@ -2,3 +2,7 @@ servers:
   hosts:
     vps2:
 
+webservers:
+  hosts:
+    vps2:
+
