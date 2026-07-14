@@ -6,3 +6,7 @@ webservers:
   hosts:
     vps2:
 
+vouchers:
+  hosts:
+    vps2:
+

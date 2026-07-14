@@ -7,6 +7,8 @@ User=www-data
 WorkingDirectory=/srv/www/vouchers.epicerieledetour.org
 
 Environment="LDTVOUCHERS_DBPATH=ldt-vouchers.sqlite3"
+Environment="UV_CACHE_DIR=uvcache"
+Environment="UV_TOOL_DIR=uvtool"
 Environment="LDTVOUCHERS_EMAILREPORT_HOST={{ ldtvouchers_emailreport_host }}"
 Environment="LDTVOUCHERS_EMAILREPORT_PORT={{ ldtvouchers_emailreport_port }}"
 Environment="LDTVOUCHERS_EMAILREPORT_FROM={{ ldtvouchers_emailreport_from }}"
@@ -17,8 +19,9 @@ Environment="LDTVOUCHERS_HACK_EMISSIONTOKEN={{ ldtvouchers_hack_emissiontoken }}
 Environment="LDTVOUCHERS_DBPATH=ldt-vouchers.sqlite3"
 Environment="LDTVOUCHERS_FILESPATH=files"
 
-ExecStart=/srv/www/vouchers.epicerieledetour.org/venv/bin/python -m ldtvouchers --db ldt-vouchers.sqlite3 emissions odsreport files/emissions/{{ ldtvouchers_hack_emissiontoken }}/report.ods
-ExecStart=/srv/www/vouchers.epicerieledetour.org/venv/bin/python -m ldtvouchers --db ldt-vouchers.sqlite3 emissions emailreport
+ExecStart=uvx --from git+https://github.com/epicerieledetour/ledetour-vouchers ldtvouchers --db ldt-vouchers.sqlite3 emissions odsreport files/emissions/{{ ldtvouchers_hack_emissiontoken }}/report.ods
+ExecStart=uvx --from git+https://github.com/epicerieledetour/ledetour-vouchers ldtvouchers --db ldt-vouchers.sqlite3 emissions emailreport
 
 [Install]
 WantedBy=default.target
+

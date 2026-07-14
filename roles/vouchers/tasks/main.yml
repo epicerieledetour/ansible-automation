@@ -1,140 +1,104 @@
 ---
-- name: Install vouchers.epicerieledetour.org dependencies
-  ansible.builtin.apt:
-    pkg:
-      - git
-      - libcairo2
-      - python3.11
-      - python3-virtualenv
-      - sqlite3
-  tags:
-    - vouchers
 
-# Stop webapp during upgrade
+- name: Vouchers
+  become: true
+  block:
 
-- name: Stop vouchers.epicerieledetour.org systemd service
-  ansible.builtin.systemd:
-    name: ldt-vouchers.service
-    state: stopped
-  ignore_errors: true
-  tags:
-    - vouchers
+  # Dependencies
+  
+  - name: Enable extrepo policies
+    ansible.builtin.lineinfile:
+      path: /etc/extrepo/config.yaml
+      regexp: "# - {{ item }}"
+      line: "- {{ item }}"
+    loop:
+      - contrib
+      - non-free
 
-# Install webapp code
+  - name: Enable extrepo source uv
+    ansible.builtin.command: "extrepo enable uv"
+    args:
+      creates: "/etc/apt/sources.list.d/extrepo_uv.sources"
 
-- name: Make vouchers.epicerieledetour.org installation folder
-  ansible.builtin.file:
-    path: /srv/www/vouchers.epicerieledetour.org
-    state: directory
-    mode: "0755"
-    owner: "www-data"
-    group: "www-data"
-  tags:
-    - vouchers
+  - name: Install vouchers dependencies
+    ansible.builtin.apt:
+      pkg:
+        - git
+        - libcairo2
+        - sqlite3
+        - uv
+      update_cache: true
 
-- name: Pip install vouchers.epicerieledetour.org
-  ansible.builtin.pip:
-    name: git+https://github.com/epicerieledetour/ledetour-vouchers.git@v2
-    virtualenv: /srv/www/vouchers.epicerieledetour.org/venv
-    state: forcereinstall
-  tags:
-    - vouchers
+  # Run folder
 
-# Copy systemd services and timers
+  - name: Make vouchers.epicerieledetour.org installation folder hierarchy
+    ansible.builtin.file:
+      path: "/srv/www/vouchers.epicerieledetour.org/files/emissions/{{ ldtvouchers_hack_emissiontoken }}"
+      state: directory
+      mode: "0755"
+      owner: "www-data"
+      group: "www-data"
 
-# Backup
+  # systemd: backup
 
-- name: Copying vouchers.epicerieledetour.org backup service file
-  ansible.builtin.copy:
-    src: ldt-vouchers-backup.service
-    dest: /etc/systemd/system/
-  notify:
-    - systemd changed
-  tags:
-    - vouchers
+  - name: Copying vouchers.epicerieledetour.org backup service file
+    ansible.builtin.copy:
+      src: ldt-vouchers-backup.service
+      dest: /etc/systemd/system/
+    notify:
+      - systemd changed
 
-- name: Copying vouchers.epicerieledetour.org backup timer file
-  ansible.builtin.copy:
-    src: ldt-vouchers-backup.timer
-    dest: /etc/systemd/system/
-  notify:
-    - systemd changed
-  tags:
-    - vouchers
+  - name: Copying vouchers.epicerieledetour.org backup timer file
+    ansible.builtin.copy:
+      src: ldt-vouchers-backup.timer
+      dest: /etc/systemd/system/
+    notify:
+      - systemd changed
 
-- name: Enable vouchers.epicerieledetour.org backup timer
-  ansible.builtin.systemd:
-    name: ldt-vouchers-backup.timer
-    state: started
-    enabled: true
-  tags:
-    - vouchers
+  - name: Enable vouchers.epicerieledetour.org backup timer
+    ansible.builtin.systemd:
+      name: ldt-vouchers-backup.timer
+      state: started
+      enabled: true
 
-# Report
+  # systemd: report
 
-- name: Create emission files directory
-  ansible.builtin.file:
-    path: "/srv/www/vouchers.epicerieledetour.org/files/emissions/{{ ldtvouchers_hack_emissiontoken }}"
-    state: directory
-    mode: "0755"
-    owner: www-data
-    group: www-data
-  tags:
-    - vouchers
+  - name: Instanciate vouchers.epicerieledetour.org ldt-vouchers-report.service
+    ansible.builtin.template:
+      src: ldt-vouchers-report.service.j2
+      dest: /etc/systemd/system/ldt-vouchers-report.service
+      mode: u=r,g=r,o=
+    notify:
+      - systemd changed
 
-- name: Instanciate vouchers.epicerieledetour.org ldt-vouchers-report.service
-  ansible.builtin.template:
-    src: ldt-vouchers-report.service.j2
-    dest: /etc/systemd/system/ldt-vouchers-report.service
-    mode: u=r,g=r,o=
-  notify:
-    - systemd changed
-  tags:
-    - vouchers
+  - name: Copying vouchers.epicerieledetour.org report timer file
+    ansible.builtin.copy:
+      src: ldt-vouchers-report.timer
+      dest: /etc/systemd/system/
+    notify:
+      - systemd changed
 
-- name: Copying vouchers.epicerieledetour.org report timer file
-  ansible.builtin.copy:
-    src: ldt-vouchers-report.timer
-    dest: /etc/systemd/system/
-  notify:
-    - systemd changed
-  tags:
-    - vouchers
+  - name: Enable vouchers.epicerieledetour.org report timer
+    ansible.builtin.systemd:
+      name: ldt-vouchers-report.timer
+      state: started
+      enabled: true
 
-- name: Enable vouchers.epicerieledetour.org report timer
-  ansible.builtin.systemd:
-    name: ldt-vouchers-report.timer
-    state: started
-    enabled: true
-  tags:
-    - vouchers
+  # systemd: service
 
-# Server
+  - name: Copying vouchers.epicerieledetour.org systemd service file
+    ansible.builtin.copy:
+      src: ldt-vouchers.service
+      dest: /etc/systemd/system/
+    notify:
+      - systemd changed
 
-- name: Copying vouchers.epicerieledetour.org systemd service file
-  ansible.builtin.copy:
-    src: ldt-vouchers.service
-    dest: /etc/systemd/system/
-  notify:
-    - systemd changed
-  tags:
-    - vouchers
+  - name: Enable vouchers.epicerieledetour.org systemd service
+    ansible.builtin.systemd:
+      name: ldt-vouchers.service
+      state: restarted
+      enabled: true
 
-- name: Enable vouchers.epicerieledetour.org systemd service
-  ansible.builtin.systemd:
-    name: ldt-vouchers.service
-    state: started
-    enabled: true
-  tags:
-    - vouchers
+  # caddy
 
-# Firewall ufw
 
-- name: Open ufw port tcp 8000 on interface wg-ledetour
-  community.general.ufw:
-    rule: allow
-    direction: in
-    port: "8000"
-    interface: "wg-ledetour"
-  tags:
-    - vouchers
