@@ -16,3 +16,13 @@
         name: caddy
         state: present
 
+    - name: Open http port 80 for caddy
+      community.general.ufw:
+        rule: allow
+        port: http
+
+    - name: Open https port 443 for caddy
+      community.general.ufw:
+        rule: allow
+        port: https
+
