@@ -101,4 +101,10 @@
 
   # caddy
 
-
+  - name: Register vouchers caddy file
+    ansible.builtin.copy:
+      src: vouchers.caddy
+      dest: /etc/caddy/sites.d/vouchers.caddy
+    notify:
+      - caddy changed
+  

@@ -35,7 +35,8 @@
 - name: Setup webservers
   hosts: webservers
   roles:
-    - role: systemd
+    - role: systemd-handlers
+    - role: caddy-handlers
     - role: caddy
       tags: ["caddy"]
   tags:
@@ -44,7 +45,8 @@
 - name: Setup vouchers
   hosts: vouchers
   roles:
-    - role: systemd
+    - role: systemd-handlers
+    - role: caddy-handlers
     - role: vouchers
   tags:
     - vouchers

@@ -1,0 +1,8 @@
+# Drop this into /etc/caddy/global.d/ (renamed to e.g. 00-molecule.caddy,
+# no .sample suffix) on Molecule/CI test VMs only.
+#
+# IMPORTANT: this file must contain bare directives with NO surrounding
+# `{ }` braces — it gets spliced directly inside the single global options
+# block already opened in the main Caddyfile.
+
+local_certs
