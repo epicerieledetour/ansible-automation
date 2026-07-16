@@ -14,6 +14,8 @@
 
 - name: "Setup common facts for all machines in the inventory"
   hosts: servers
+  vars:
+    group_suffix: "-server"
   roles:
     - role: common_facts
       tags: ["common_facts"]
@@ -29,6 +31,8 @@
       tags: ["upgrade"]
     - role: ufw
       tags: ["ufw"]
+    - role: wireguard
+      tags: ["wireguard"]
   tags:
     - common
 
@@ -41,6 +45,11 @@
       tags: ["caddy"]
   tags:
     - webservers
+
+- name: Setup borg repository stores
+  hosts: borgstores
+  roles:
+    - borgstore
 
 - name: Setup vouchers
   hosts: vouchers
@@ -60,11 +69,6 @@
 #     - systemd
 #     - wireguard
 #
-# - name: Setup borg repository stores
-#   hosts: borgstores
-#   become: true
-#   roles:
-#     - borgstore
 #
 # - name: "Setup hosts to backup"
 #   hosts: backuphead

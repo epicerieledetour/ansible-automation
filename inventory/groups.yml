@@ -1,5 +1,6 @@
 servers:
   hosts:
+    pi1:
     vps2:
 
 webservers:

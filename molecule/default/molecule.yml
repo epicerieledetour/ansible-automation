@@ -15,12 +15,12 @@ platforms:
     vcpu: 1
     disk_size: "5G"
     qemu_user: "libvirt-qemu"
-  # - name: srv1
-  #   image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
-  #   memory_size: 1 # GB
-  #   vcpu: 1
-  #   disk_size: "5G"
-  #   qemu_user: "libvirt-qemu"
+  - name: pi1
+    image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
+    memory_size: 1 # GB
+    vcpu: 1
+    disk_size: "5G"
+    qemu_user: "libvirt-qemu"
 
 provisioner:
   name: ansible

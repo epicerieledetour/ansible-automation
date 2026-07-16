@@ -1,44 +1,31 @@
 ---
-# TODO: use apt_repository
-- name: Copy /etc/apt/sources.list.d/buster-backports.list if OS is Debian buster
-  ansible.builtin.copy:
-    src: buster-backports.list
-    dest: /etc/apt/sources.list.d
-  when: ansible_distribution == "Debian" and ansible_distribution_release == "buster"
-  tags:
-    - wireguard
+- name: Wireguard
+  become: true
+  block:
+  - name: Install wireguard
+    ansible.builtin.apt:
+      pkg:
+        - wireguard
+      update_cache: true
+      state: present
 
-- name: Install wireguard
-  ansible.builtin.apt:
-    pkg:
-      - wireguard
-    update_cache: true
-    state: present
-  tags:
-    - wireguard
+  - name: Instanciate wireguard config wg-ledetour.conf
+    ansible.builtin.template:
+      src: wg-ledetour-{{ wireguard_type }}.conf.j2
+      dest: /etc/wireguard/wg-ledetour.conf
+      mode: u=r,g=,o=
+    notify:
+      - wireguard changed
 
-- name: Instanciate wireguard config wg-ledetour.conf
-  ansible.builtin.template:
-    src: wg-ledetour-{{ wireguard_type }}.conf.j2
-    dest: /etc/wireguard/wg-ledetour.conf
-    mode: u=r,g=,o=
-  notify:
-    - reload wireguard
-  tags:
-    - wireguard
+  - name: Open wireguard port
+    community.general.ufw:
+      rule: allow
+      proto: udp
+      port: '"{{ wireguard_endpoint_port }}"'
 
-- name: Open wireguard port
-  community.general.ufw:
-    rule: allow
-    proto: udp
-    port: '"{{ wireguard_endpoint_port }}"'
-  tags:
-    - wireguard
+  - name: Start wireguard systemd service wg-quick@wg-ledetour.service
+    ansible.builtin.systemd:
+      name: wg-quick@wg-ledetour.service
+      enabled: true
+      state: started
 
-- name: Start wireguard systemd service wg-quick@wg-ledetour.service
-  ansible.builtin.systemd:
-    name: wg-quick@wg-ledetour.service
-    enabled: true
-    state: started
-  tags:
-    - wireguard
