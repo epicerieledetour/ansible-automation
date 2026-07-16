@@ -3,6 +3,10 @@ servers:
     pi1:
     vps2:
 
+borgstores:
+  hosts:
+    pi1:
+      
 webservers:
   hosts:
     vps2:

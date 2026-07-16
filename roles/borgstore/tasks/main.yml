@@ -1,16 +1,16 @@
 ---
-- name: Install borg packages
-  ansible.builtin.apt:
-    pkg:
-      - borgbackup
-  tags:
-    - borgstore
+- name: Borgstore
+  become: true
+  block:
+    - name: Install borg packages
+      ansible.builtin.apt:
+        pkg:
+          - borgbackup
 
-- name: Make root borg directory /srv/borg
-  ansible.builtin.file:
-    path: /srv/borg
-    state: directory
-    mode: "0700"
-    owner: "{{ ansible_user }}"
-  tags:
-    - borgstore
+    - name: Make root borg directory /srv/borg
+      ansible.builtin.file:
+        path: /srv/borg
+        state: directory
+        mode: "0700"
+        owner: "{{ ansible_user }}"
+

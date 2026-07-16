@@ -50,6 +50,8 @@
   hosts: borgstores
   roles:
     - borgstore
+  tags:
+    - borgstore
 
 - name: Setup vouchers
   hosts: vouchers
