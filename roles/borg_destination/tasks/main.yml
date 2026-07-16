@@ -1,5 +1,5 @@
 ---
-- name: Borgstore
+- name: Borg destination
   become: true
   block:
     - name: Install borg packages

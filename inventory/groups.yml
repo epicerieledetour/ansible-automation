@@ -3,10 +3,15 @@ servers:
     pi1:
     vps2:
 
-borgstores:
+backup_destinations:
   hosts:
     pi1:
-      
+
+backup_sources:
+  hosts:
+#    pi1:
+    vps2:
+
 webservers:
   hosts:
     vps2:
