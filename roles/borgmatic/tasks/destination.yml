@@ -1,0 +1,18 @@
+---
+- name: "Configure backup destination {{ borgmatic_destination_hostname }}"
+  become: true
+  become_user: borg
+  delegate_to: "{{ borgmatic_destination_hostname }}"
+  block:
+    - name: "Create borg backup folder"
+      ansible.builtin.file:
+        path: "/srv/borg/{{ inventory_hostname }}"
+        state: directory
+
+    - name: "Add borg ssh key to borg user"
+      ansible.posix.authorized_key:
+        user: borg
+        key: "{{ borgmatic_ssh_public_key }}"
+        state: present
+        key_options: "command=\"borg serve --restrict-to-path /srv/borg/{{ inventory_hostname }}\",restrict"
+

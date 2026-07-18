@@ -1,0 +1,9 @@
+---
+- name: Srv
+  become: true
+  block:
+    - name: Create /srv
+      ansible.builtin.file:
+        path: /srv
+        state: directory
+

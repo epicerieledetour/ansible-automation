@@ -4,6 +4,7 @@
   ansible.builtin.apt:
     update_cache: true
     pkg:
+      - acl  # To allow ansible to become an unprivileged user from another unprivileged user
       - aptitude
       - ca-certificates
       - extrepo

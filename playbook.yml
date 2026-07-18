@@ -33,6 +33,8 @@
       tags: ["ufw"]
     - role: wireguard
       tags: ["wireguard"]
+    - role: srv
+      tags: ["srv"]
   tags:
     - common
 
@@ -58,7 +60,7 @@
   hosts: backup_sources
   roles:
     - systemd_handlers
-    - borg_source
+    - borgmatic
   tags:
     - backup
     - source

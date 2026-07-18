@@ -1,5 +1,6 @@
 ---
-borg_passphrase: "{{ vault_borg_passphrase }}"
+borgmatic_ssh_public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHskoZuXogTBZkBx4KJn3q+mFGjOwekI0bAeBf16o74s borgmatic@vps2
+borgmatic_ssh_private_key: "{{ vault_borgmatic_ssh_private_key }}"
 wireguard_type: endpoint
 wireguard_allowed_ips: 192.168.211.0/24
 wireguard_address: 192.168.211.90

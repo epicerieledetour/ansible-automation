@@ -1,0 +1,37 @@
+---
+- name: Borgmatic
+  become: true
+  block:
+    - name: Create borgmatic configuration folders
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0700"
+      loop:
+        - "{{ borgmatic_etc_dir }}"
+        - "{{ borgmatic_snippets_dir }}"
+        - "{{ borgmatic_ssh_dir }}"
+
+    - name: Copy borg ssh keypair
+      ansible.builtin.copy:
+        content: "{{ borgmatic_ssh_private_key }}"
+        dest: "{{ borgmatic_ssh_id }}"
+        mode: "0400"
+
+    - name: Create common.yaml snippet
+      ansible.builtin.template:
+        src: common.yaml.j2
+        dest: "{{ borgmatic_snippets_common }}"
+        mode: "0400"
+
+    - name: Install borgmatic
+      ansible.builtin.apt:
+        pkg:
+          - borgmatic
+
+    - name: "Create backup folder on borg destinations"
+      ansible.builtin.include_tasks:
+        file: destination.yml
+      loop: "{{ groups['backup_destinations'] }}"
+      vars:
+        borgmatic_destination_hostname: "{{ item }}"
