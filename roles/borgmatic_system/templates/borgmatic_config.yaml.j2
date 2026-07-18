@@ -1,0 +1,9 @@
+<<: !include
+  - /etc/borgmatic.d/snippets/common.yaml
+  - {{ borgmatic_snippet_snippet }}
+
+repositories:
+{% for dest in groups['backup_destinations'] %}
+    - path: ssh://borg@{{ dest }}/./{{ inventory_hostname }}/{{ borgmatic_snippet_name }}.borg
+      label: {{ dest }}-{{ borgmatic_snippet_name }}
+{% endfor %}

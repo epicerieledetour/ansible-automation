@@ -1,5 +1,7 @@
 ---
 borg_passphrase: "{{ vault_borg_passphrase }}"
+ssh_host_private_ed25519_key: "{{ vault_ssh_host_private_ed25519_key }}"
+ssh_host_public_ed25519_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHI09EDIkejhEZxxNYusOwZKHbBzk4xUSiKxcthJ03YO root@(none)"
 wireguard_type: client
 wireguard_address: 192.168.211.30
 wireguard_private_key: "{{ vault_wireguard_private_key }}"

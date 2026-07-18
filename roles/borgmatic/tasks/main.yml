@@ -32,6 +32,6 @@
     - name: "Create backup folder on borg destinations"
       ansible.builtin.include_tasks:
         file: destination.yml
-      loop: "{{ groups['backup_destinations'] }}"
       vars:
         borgmatic_destination_hostname: "{{ item }}"
+      loop: "{{ groups['backup_destinations'] }}"

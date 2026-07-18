@@ -12,6 +12,16 @@
   tags:
     - never
 
+- name: "Initial ssh configuration"
+  hosts: servers
+  roles:
+    - role: authorized_keys
+      tags: ["authorized_keys"]
+    - role: sshd
+      tags: ["sshd"]
+  tags:
+    - ssh
+
 - name: "Setup common facts for all machines in the inventory"
   hosts: servers
   vars:
@@ -19,8 +29,6 @@
   roles:
     - role: common_facts
       tags: ["common_facts"]
-    - role: authorized_keys
-      tags: ["authorized_keys"]
     - role: common_packages
       tags: ["common_packages"]
     - role: hostname
@@ -61,6 +69,8 @@
   roles:
     - systemd_handlers
     - borgmatic
+    - role: borgmatic_system
+      tags: ["borgmatic_system"]
   tags:
     - backup
     - source

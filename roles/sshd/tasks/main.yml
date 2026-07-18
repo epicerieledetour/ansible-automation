@@ -1,0 +1,36 @@
+---
+- name: Sshd
+  become: true
+  block:
+    - name: Replace ssh_host ed25519 private key
+      ansible.builtin.copy:
+        content: "{{ ssh_host_private_ed25519_key }}"
+        dest: /etc/ssh/ssh_host_ed25519_key
+        mode: "0400"
+      notify:
+        - sshd changed
+
+    - name: Replace ssh_host ed25519 public key
+      ansible.builtin.copy:
+        content: "{{ ssh_host_public_ed25519_key }}"
+        dest: /etc/ssh/ssh_host_ed25519_key.pub
+        mode: "0444"
+      notify:
+        - sshd changed
+
+    - name: Allow ed25519 key only
+      ansible.builtin.copy:
+        src: "00-ldt-ed25519-only.conf"
+        dest: /etc/ssh/sshd_config.d/00-ldt-ed25519-only.conf
+      notify:
+        - sshd changed
+
+    - name: Remove keys with legacy cyphers
+      ansible.builtin.file:
+        path: "/etc/ssh/{{ item }}"
+        state: absent
+      loop:
+        - ssh_host_ecdsa_key
+        - ssh_host_ecdsa_key.pub
+        - ssh_host_rsa_key
+        - ssh_host_rsa_key.pub

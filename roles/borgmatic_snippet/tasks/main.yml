@@ -1,0 +1,25 @@
+---
+
+- name: Set configuration paths
+  ansible.builtin.set_fact:
+    borgmatic_snippet_snippet: "/etc/borgmatic.d/snippets/{{ borgmatic_snippet_name }}.yaml"
+    borgmatic_snippet_config: "/etc/borgmatic.d/{{ borgmatic_snippet_name }}.yaml"
+
+- name: Bormatic snippet
+  become: true
+  block:
+    - name: Copy borgmatic snippet
+      ansible.builtin.copy:
+        src: "{{ borgmatic_snippet_file }}"
+        dest: "{{ borgmatic_snippet_snippet }}"
+
+    - name: Instanciate borgmatic configuration
+      ansible.builtin.template:
+        src: borgmatic_config.yaml.j2
+        dest: "{{ borgmatic_snippet_config }}"
+
+    - name: Initialize repositories
+      ansible.builtin.command:
+        cmd: "borgmatic --config {{ borgmatic_snippet_config }} repo-create --encryption repokey"
+      register: command_result
+      changed_when: command_result.stderr | length > 0

@@ -1,0 +1,10 @@
+---
+
+- name: "Setting the borgmatic snippet path and name"
+  ansible.builtin.set_fact:
+    borgmatic_snippet_file: "{{ role_path }}/files/system.yaml"
+    borgmatic_snippet_name: system
+
+- name: Setup borgmatic system backup
+  ansible.builtin.include_role:
+    name: borgmatic_snippet

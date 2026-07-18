@@ -1,4 +1,14 @@
 ---
+- name: "Register backup destination {{ borgmatic_destination_hostname }} to hosts file"
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars[borgmatic_destination_hostname].wireguard_address }}\t{{ borgmatic_destination_hostname }}"
+
+- name: "Adding {{ borgmatic_destination_hostname }} to ssh known hosts"
+  ansible.builtin.known_hosts:
+    name: "{{ borgmatic_destination_hostname }}"
+    key: "{{ borgmatic_destination_hostname }},{{ hostvars[borgmatic_destination_hostname].wireguard_address }} {{ hostvars[borgmatic_destination_hostname].ssh_host_public_ed25519_key }}"
+
 - name: "Configure backup destination {{ borgmatic_destination_hostname }}"
   become: true
   become_user: borg

@@ -10,3 +10,4 @@
       ansible.builtin.lineinfile:
         path: /etc/hosts
         line: "127.0.0.1\t{{ inventory_hostname }}"
+
