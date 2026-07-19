@@ -1,0 +1,22 @@
+---
+- name: "Reload system daemon"
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+  listen: vouchers changed
+
+- name: Enable vouchers.epicerieledetour.org report timer
+  become: true
+  ansible.builtin.systemd:
+    name: ldt-vouchers-report.timer
+    state: restarted
+    enabled: true
+  listen: vouchers changed
+
+- name: Enable vouchers.epicerieledetour.org systemd service
+  become: true
+  ansible.builtin.systemd:
+    name: ldt-vouchers.service
+    state: restarted
+    enabled: true
+  listen: vouchers changed
