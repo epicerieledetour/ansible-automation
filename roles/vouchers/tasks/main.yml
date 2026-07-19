@@ -1,5 +1,4 @@
 ---
-
 - name: Vouchers
   become: true
   block:
@@ -39,28 +38,6 @@
       owner: "www-data"
       group: "www-data"
 
-  # systemd: backup
-
-  - name: Copying vouchers.epicerieledetour.org backup service file
-    ansible.builtin.copy:
-      src: ldt-vouchers-backup.service
-      dest: /etc/systemd/system/
-    notify:
-      - systemd changed
-
-  - name: Copying vouchers.epicerieledetour.org backup timer file
-    ansible.builtin.copy:
-      src: ldt-vouchers-backup.timer
-      dest: /etc/systemd/system/
-    notify:
-      - systemd changed
-
-  - name: Enable vouchers.epicerieledetour.org backup timer
-    ansible.builtin.systemd:
-      name: ldt-vouchers-backup.timer
-      state: started
-      enabled: true
-
   # systemd: report
 
   - name: Instanciate vouchers.epicerieledetour.org ldt-vouchers-report.service
@@ -99,7 +76,7 @@
       state: restarted
       enabled: true
 
-  # caddy
+ # caddy
 
   - name: Register vouchers caddy file
     ansible.builtin.copy:
@@ -107,4 +84,8 @@
       dest: /etc/caddy/sites.d/vouchers.caddy
     notify:
       - caddy changed
-  
+
+  - name: Setup backup
+    ansible.builtin.include_tasks:
+      file: backup.yml
+

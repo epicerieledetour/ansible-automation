@@ -1,0 +1,3 @@
+sqlite_databases:
+  - name: mydb
+    path: /srv/www/vouchers.epicerieledetour.org/ldt-vouchers.sqlite3
