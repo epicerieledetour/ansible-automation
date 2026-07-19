@@ -10,8 +10,8 @@ Environment="LDTVOUCHERS_DBPATH=ldt-vouchers.sqlite3"
 Environment="UV_CACHE_DIR=uvcache"
 Environment="UV_TOOL_DIR=uvtool"
 
+ExecStartPre=uvx --from git+https://github.com/epicerieledetour/ledetour-vouchers ldtvouchers --db ldt-vouchers.sqlite3 db init
 ExecStart=uvx --from git+https://github.com/epicerieledetour/ledetour-vouchers ldtvouchers server serve --host 127.0.0.1 --port 8000
 
 [Install]
 WantedBy=default.target
-

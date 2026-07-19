@@ -46,20 +46,15 @@
       dest: /etc/systemd/system/ldt-vouchers-report.service
       mode: u=r,g=r,o=
     notify:
-      - systemd changed
+      - vouchers changed
 
   - name: Copying vouchers.epicerieledetour.org report timer file
     ansible.builtin.copy:
       src: ldt-vouchers-report.timer
       dest: /etc/systemd/system/
     notify:
-      - systemd changed
+      - vouchers changed
 
-  - name: Enable vouchers.epicerieledetour.org report timer
-    ansible.builtin.systemd:
-      name: ldt-vouchers-report.timer
-      state: started
-      enabled: true
 
   # systemd: service
 
@@ -68,13 +63,8 @@
       src: ldt-vouchers.service
       dest: /etc/systemd/system/
     notify:
-      - systemd changed
+      - vouchers changed
 
-  - name: Enable vouchers.epicerieledetour.org systemd service
-    ansible.builtin.systemd:
-      name: ldt-vouchers.service
-      state: restarted
-      enabled: true
 
  # caddy
 

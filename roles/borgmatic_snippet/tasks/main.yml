@@ -23,3 +23,17 @@
         cmd: "borgmatic --config {{ borgmatic_snippet_config }} repo-create --encryption repokey"
       register: command_result
       changed_when: command_result.stderr | length > 0
+
+    - name: "Create new backup {{ borgmatic_snippet_name }}"
+      ansible.builtin.command:
+        cmd: "borgmatic --config {{ borgmatic_snippet_config }} create"
+      when: "'borgmatic_create' in ansible_run_tags"
+      tags:
+        - borgmatic_create
+
+    - name: "Restore last backup {{ borgmatic_snippet_name }}"
+      ansible.builtin.command:
+        cmd: "borgmatic --config {{ borgmatic_snippet_config }} restore --archive latest"
+      when: "'borgmatic_restore' in ansible_run_tags"
+      tags:
+        - borgmatic_restore 
