@@ -151,7 +151,7 @@ This `playbook.yml` will setup all machines described in `hosts` according to th
 
 ## First setup of a production machine
 
-1. Install debian 10 (buster)
+1. Install debian 13 (trixie)
 2. Full disk encryption
 3. Add a single user `debian`
 4. Ensure openssh server is running
