@@ -64,7 +64,7 @@
     - backup
     - destination
 
-- name: Setup borg no servers that needs to be backed up
+- name: Setup borg on servers that needs to be backed up
   hosts: backup_sources
   roles:
     - systemd_handlers
