@@ -197,7 +197,9 @@ You can now ping other machines in the vpn according to the IPs specified in the
 
 If Ansible has added your public ssh keys to other machines in the wireguard network, you can now ssh into them using the username specified in the file `hosts`.
 
-### Developement mode
+## Developement
+
+### Development environment
 
 We're using [Molecule](https://docs.ansible.com/projects/molecule/) to safely develop the Ansible playbook on local virtual machines without modifying the production servers.
 
@@ -208,21 +210,19 @@ uv run molecule create
 # Run the Ansible playbook on local virtual machines
 uv run molecule converge
 
+# Logging into a running virtual machine, for example vps2
+uv run molecule login --host vps2
+
 # Destroy all virtual machines
 uv run molecule destroy
 ```
 
-#### Get ssh logging info
+### Does it work ?
 
-```sh
-sudo grep sshd /var/log/auth.log
-```
+#### Vouchers
 
-```sh
-w
- 12:42:14 up 1 min,  1 user,  load average: 0.06, 0.04, 0.01
-USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
-vagrant  pts/0    10.0.2.2         12:41    1.00s  0.07s  0.00s w
+```bash
+ansible-host$ curl -v --connect-to vouchers.epicerieledetour.org:443 127.0.0.1:443 https://vouchers.epicerieledetour.org
 ```
 
 #### Wordpress backup info
