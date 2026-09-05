@@ -199,14 +199,17 @@ If Ansible has added your public ssh keys to other machines in the wireguard net
 
 ### Developement mode
 
-A [Vagrant](https://vagrantup.com) virtual machine can be used during development to safely test new configurations without modifying the production servers.
+We're using [Molecule](https://docs.ansible.com/projects/molecule/) to safely develop the Ansible playbook on local virtual machines without modifying the production servers.
 
 ```sh
 # Creates and run the virtual machines
-vagrant up
+uv run molecule create
 
-# Run the Ansible playbook on the Vagrant virtual machine
-vagrant provision
+# Run the Ansible playbook on local virtual machines
+uv run molecule converge
+
+# Destroy all virtual machines
+uv run molecule destroy
 ```
 
 #### Get ssh logging info

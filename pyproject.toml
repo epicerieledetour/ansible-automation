@@ -1,16 +1,16 @@
 [project]
-name = "my-ansible-project"
+name = "ansible-automation"
 version = "0.0.1"
-description = "Ansible playbooks with pinned dependencies"
+description = "Épicerie le Détour Ansible playbook"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "ansible>=14.1.0",
-    "ansible-core>=2.21.1",
-    "ansible-lint>=26.6.0",
-    "libvirt-python>=12.5.0",
-    "molecule>=26.6.0",
-    "molecule-libvirt-ng>=1.0.3",
+    "ansible",
+    "ansible-core",
+    "ansible-lint",
+    "libvirt-python",
+    "molecule",
+    "molecule-libvirt-ng",
 ]
 
 [tool.uv]
