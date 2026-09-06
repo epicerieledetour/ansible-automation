@@ -201,11 +201,19 @@ If Ansible has added your public ssh keys to other machines in the wireguard net
 
 ### Development environment
 
+Debian:
+- pkg-config (probably build-essential ?)
+- libvirt ?
+
+
 We're using [Molecule](https://docs.ansible.com/projects/molecule/) to safely develop the Ansible playbook on local virtual machines without modifying the production servers.
 
 ```sh
 # Creates and run the virtual machines
 uv run molecule create
+
+# Setup the virtual machines for local development
+uv run molecule prepare
 
 # Run the Ansible playbook on local virtual machines
 uv run molecule converge
@@ -217,7 +225,28 @@ uv run molecule login --host vps2
 uv run molecule destroy
 ```
 
-### Does it work ?
+### Testing that the services work
+
+#### Web services
+
+Exposing the web services on dynamic IPs assigned by Molecule over libvirt without modifying the ansible host itself can be tricky, requiring a mix of DNS masquerading, `/etc/hosts` configuration or complex molecule setups.
+
+Fortunately, all web services are available as `https://servicename.localhost` on the web servers themselves (so we can ensure that they work correctly locally).
+
+The easiest way to test web services is to redirect the web server ports 443 to the host port 443.
+
+```bash
+$ ssh -N -L 443:localhost:443 \
+    -i ~/.ansible/tmp/molecule.j0UL.default/id_ssh_rsa \
+    molecule@10.10.10.152  # Connect to the webserver virtual machine to get its IP
+```
+
+Web services are then accessible from the host on `localhost`:
+
+```bash
+$ curl https://vouchers.localhost
+$ firefox https://vouchers.localhost
+```
 
 #### Vouchers
 

@@ -1,23 +1,7 @@
 {
-	# Global options block.
-	# Set a real email so Let's Encrypt can reach you about cert issues.
 	email contact@epicerieledetour.org
-
-	# Pulls in any *.caddy files from global.d/ as extra global directives.
-	# This is how test/CI environments (e.g. Ansible Molecule) inject
-	# `local_certs` without touching this file: just drop a snippet in
-	# global.d/, e.g. global.d/00-molecule.caddy containing `local_certs`.
-	import global.d/*.caddy
+    import global.d/*.caddy
 }
 
-# Belt-and-suspenders redirect: Caddy already auto-redirects HTTP -> HTTPS
-# for any site block below that has a real hostname, but this catches
-# EVERY port-80 request — including requests to hosts that don't match
-# anything in sites-enabled/ — so nothing on :80 is ever served as plain HTTP.
-:80 {
-	redir https://{host}{uri} permanent
-}
-
-# Drop one .caddy file per site/app into sites-enabled/ and it's live.
-# On a native install this resolves to /etc/caddy/sites-enabled/*.caddy
 import sites.d/*.caddy
+

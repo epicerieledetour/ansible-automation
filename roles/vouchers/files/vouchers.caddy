@@ -1,4 +1,4 @@
-vouchers.epicerieledetour.org {
-	reverse_proxy 127.0.0.1:8000
+vouchers.epicerieledetour.org, vouchers.localhost {
+	reverse_proxy localhost:8000
 }
 
