@@ -35,8 +35,8 @@
       path: "/srv/www/vouchers.epicerieledetour.org/files/emissions/{{ ldtvouchers_hack_emissiontoken }}"
       state: directory
       mode: "0755"
-      owner: "www-data"
-      group: "www-data"
+      owner: "caddy"
+      group: "caddy"
 
   # systemd: report
 

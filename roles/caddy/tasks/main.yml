@@ -18,27 +18,16 @@
 
     - name: Make caddy directories
       ansible.builtin.file:
-        path: "/etc/caddy/{{ item }}"
+        path: "{{ item }}"
         state: directory
         mode: "u=rwx,g=rx,o=rx"
+        owner: caddy
+        group: caddy
       loop:
-        - sites.d
-        - global.d
-
-    - name: Copy main caddy configuration
-      ansible.builtin.copy:
-        src: Caddyfile
-        dest: /etc/caddy/Caddyfile
-      notify:
-        - caddy changed
-
-    - name: Use Caddy internal CA Root in devevlopment mode
-      ansible.builtin.copy:
-        src: global.d/00-local_certs.caddy
-        dest: /etc/caddy/global.d/00-local_certs.caddy
-      when: deployment_is_dev
-      notify:
-        - caddy changed
+        - /etc/caddy
+        - /etc/caddy/sites.d
+        - /etc/caddy/global.d
+        - /srv/www
 
     - name: Open http port 80 for caddy
       community.general.ufw:
@@ -50,3 +39,22 @@
         rule: allow
         port: https
 
+- name: Caddy as user caddy
+  become: true
+  become_user: caddy
+  block:
+
+    - name: Copy main caddy configuration
+      ansible.builtin.copy:
+        src: Caddyfile
+        dest: /etc/caddy/Caddyfile
+      notify:
+        - caddy changed
+
+    - name: Use Caddy internal CA Root in development mode
+      ansible.builtin.copy:
+        src: global.d/00-local_certs.caddy
+        dest: /etc/caddy/global.d/00-local_certs.caddy
+      when: deployment_is_dev
+      notify:
+        - caddy changed

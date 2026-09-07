@@ -7,15 +7,15 @@
 - molecule: check again what is backed up by default
 
 - prod/vps: manual backup wordpress
-- molecule/vps2: site:wordpress manual restore
 - molecule/vps2: site:wordpress backup role
+- molecule/vps2: site:wordpress manual restore
 - molecule/vps2: site:wordpress restore role
 - molecule/vps2: site:wordpress test ansible backup/restore
 
 - prod/vps2: site:vouchers manual vouchers backup
+- molecule/vps2: site:vouchers backup role
 - molecule/vps2: site:vouchers manual restore
 - molecule/vps2: site:vouchers restore role
-- molecule/vps2: site:vouchers backup role
 - molecule/vps2: site:vouchers test ansible backup/restore
 
 - prod/charles-ws: generate and install networkd vpn config

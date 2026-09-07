@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# This script temporarily sets Charles's workstation firewall
+# for molecule development
+
 # 1. Allow the VM to talk to the host (DHCP & DNS)
 sudo nft add rule inet filter input iifname "molecule-*" accept
 

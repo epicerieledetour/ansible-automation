@@ -254,6 +254,37 @@ $ firefox https://vouchers.localhost
 ansible-host$ curl -v --connect-to vouchers.epicerieledetour.org:443 127.0.0.1:443 https://vouchers.epicerieledetour.org
 ```
 
+#### Membres
+
+```bash
+# Without client SSL, members.json should be anonymized
+$ curl -skL https://membres.localhost/members.json | jq -r '{ members: {"333": .members."333"}, contains_private_data }'
+
+{
+  "members": {
+    "333": {
+      "active": true,
+      "hours_in_bank": 61
+    }
+  },
+  "contains_private_data": false
+}
+
+# With client SSL, members.json should not be anonymized
+$ curl -skL --cert roles/membres/files/client.crt --key roles/membres/files/client.key https://membres.localhost/members.json | jq -r '{ members: {"333": .members."333"}, contains_private_data }'
+{
+  "members": {
+    "333": {
+      "active": true,
+      "family_name": "Flèche",
+      "first_name": "Charles",
+      "phone": "********"
+    }
+  },
+  "contains_private_data": true
+}
+```
+
 #### Wordpress backup info
 
 The plugin used for backups of the wordpress documents and databases is

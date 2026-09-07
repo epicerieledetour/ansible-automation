@@ -1,0 +1,69 @@
+---
+- name: Install git
+  become: true
+  ansible.builtin.apt:
+    pkg:
+      - git
+      - python3
+
+- name: Membres setup for user caddy
+  become: true
+  become_user: caddy
+  block:
+
+  - name: Clone membres git repository
+    ansible.builtin.git:
+      repo: "https://github.com/epicerieledetour/ledetour-membres.git"
+      dest: "{{ membres_root_dir }}"
+
+    # caddy
+
+  - name: Instanciate caddy setup
+    ansible.builtin.template:
+      src: membres.caddy.j2
+      dest: /etc/caddy/sites.d/membres.caddy
+    notify:
+      - caddy changed
+
+  - name: Copy Client SSL CA certificate
+    ansible.builtin.copy:
+      src: client-ca.crt
+      dest: "{{ membres_client_ca_path }}"
+      mode: u=r,g=,o=
+    notify:
+      - caddy changed
+
+- name: Membres
+  become: true
+  block:
+
+    # systemd
+
+    - name: Instanciate membres DB system service environment file
+      ansible.builtin.template:
+        src: ldt-membres.env.j2
+        dest: "{{ membres_env_path }}"
+        mode: u=r,g=,o=
+
+    - name: Instanciate membres DB systemd service
+      ansible.builtin.template:
+        src: ldt-membres.service.j2
+        dest: /etc/systemd/system/ldt-membres.service
+      notify:
+        - systemd changed
+
+    - name: Instanciate membres DB systemd timer
+      ansible.builtin.copy:
+        src: ldt-membres.timer
+        dest: /etc/systemd/system/ldt-membres.timer
+      notify:
+        - systemd changed
+
+    - name: Force handlers to run immediately
+      ansible.builtin.meta: flush_handlers
+
+    - name: Enable membres DB systemd timer
+      ansible.builtin.systemd:
+        name: ldt-membres.timer
+        enabled: true
+        state: started 

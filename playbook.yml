@@ -74,6 +74,8 @@
       tags: ["caddy"]
     - role: vouchers
       tags: ["vouchers"]
+    - role: membres
+      tags: ["membres"]
 
 # Everything below is the old setup being migrated
 # ---

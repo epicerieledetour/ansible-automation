@@ -1,0 +1,35 @@
+membres.epicerieledetour.org, membres.localhost {
+	root * {{ membres_files_dir }}
+    file_server
+    encode zstd gzip
+
+    tls {
+        client_auth {
+            mode request
+            trust_pool file {{ membres_client_ca_path }}
+        }
+    }
+
+    route {
+        @has_cert {
+            path /members.json
+            expression {http.request.tls.client.subject} != ""
+        }
+
+        @no_cert {
+            path /members.json
+            expression {http.request.tls.client.subject} == ""
+        }
+
+        rewrite @has_cert /{{ membres_db_non_anonymized_name }}
+        rewrite @no_cert /{{ membres_db_anonymized_name }}
+
+        @direct_access {
+            path /{{ membres_db_non_anonymized_name }} /{{ membres_db_anonymized_name }}
+            not vars_regexp {http.request.orig_uri} ^/members\.json$
+        }
+        respond @direct_access 404
+    }
+}
+
+

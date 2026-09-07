@@ -3,7 +3,7 @@ Description=Run ledetour-vouchers
 
 [Service]
 Type=simple
-User=www-data
+User=caddy
 WorkingDirectory=/srv/www/vouchers.epicerieledetour.org
 
 Environment="LDTVOUCHERS_DBPATH=ldt-vouchers.sqlite3"
