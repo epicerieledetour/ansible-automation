@@ -1,7 +1,5 @@
 # TODO
 
-- molecule/vps2: webserver
-- molecule/vps2: site: vouchers
 - molecule/vps2: site: membres
 - molecule/vps2: site: wordpress
 - molecule/vps2: grafana stack
