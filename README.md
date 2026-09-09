@@ -103,9 +103,24 @@ sudo apt install \
     python3-dev
 ```
 
+### Install `uv`
+
+We use [`uv`](https://docs.astral.sh/uv/) to run Ansible and Molecule. Follow the instructions on that page to install it.
+
+### Set up libvirt
+
+The Molecule testing environment runs virtual machines managed by [`libvirt`](https://libvirt.org/). The user running the Molecule environment must be added to the `libvirt` group:
+
+```bash
+sudo usermod --append --groups libvirt `whoami`
+newgrp libvirt
+```
+
 ### Install Ansible dependencies
 
 Install community package for creating and using roles:
+
+**Probably not needed anymore**
 
 ```sh
 ansible-galaxy collection install -r requirements.yml
