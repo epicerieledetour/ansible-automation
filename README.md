@@ -89,11 +89,10 @@ To add a new administrator that could run this ansible setup:
 On debian:
 
 ```sh
+# age: to encrypt and decrypt the vault password
+# the rest is for running ansible and the molecule virtual machines
 sudo apt install \
-    age  # to encrypt and decrypt the vault password \
-    \
-    # Below dependencies are for running the ansible \
-    # and molecule virtual machines \
+    age \
     cloud-image-utils \
     qemu-kvm \
     libguestfs-tools \
@@ -102,7 +101,6 @@ sudo apt install \
     pkg-config \
     python3-dev
 ```
-
 
 ### Install Ansible dependencies
 
