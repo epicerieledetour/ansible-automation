@@ -90,10 +90,10 @@ On debian:
 
 ```sh
 sudo apt install \
-    age  # to encrypt and decrypt the vault password
-
-    # Below dependencies are for running the ansible
-    # and molecule virtual machines
+    age  # to encrypt and decrypt the vault password \
+    \
+    # Below dependencies are for running the ansible \
+    # and molecule virtual machines \
     cloud-image-utils \
     qemu-kvm \
     libguestfs-tools \
