@@ -93,6 +93,7 @@ On debian:
 # the rest is for running ansible and the molecule virtual machines
 sudo apt install \
     age \
+    build-essential \
     cloud-image-utils \
     qemu-kvm \
     libguestfs-tools \
