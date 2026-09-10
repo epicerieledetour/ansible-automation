@@ -33,6 +33,12 @@
 
     # MariaDB
 
+    - name: Enable MariaDB service
+      ansible.builtin.systemd:
+        name: mariadb
+        enabled: true
+        status: started
+
     - name: Removes all MariaDB anonymous user accounts
       ansible.mariadb.mariadb_user:
         login_unix_socket: /var/run/mysqld/mysqld.sock
