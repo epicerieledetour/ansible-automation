@@ -65,8 +65,8 @@
     - backup
     - source
 
-- name: Setup vouchers
-  hosts: vouchers
+- name: Setup web servers
+  hosts: webservers
   roles:
     - role: systemd_handlers
     - role: caddy_handlers
@@ -76,6 +76,9 @@
       tags: ["vouchers"]
     - role: membres
       tags: ["membres"]
+    - role: wordpress
+      tags: ['wordpress']
+  tags: ['webservers']
 
 # Everything below is the old setup being migrated
 # ---

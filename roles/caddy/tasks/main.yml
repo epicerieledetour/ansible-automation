@@ -16,7 +16,15 @@
         name: caddy
         state: present
 
-    - name: Make caddy directories
+    - name: Make /srv/www directory
+      ansible.builtin.file:
+        path: /srv/www
+        state: directory
+        mode: "u=rwx,g=rx,o=rx"
+        owner: www-data
+        group: www-data
+
+    - name: Make /etc/caddy directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -27,7 +35,6 @@
         - /etc/caddy
         - /etc/caddy/sites.d
         - /etc/caddy/global.d
-        - /srv/www
 
     - name: Open http port 80 for caddy
       community.general.ufw:

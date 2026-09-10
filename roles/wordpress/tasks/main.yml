@@ -1,105 +1,159 @@
 ---
 # MariaDB
 
-- name: Install MariaDB and PHP
-  ansible.builtin.apt:
-    pkg:
-      - mariadb-server
-      - php-curl # For wordpress plugin miniOrange OAuth Single Sign On
-      - php-fpm
-      - php-mysql
-      - python3-pymysql # For the community.mysql.* modules
+- name: Wordpress as root
+  become: true
+  block:
 
-- name: Create a new database with name 'wordpress'
-  community.mysql.mysql_db:
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-    name: wordpress
-    state: present
+    - name: Install MariaDB and PHP
+      ansible.builtin.apt:
+        pkg:
+          - mariadb-server
+          - php-curl
+          - php-fpm
+          - php-gd
+          - php-intl
+          - php-mbstring
+          - php-mysql
+          - php-soap
+          - php-xml
+          - php-xmlrpc
+          - php-zip
+          - python3-pymysql  # For the community.mysql.* modules
 
-- name: Removes all MariaDB anonymous user accounts
-  community.mysql.mysql_user:
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-    name: ""
-    host_all: true
-    state: absent
+    # Wordpress CLI
 
-- name: Create MariaDB Wordpress user
-  community.mysql.mysql_user:
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-    state: present
-    name: wordpress
-    password: "{{ wordpress_db_password }}"
-    priv:
-      "wordpress.*": "ALL,GRANT"
+    - name: Install wp-cli
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+        dest: /usr/local/bin/wp
+        mode: u=rx,g=rx,o=rx
+        owner: root
+        group: root
 
-- name: Copying MariaDB dump systemd service file
-  ansible.builtin.copy:
-    src: mariadb-dump.service
-    dest: /etc/systemd/system/
-  notify:
-    - systemd changed
+    # MariaDB
 
-- name: Copying MariaDB dump systemd timer file
-  ansible.builtin.copy:
-    src: mariadb-dump.timer
-    dest: /etc/systemd/system/
-  notify:
-    - systemd changed
+    - name: Removes all MariaDB anonymous user accounts
+      ansible.mariadb.mariadb_user:
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        name: ""
+        host_all: true
+        state: absent
 
-- name: "Start MariaDB backup script systemd timer"
-  ansible.builtin.systemd:
-    name: mariadb-dump.timer
-    enabled: true
-    state: started
+    # - name: "Create the MariaDB '{{ wordpress_db_name }}' database"
+    #   ansible.mariadb.mariadb_db:
+    #     login_unix_socket: /var/run/mysqld/mysqld.sock
+    #     name: "{{ wordpress_db_name }}"
+    #     state: present
 
-# Wordpress
+    - name: Create MariaDB Wordpress user
+      ansible.mariadb.mariadb_user:
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        state: present
+        name: "{{ wordpress_db_user }}"
+        password: "{{ wordpress_db_password }}"
+        priv:
+          "wordpress.*": "ALL,GRANT"  # caution: ensure wordpress.* matches the db name
 
-- name: Download Wordpress 5.7 tarball
-  ansible.builtin.get_url:
-    url: "https://wordpress.org/wordpress-5.7.tar.gz"
-    checksum: sha1:76d1332cfcbc5f8b17151b357999d1f758faf897
-    dest: /tmp/wordpress-5.7.tar.gz
+- name: Wordpress as caddy
+  become: true
+  become_user: www-data
+  block:
 
-- name: Make directory /srv/www/wordpress-5.7
-  ansible.builtin.file:
-    path: /srv/www/wordpress-5.7
-    state: directory
+    - name: Install wordpress
+      ansible.builtin.command:
+        cmd: "wp core download --path={{ wordpress_root_dir }}"
+      changed_when:
+        - _task.result.rc == 0
+      failed_when:
+        - _task.result.rc != 0
+        - '"WordPress files seem to already be present here." not in _task.result.stderr'
 
-- name: Unzip Wordpress
-  ansible.builtin.unarchive:
-    src: /tmp/wordpress-5.7.tar.gz
-    dest: /srv/www/wordpress-5.7
-    creates: /srv/www/wordpress-5.7/wordpress
-    owner: www-data
-    remote_src: true
-    mode: "a+x"
+    - name: Create wp-config.php
+      ansible.builtin.command:
+        chdir: "{{ wordpress_root_dir }}"
+        cmd: "wp config create --dbname={{ wordpress_db_name}} --dbuser={{ wordpress_db_user }} --dbpass={{ wordpress_db_password }}"
+      changed_when:
+        - _task.result.rc == 0
+      failed_when:
+        - _task.result.rc != 0
+        - '"file already exists." not in _task.result.stderr'
 
-- name: Remove wp-config-sample.php
-  ansible.builtin.file:
-    path: /srv/www/wordpress-5.7/wordpress/wp-config-sample.php
-    state: absent
+    - name: Ensure wp-config is readable by owner only
+      ansible.builtin.file:
+        path: "{{ wordpress_root_dir }}/wp-config.php"
+        mode: u=rw,g=rw,o=
 
-- name: Instanciate Wordpress wp-config.php
+    - name: Create db
+      ansible.builtin.command:
+        chdir: "{{ wordpress_root_dir }}"
+        cmd: "wp db create"
+      changed_when:
+        - _task.result.rc == 0
+      failed_when:
+        - _task.result.rc != 0
+        - '"database exists" not in _task.result.stderr'
+
+    - name: Initialize wordpress
+      ansible.builtin.command:
+        chdir: "{{ wordpress_root_dir }}"
+        cmd: "wp core install --skip-email --url={{ wordpress_url }} --title=\"{{ wordpress_title }}\" --admin_user={{ wordpress_admin_user }} --admin_password={{ wordpress_admin_password }} --admin_email={{ wordpress_admin_email }}"
+      changed_when:
+         - _task.result.rc == 0
+         - '_task.result.stdout.startswith("Success")'
+
+- name: Instanciate caddy file
+  become: true
+  become_user: caddy
   ansible.builtin.template:
-    src: wp-config.php.j2
-    dest: /srv/www/wordpress-5.7/wordpress/wp-config.php
-    mode: u=rw,g=r,o=r
+    src: wordpress.caddy.j2
+    dest: /etc/caddy/sites.d/wordpress.caddy
+  notify: caddy changed
 
-# Nginx
-
-- ansible.builtin.include_tasks:
-    file: "main{{ deployment_suffix }}.yml"
-
-- name: Instanciate Wordpress nginx config
-  ansible.builtin.template:
-    src: wordpress.conf.j2
-    dest: /etc/nginx/sites-available/wordpress.conf
-    mode: u=r,g=r,o=r
-  notify:
-    - nginx changed
-
-- name: Enable wordpress.epicerieledetour.org nginx config
-  ansible.builtin.file:
-    src: /etc/nginx/sites-available/wordpress.conf
-    dest: /etc/nginx/sites-enabled/wordpress.conf
-    state: link
+#
+# - name: Copying MariaDB dump systemd service file
+#   ansible.builtin.copy:
+#     src: mariadb-dump.service
+#     dest: /etc/systemd/system/
+#   notify:
+#     - systemd changed
+#
+# - name: Copying MariaDB dump systemd timer file
+#   ansible.builtin.copy:
+#     src: mariadb-dump.timer
+#     dest: /etc/systemd/system/
+#   notify:
+#     - systemd changed
+#
+# - name: "Start MariaDB backup script systemd timer"
+#   ansible.builtin.systemd:
+#     name: mariadb-dump.timer
+#     enabled: true
+#     state: started
+#
+# # Wordpress
+#
+# - name: Instanciate Wordpress wp-config.php
+#   ansible.builtin.template:
+#     src: wp-config.php.j2
+#     dest: /srv/www/wordpress-5.7/wordpress/wp-config.php
+#     mode: u=rw,g=r,o=r
+#
+# # Nginx
+#
+# - ansible.builtin.include_tasks:
+#     file: "main{{ deployment_suffix }}.yml"
+#
+# - name: Instanciate Wordpress nginx config
+#   ansible.builtin.template:
+#     src: wordpress.conf.j2
+#     dest: /etc/nginx/sites-available/wordpress.conf
+#     mode: u=r,g=r,o=r
+#   notify:
+#     - nginx changed
+#
+# - name: Enable wordpress.epicerieledetour.org nginx config
+#   ansible.builtin.file:
+#     src: /etc/nginx/sites-available/wordpress.conf
+#     dest: /etc/nginx/sites-enabled/wordpress.conf
+#     state: link

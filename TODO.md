@@ -1,5 +1,8 @@
 # TODO
 
+- clean role wordpress
+- split rights caddy / www-data
+
 - molecule/vps2: site: wordpress
 - molecule/vps2: grafana stack
 
@@ -32,4 +35,6 @@
 - molecule/vps2: rename vps2->vps
 - prod/vps2: rename vps2->vps
 - prod/vps2: change si/.ssh/config
+
+- wordpress: auto update cli / site / plugin
 
