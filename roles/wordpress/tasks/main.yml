@@ -40,12 +40,6 @@
         host_all: true
         state: absent
 
-    # - name: "Create the MariaDB '{{ wordpress_db_name }}' database"
-    #   ansible.mariadb.mariadb_db:
-    #     login_unix_socket: /var/run/mysqld/mysqld.sock
-    #     name: "{{ wordpress_db_name }}"
-    #     state: present
-
     - name: Create MariaDB Wordpress user
       ansible.mariadb.mariadb_user:
         login_unix_socket: /var/run/mysqld/mysqld.sock
