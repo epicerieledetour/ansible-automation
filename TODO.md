@@ -1,5 +1,6 @@
 # TODO
 
+- add wordpress test in readme
 - clean role wordpress
 - split rights caddy / www-data
 
