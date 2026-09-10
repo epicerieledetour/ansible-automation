@@ -1,7 +1,5 @@
 # TODO
 
-- add wordpress test in readme
-- clean role wordpress
 - split rights caddy / www-data
 
 - molecule/vps2: site: wordpress

@@ -7,20 +7,6 @@ uv run molecule converge -- --tag vouchers --tags borgmatic_create
 uv run molecule converge -- --tag vouchers --tags borgmatic_restore
 ```
 
-## Migration
-
-- ansible backups: backup by service, not by machine-service
-- ansible gdrivesync
-- pi perso: connection / heat
-- pi1: prepare trixie image on pi perso
-- pi perso: disconnect wg ldt
-- pi1: run ansible setup, becomes production
-- pi perso: remove wg ldt
-- vps2: recreate production server
-- vps1: move membres to vps2
-- vps1: move wordpress to vps2
-- vps1: destroy
-
 # ansible-automation
 
 This repository contains the [Ansible](https://docs.ansible.com/projects/ansible/latest/getting_started/introduction.html) playbook and roles of the [Épicerie Le Détour](https://epicerieledetour.org/). It configures the different servers (VPS or self-hosted) and services (custom software, backup setups or third-party open source softwares) needed for the épicerie's mission, for example:
@@ -265,7 +251,7 @@ $ firefox https://vouchers.localhost
 #### Vouchers
 
 ```bash
-ansible-host$ curl -v --connect-to vouchers.epicerieledetour.org:443 127.0.0.1:443 https://vouchers.epicerieledetour.org
+ansible-host$ curl -kL https://vouchers.localhost
 ```
 
 #### Membres
@@ -297,6 +283,12 @@ $ curl -skL --cert roles/membres/files/client.crt --key roles/membres/files/clie
   },
   "contains_private_data": true
 }
+```
+
+#### Wordpress
+
+```bash
+$ curl -kL https://wordpress.localhost
 ```
 
 #### Wordpress backup info
