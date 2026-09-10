@@ -1,8 +1,8 @@
 # TODO
 
+- php from extrepo
 - split rights caddy / www-data
 
-- molecule/vps2: site: wordpress
 - molecule/vps2: grafana stack
 
 - molecule: check again what is backed up by default
