@@ -5,8 +5,14 @@
   become: true
   block:
 
+    - name: Enable PHP repo via extrepo
+      ansible.builtin.command:
+        cmd: extrepo enable sury
+        creates: /etc/apt/sources.list.d/extrepo_sury.sources
+
     - name: Install MariaDB and PHP
       ansible.builtin.apt:
+        update_cache: true
         pkg:
           - mariadb-server
           - php-curl
@@ -37,7 +43,7 @@
       ansible.builtin.systemd:
         name: mariadb
         enabled: true
-        status: started
+        state: started
 
     - name: Removes all MariaDB anonymous user accounts
       ansible.mariadb.mariadb_user:

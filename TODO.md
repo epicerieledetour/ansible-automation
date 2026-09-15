@@ -1,6 +1,5 @@
 # TODO
 
-- php from extrepo
 - split rights caddy / www-data
 
 - molecule/vps2: grafana stack
