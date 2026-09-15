@@ -15,16 +15,17 @@
         update_cache: true
         pkg:
           - mariadb-server
-          - php-curl
-          - php-fpm
-          - php-gd
-          - php-intl
-          - php-mbstring
-          - php-mysql
-          - php-soap
-          - php-xml
-          - php-xmlrpc
-          - php-zip
+          - "php{{ wordpress_php_version }}-cli"
+          - "php{{ wordpress_php_version }}-curl"
+          - "php{{ wordpress_php_version }}-fpm"
+          - "php{{ wordpress_php_version }}-gd"
+          - "php{{ wordpress_php_version }}-intl"
+          - "php{{ wordpress_php_version }}-mbstring"
+          - "php{{ wordpress_php_version }}-mysql"
+          - "php{{ wordpress_php_version }}-soap"
+          - "php{{ wordpress_php_version }}-xml"
+          - "php{{ wordpress_php_version }}-xmlrpc"
+          - "php{{ wordpress_php_version }}-zip"
           - python3-pymysql  # For the community.mysql.* modules
 
     # Wordpress CLI
@@ -68,7 +69,7 @@
 
     - name: Install wordpress
       ansible.builtin.command:
-        cmd: "wp core download --path={{ wordpress_root_dir }}"
+        cmd: "{{ wordpress_wp_cli }} core download --path={{ wordpress_root_dir }}"
       changed_when:
         - _task.result.rc == 0
       failed_when:
@@ -78,7 +79,7 @@
     - name: Create wp-config.php
       ansible.builtin.command:
         chdir: "{{ wordpress_root_dir }}"
-        cmd: "wp config create --dbname={{ wordpress_db_name}} --dbuser={{ wordpress_db_user }} --dbpass={{ wordpress_db_password }}"
+        cmd: "{{ wordpress_wp_cli }} config create --dbname={{ wordpress_db_name}} --dbuser={{ wordpress_db_user }} --dbpass={{ wordpress_db_password }}"
       changed_when:
         - _task.result.rc == 0
       failed_when:
@@ -93,7 +94,7 @@
     - name: Create db
       ansible.builtin.command:
         chdir: "{{ wordpress_root_dir }}"
-        cmd: "wp db create"
+        cmd: "{{ wordpress_wp_cli }} db create"
       changed_when:
         - _task.result.rc == 0
       failed_when:
@@ -103,7 +104,7 @@
     - name: Initialize wordpress
       ansible.builtin.command:
         chdir: "{{ wordpress_root_dir }}"
-        cmd: "wp core install --skip-email --url={{ wordpress_url }} --title=\"{{ wordpress_title }}\" --admin_user={{ wordpress_admin_user }} --admin_password={{ wordpress_admin_password }} --admin_email={{ wordpress_admin_email }}"
+        cmd: "{{ wordpress_wp_cli }} core install --skip-email --url={{ wordpress_url }} --title=\"{{ wordpress_title }}\" --admin_user={{ wordpress_admin_user }} --admin_password={{ wordpress_admin_password }} --admin_email={{ wordpress_admin_email }}"
       changed_when:
          - _task.result.rc == 0
          - '_task.result.stdout.startswith("Success")'

@@ -1,0 +1,3 @@
+---
+wordpress_php_version: "8.5"
+wordpress_wp_cli: "php{{ wordpress_php_version }} /usr/local/bin/wp"

@@ -2,6 +2,6 @@ wordpress.epicerieledetour.org, wordpress.localhost {
 	root * {{ wordpress_root_dir }}
     file_server
     encode zstd gzip
-    php_fastcgi unix//run/php/php-fpm.sock
+    php_fastcgi unix//run/php/php{{ wordpress_php_version }}-fpm.sock
 }
 

@@ -1,7 +1,6 @@
 # TODO
 
-- split rights caddy / www-data
-
+- test membres, vouchers, wordpress
 - molecule/vps2: grafana stack
 
 - molecule: check again what is backed up by default
