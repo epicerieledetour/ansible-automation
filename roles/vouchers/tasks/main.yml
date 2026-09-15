@@ -34,9 +34,10 @@
     ansible.builtin.file:
       path: "/srv/www/vouchers.epicerieledetour.org/files/emissions/{{ ldtvouchers_hack_emissiontoken }}"
       state: directory
-      mode: "0755"
-      owner: "caddy"
-      group: "caddy"
+      # setgid bit so files created by caddy are group owned by www-data
+      mode: "u=rwx,g=rwxs,o=rx"
+      owner: "www-data"
+      group: "www-data"
 
   # systemd: report
 
@@ -65,17 +66,19 @@
     notify:
       - vouchers changed
 
-
- # caddy
-
-  - name: Register vouchers caddy file
-    ansible.builtin.copy:
-      src: vouchers.caddy
-      dest: /etc/caddy/sites.d/vouchers.caddy
-    notify:
-      - caddy changed
-
   - name: Setup backup
     ansible.builtin.include_tasks:
       file: backup.yml
+
+
+- name: Register vouchers caddy file
+  become: true
+  become_user: caddy
+  ansible.builtin.copy:
+    src: vouchers.caddy
+    dest: /etc/caddy/sites.d/vouchers.caddy
+    owner: caddy
+    group: caddy
+  notify:
+    - caddy changed
 

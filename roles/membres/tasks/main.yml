@@ -6,32 +6,39 @@
       - git
       - python3
 
-- name: Membres setup for user caddy
+
+- name: Membres setup
   become: true
-  become_user: caddy
+  become_user: www-data
   block:
 
   - name: Clone membres git repository
+    become: true
     ansible.builtin.git:
       repo: "https://github.com/epicerieledetour/ledetour-membres.git"
       dest: "{{ membres_root_dir }}"
 
-    # caddy
-
-  - name: Instanciate caddy setup
-    ansible.builtin.template:
-      src: membres.caddy.j2
-      dest: /etc/caddy/sites.d/membres.caddy
-    notify:
-      - caddy changed
 
   - name: Copy Client SSL CA certificate
     ansible.builtin.copy:
       src: client-ca.crt
       dest: "{{ membres_client_ca_path }}"
-      mode: u=r,g=,o=
+      owner: www-data
+      group: www-data
+      mode: u=r,g=r,o=
     notify:
       - caddy changed
+
+- name: Instanciate caddy setup
+  become: true
+  become_user: caddy
+  ansible.builtin.template:
+    src: membres.caddy.j2
+    dest: /etc/caddy/sites.d/membres.caddy
+    owner: caddy
+    group: caddy
+  notify:
+    - caddy changed
 
 - name: Membres
   become: true
@@ -66,4 +73,4 @@
       ansible.builtin.systemd:
         name: ldt-membres.timer
         enabled: true
-        state: started 
+        state: started

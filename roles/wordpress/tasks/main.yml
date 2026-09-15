@@ -61,7 +61,7 @@
         priv:
           "wordpress.*": "ALL,GRANT"  # caution: ensure wordpress.* matches the db name
 
-- name: Wordpress as caddy
+- name: Wordpress as www-data
   become: true
   become_user: www-data
   block:
@@ -114,4 +114,6 @@
   ansible.builtin.template:
     src: wordpress.caddy.j2
     dest: /etc/caddy/sites.d/wordpress.caddy
+    owner: caddy
+    group: caddy
   notify: caddy changed

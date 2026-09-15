@@ -3,6 +3,6 @@ Description=Update database files of membres.epicerieledetour.org
 
 [Service]
 Type=oneshot
-User=caddy
+User=www-data
 ExecStart=python3 {{ membres_root_dir }}/scripts/get-members-json.py
 EnvironmentFile={{ membres_env_path }}

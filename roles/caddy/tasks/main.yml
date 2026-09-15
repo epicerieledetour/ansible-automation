@@ -16,6 +16,12 @@
         name: caddy
         state: present
 
+    - name: Add caddy user to www-data group
+      ansible.builtin.user:
+        name: caddy
+        groups: www-data
+        append: true
+
     - name: Make /srv/www directory
       ansible.builtin.file:
         path: /srv/www
@@ -55,6 +61,8 @@
       ansible.builtin.copy:
         src: Caddyfile
         dest: /etc/caddy/Caddyfile
+        owner: caddy
+        group: caddy
       notify:
         - caddy changed
 
@@ -62,6 +70,8 @@
       ansible.builtin.copy:
         src: global.d/00-local_certs.caddy
         dest: /etc/caddy/global.d/00-local_certs.caddy
+        owner: caddy
+        group: caddy
       when: deployment_is_dev
       notify:
         - caddy changed
