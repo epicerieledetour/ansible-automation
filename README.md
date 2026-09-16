@@ -291,6 +291,8 @@ $ curl -skL --cert roles/membres/files/client.crt --key roles/membres/files/clie
 $ curl -kL https://wordpress.localhost
 ```
 
+Default login on a Molecule/dev environment is username `admin`, with the password stored (vault-encrypted) in `wordpress_admin_password` in `roles/wordpress/vars/main.yml` — view it with `ansible-vault view roles/wordpress/vars/main.yml`. In production, regular Wordpress users log in with their `@epicerieledetour.org` Google account; this `admin` account remains as a fallback.
+
 #### Wordpress backup info
 
 The plugin used for backups of the wordpress documents and databases is
@@ -305,4 +307,12 @@ Go to the `settings` tab showed below
 Scroll down until you reach the `Google Drive` section
 
 ![](pictures/gdrive_options.png)
+
+#### Grafana
+
+```bash
+$ curl -kL https://grafana.localhost
+```
+
+On a Molecule/dev environment, Google OAuth is disabled, so login falls back to Grafana's built-in default account: username `admin`, password `admin` (Grafana forces a password change on first login). In production, Grafana is only reachable through Google OAuth (see `roles/grafana/templates/grafana.ini.j2`) — users log in with their `@epicerieledetour.org` Google account, and there is no separate local admin login.
 

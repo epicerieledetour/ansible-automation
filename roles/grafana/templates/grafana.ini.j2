@@ -1,0 +1,21 @@
+[server]
+http_addr = 127.0.0.1
+{% if deployment_is_prod %}
+root_url = https://{{ grafana_url }}
+{% endif %}
+
+[auth]
+oauth_auto_login = {{ deployment_is_prod | ternary('true', 'false') }}
+
+[auth.google]
+enabled = {{ deployment_is_prod | ternary('true', 'false') }}
+client_id = {{ google_auth_client_id }}
+client_secret = {{ google_auth_client_secret }}
+allowed_domains = epicerieledetour.org
+
+[plugins]
+# Only prometheus and loki are provisioned as datasources (see
+# provisioning/datasources/); the rest of Grafana's bundled core datasource
+# plugins each spawn their own backend process on startup for no reason,
+# needlessly inflating memory usage.
+disable_plugins = stackdriver,grafana-pyroscope-datasource,opentsdb,mssql,grafana-postgresql-datasource,tempo,jaeger,mysql,elasticsearch,influxdb,zipkin

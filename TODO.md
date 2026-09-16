@@ -1,10 +1,10 @@
 # TODO
 
-- test membres, vouchers, wordpress
-- molecule/vps2: grafana stack
+- test membres, vouchers, wordpress: resume Claude session
 
 - molecule: check again what is backed up by default
 
+- molecule/vps2: setup plugin currently needed by the prod wordpress
 - prod/vps: manual backup wordpress
 - molecule/vps2: site:wordpress backup role
 - molecule/vps2: site:wordpress manual restore
@@ -22,6 +22,10 @@
 
 - molecule/srv1: mount /dev/sdb1 -> /srv/borgmatic
 - prod/srv1: run ansible
+
+- molecule/srv1: move grafana/loki/alloy/prometheus/node_exporter roles from vps2 to srv1
+- prod/srv1: move grafana/loki/alloy/prometheus/node_exporter roles from vps2 to srv1
+- prod/vps2: keep only grafana reverse proxy (roles/grafana/files/grafana.caddy) once srv1 serves grafana
 
 - prod/vps2: reinstall trixie
 - prod/vps2: run playbook

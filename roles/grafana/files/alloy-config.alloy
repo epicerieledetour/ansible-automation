@@ -1,0 +1,25 @@
+// Ships local logs to Loki, replacing the (now EOL) Promtail agent.
+//
+// Note: the old promtail config also scraped /var/log/borg.log (with a JSON
+// pipeline stage pulling out duration/compressed_size/timestamp), but the
+// current borgmatic setup doesn't write that file anymore. Add it back with
+// a loki.source.journal block against the borgmatic systemd units if wanted.
+
+local.file_match "logs" {
+	path_targets = [
+		{__path__ = "/var/log/ufw.log", job = "ufw"},
+		{__path__ = "/var/log/fail2ban.log", job = "fail2ban"},
+		{__path__ = "/var/log/auth.log", job = "ssh"},
+	]
+}
+
+loki.source.file "logs" {
+	targets    = local.file_match.logs.targets
+	forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+	endpoint {
+		url = "http://localhost:3100/loki/api/v1/push"
+	}
+}

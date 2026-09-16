@@ -1,4 +1,0 @@
----
-- ansible.builtin.set_fact:
-    grafana_ssl_snippet_conf: snakeoil.conf
-    grafana_server_fqdn: "grafana.*"

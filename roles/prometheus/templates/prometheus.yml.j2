@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: node
+    static_configs:
+      - targets:
+{% for host in groups['servers'] %}
+          - "{{ hostvars[host].wireguard_address }}:9100"
+{% endfor %}

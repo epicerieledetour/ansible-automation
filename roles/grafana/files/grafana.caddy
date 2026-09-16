@@ -1,0 +1,3 @@
+grafana.epicerieledetour.org, grafana.localhost {
+	reverse_proxy localhost:3000
+}

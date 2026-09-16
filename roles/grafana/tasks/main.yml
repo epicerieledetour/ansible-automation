@@ -1,159 +1,115 @@
 ---
-# nginx
+- name: Grafana, Loki and Alloy as root
+  become: true
+  block:
 
-- ansible.builtin.include_tasks:
-    file: "main{{ deployment_suffix }}.yml"
+    - name: Enable Grafana repo via extrepo
+      ansible.builtin.command:
+        cmd: extrepo enable grafana
+        creates: /etc/apt/sources.list.d/extrepo_grafana.sources
 
-- name: Instanciate grafana nginx config
-  ansible.builtin.template:
-    src: nginx/grafana.conf.j2
-    dest: /etc/nginx/sites-available/grafana.conf
-    mode: u=r,g=r,o=r
-  notify:
-    - "nginx changed"
+    - name: Install grafana, loki and alloy
+      ansible.builtin.apt:
+        pkg:
+          - grafana
+          - loki
+          - alloy
+        update_cache: true
 
-- name: Enable grafana's nginx configuration file
-  ansible.builtin.file:
-    src: /etc/nginx/sites-available/grafana.conf
-    dest: /etc/nginx/sites-enabled/grafana.conf
-    state: link
+    # Grafana
 
-# This guide has been useful in setting up InfluxDB / telegraf / grafana
-# https://www.howtoforge.com/tutorial/how-to-install-tig-stack-telegraf-influxdb-and-grafana-on-ubuntu-1804/
+    - name: Instanciate grafana config
+      ansible.builtin.template:
+        src: grafana.ini.j2
+        dest: /etc/grafana/grafana.ini
+        mode: u=rw,g=r
+      notify: grafana changed
 
-# Grafana
+    - name: Copy grafana dashboards
+      ansible.builtin.copy:
+        src: grafana/dashboards/
+        dest: /var/lib/grafana/dashboards/
+        owner: root
+        group: grafana
+        mode: u=rw,g=r
+      notify: grafana changed
 
-- name: Install gpg
-  ansible.builtin.apt:
-    pkg:
-      - gpg
+    - name: Copy grafana provisioning files
+      ansible.builtin.copy:
+        src: grafana/provisioning/
+        dest: /etc/grafana/provisioning/
+        owner: root
+        group: grafana
+        mode: u=rw,g=r
+        directory_mode: u=rwx,g=rx,o=rx
+      notify: grafana changed
 
-- name: Add Grafana repository key
-  ansible.builtin.apt_key:
-    url: "https://packages.grafana.com/gpg.key"
-    state: present
+    - name: Make grafana-server systemd override directory
+      ansible.builtin.file:
+        path: /etc/systemd/system/grafana-server.service.d
+        state: directory
+        mode: u=rwx,g=rx,o=rx
 
-- name: Add Grafana Repository
-  ansible.builtin.apt_repository:
-    repo: "deb https://packages.grafana.com/oss/deb stable main"
-    state: present
+    - name: Cap grafana-server memory usage
+      ansible.builtin.copy:
+        src: grafana-server-memory.conf
+        dest: /etc/systemd/system/grafana-server.service.d/memory.conf
+        mode: u=rw,g=r,o=r
+      notify:
+        - systemd changed
+        - grafana changed
 
-- name: Install grafana
-  ansible.builtin.apt:
-    update_cache: true
-    pkg:
-      - grafana
+    - name: Force handlers to run immediately
+      ansible.builtin.meta: flush_handlers
 
-- name: Instanciate grafana config
-  ansible.builtin.template:
-    src: grafana/grafana.ini.j2
-    dest: /etc/grafana/grafana.ini
-    mode: u=rw,g=r
-  notify:
-    - "grafana changed"
+    - name: Start grafana
+      ansible.builtin.systemd:
+        name: grafana-server
+        enabled: true
+        state: started
 
-- name: Copy grafana dashboards
-  ansible.builtin.copy:
-    src: grafana/dashboards/
-    dest: /var/lib/grafana/dashboards/
-    owner: root
-    group: grafana
-    mode: u=rw,g=r
-  notify:
-    - grafana changed
+    # Loki
 
-- name: Copy grafana provisioning files
-  ansible.builtin.copy:
-    src: grafana/provisioning/
-    dest: /etc/grafana/provisioning/
-    owner: root
-    group: grafana
-    mode: u=rw,g=r
-    directory_mode: u=rwx,g=rx,o=rx
-  notify:
-    - grafana changed
+    - name: Make /var/lib/loki directory
+      ansible.builtin.file:
+        path: /var/lib/loki
+        state: directory
+        owner: loki
+        mode: u=rwx,g=,o=
 
-- name: Start Grafana
-  ansible.builtin.systemd:
-    name: grafana-server
-    enabled: true
-    state: started
+    - name: Instanciate loki config
+      ansible.builtin.copy:
+        src: loki-config.yml
+        dest: /etc/loki/config.yml
+        mode: u=rw,g=r,o=r
+      notify: loki changed
 
-# Loki
+    - name: Start loki
+      ansible.builtin.systemd:
+        name: loki
+        enabled: true
+        state: started
 
-- name: Install unzip
-  ansible.builtin.apt:
-    pkg:
-      - unzip
+    # Alloy
 
-- name: Loki Download
-  ansible.builtin.get_url:
-    url: "https://github.com/grafana/loki/releases/download/v2.2.1/loki-linux-amd64.zip"
-    checksum: sha256:dacfb229dbc7064b1d6390173ea6963eb3c85f60dc2336081b0113476405c5aa
-    dest: /tmp/loki-v2.2.1-linux-amd64.zip
+    - name: Instanciate alloy config
+      ansible.builtin.copy:
+        src: alloy-config.alloy
+        dest: /etc/alloy/config.alloy
+        mode: u=rw,g=r,o=r
+      notify: alloy changed
 
-- name: Unzip Loki
-  ansible.builtin.unarchive:
-    src: /tmp/loki-v2.2.1-linux-amd64.zip
-    dest: /usr/local/bin/
-    remote_src: true
-    mode: "a+x"
-  notify:
-    - loki changed
+    - name: Start alloy
+      ansible.builtin.systemd:
+        name: alloy
+        enabled: true
+        state: started
 
-- name: Copying Loki systemd service config
-  ansible.builtin.copy:
-    src: loki/loki.service
-    dest: /etc/systemd/system/
-  notify:
-    - loki changed
+    # Caddy
 
-- name: Copying Loki config
-  ansible.builtin.copy:
-    src: loki/config-loki.yml
-    dest: /usr/local/bin/
-  notify:
-    - loki changed
-
-- name: Start Loki
-  ansible.builtin.systemd:
-    name: loki
-    enabled: true
-    state: started
-
-# Promtail
-
-- name: Promtail Download
-  ansible.builtin.get_url:
-    url: "https://github.com/grafana/loki/releases/download/v2.2.1/promtail-linux-amd64.zip"
-    checksum: sha256:40d8d414b44baa78c5010cb7575d74eea035b6b00adb78e9676a045d6730a16f
-    dest: /tmp/promtail-v2.2.1-linux-amd64.zip
-
-- name: Unzip Promtail
-  ansible.builtin.unarchive:
-    src: /tmp/promtail-v2.2.1-linux-amd64.zip
-    dest: /usr/local/bin/
-    remote_src: true
-    mode: "a+x"
-  notify:
-    - promtail changed
-
-- name: Copying Promtail service config
-  ansible.builtin.copy:
-    src: promtail/promtail.service
-    dest: /etc/systemd/system/
-  notify:
-    - promtail changed
-
-- name: Copying promtail config
-  ansible.builtin.copy:
-    src: promtail/config-promtail.yml
-    dest: /usr/local/bin/
-  notify:
-    - promtail changed
-
-- name: Start promtail
-  ansible.builtin.systemd:
-    name: promtail
-    enabled: true
-    state: started
+    - name: Register grafana caddy file
+      ansible.builtin.copy:
+        src: grafana.caddy
+        dest: /etc/caddy/sites.d/grafana.caddy
+        mode: u=rw,g=r,o=r
+      notify: caddy changed

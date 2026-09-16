@@ -78,9 +78,19 @@
       tags: ["membres"]
     - role: wordpress
       tags: ['wordpress']
+    - role: prometheus
+      tags: ["prometheus"]
+    - role: grafana
+      tags: ["grafana"]
   tags: ['webservers']
 
-# Everything below is the old setup being migrated
+- name: Setup node_exporter
+  hosts: servers
+  roles:
+    - role: node_exporter
+      tags: ["node_exporter"]
+
+  # Everything below is the old setup being migrated
 # ---
 # - name: "Setup Wireguard"
 #   hosts: all
@@ -126,7 +136,6 @@
 #     - nginx
 #     - nginx-membres
 #     - nginx-vouchers
-#     - grafana
 #     - wordpress
 #
 # - name: Setup kiosks
