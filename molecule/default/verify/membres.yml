@@ -1,0 +1,24 @@
+---
+- name: Membres
+  block:
+    - name: "Membres: home page"
+      ansible.builtin.uri:
+        url: https://membres.localhost/
+        validate_certs: false
+        return_content: true
+      register: _membres_home
+      failed_when: false
+
+    - name: "Membres: home page is rendered"
+      ansible.builtin.assert:
+        that:
+          - _membres_home.status == 200
+          - "'<title>Le Détour - Recherche des membres</title>' in _membres_home.content"
+        fail_msg: >-
+          https://membres.localhost/ returned {{ _membres_home.status }}:
+          {{ _membres_home.content | default('') | truncate(300) }}
+
+  rescue:
+    - name: "Membres: record failure"
+      ansible.builtin.set_fact:
+        verify_failures: "{{ verify_failures + ['membres: ' ~ ansible_failed_result.msg] }}"

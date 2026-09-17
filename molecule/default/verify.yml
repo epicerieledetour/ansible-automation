@@ -1,0 +1,37 @@
+---
+# Functional checks of the web services, run by `uv run molecule verify`
+# after a converge. The uri tasks run on the webserver VM itself, where
+# https://<service>.localhost resolves, so no SSH tunnel is needed.
+#
+# Each verify/<service>.yml records its failure in verify_failures instead of
+# aborting, so a single run reports every broken service.
+
+- name: Verify web services
+  hosts: webservers
+  gather_facts: false
+  vars:
+    verify_failures: []
+  tasks:
+    - name: Wait for Caddy to accept HTTPS
+      ansible.builtin.wait_for:
+        host: 127.0.0.1
+        port: 443
+        timeout: 60
+
+    - name: Verify wordpress
+      ansible.builtin.include_tasks: verify/wordpress.yml
+
+    - name: Verify vouchers
+      ansible.builtin.include_tasks: verify/vouchers.yml
+
+    - name: Verify membres
+      ansible.builtin.include_tasks: verify/membres.yml
+
+    - name: Verify grafana
+      ansible.builtin.include_tasks: verify/grafana.yml
+
+    - name: Report
+      ansible.builtin.assert:
+        that: verify_failures | length == 0
+        fail_msg: "Failing checks: {{ verify_failures }}"
+        success_msg: "All web services verified"

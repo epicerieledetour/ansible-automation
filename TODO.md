@@ -1,9 +1,5 @@
 # TODO
 
-- test membres, vouchers, wordpress: resume Claude session
-
-- molecule: check again what is backed up by default
-
 - molecule/vps2: setup plugin currently needed by the prod wordpress
 - prod/vps: manual backup wordpress
 - molecule/vps2: site:wordpress backup role

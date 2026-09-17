@@ -1,0 +1,65 @@
+---
+# Only the grafana vsite is checked: the rest of the observability stack on
+# the webserver is temporary, only the reverse proxy stays.
+
+- name: Grafana
+  block:
+    - name: "Grafana: plain HTTP"
+      ansible.builtin.uri:
+        url: http://grafana.localhost/
+        follow_redirects: none
+      register: _grafana_http
+      failed_when: false
+
+    - name: "Grafana: plain HTTP redirects to HTTPS"
+      ansible.builtin.assert:
+        that:
+          - _grafana_http.status == 308
+          - _grafana_http.location | default('') is match('https://grafana.localhost/')
+        fail_msg: >-
+          http://grafana.localhost/ returned {{ _grafana_http.status }}
+          to {{ _grafana_http.location | default('nowhere') }}
+
+    - name: "Grafana: health"
+      ansible.builtin.uri:
+        url: https://grafana.localhost/api/health
+        validate_certs: false
+        return_content: true
+      register: _grafana_health
+      failed_when: false
+      until: _grafana_health.status == 200
+      retries: 10
+      delay: 6
+
+    - name: "Grafana: health is ok"
+      ansible.builtin.assert:
+        that:
+          - _grafana_health.status == 200
+          - (_grafana_health.content | from_json).database == 'ok'
+        fail_msg: >-
+          https://grafana.localhost/api/health returned {{ _grafana_health.status }}:
+          {{ _grafana_health.content | default('') | truncate(300) }}
+
+    # Not following redirects: an OAuth auto-login would redirect to Google
+    - name: "Grafana: login page"
+      ansible.builtin.uri:
+        url: https://grafana.localhost/login
+        validate_certs: false
+        follow_redirects: none
+        return_content: true
+      register: _grafana_login
+      failed_when: false
+
+    - name: "Grafana: login page is rendered"
+      ansible.builtin.assert:
+        that:
+          - _grafana_login.status == 200
+          - "'<title>Grafana</title>' in _grafana_login.content"
+        fail_msg: >-
+          https://grafana.localhost/login returned {{ _grafana_login.status }}
+          to {{ _grafana_login.location | default('nowhere') }}
+
+  rescue:
+    - name: "Grafana: record failure"
+      ansible.builtin.set_fact:
+        verify_failures: "{{ verify_failures + ['grafana: ' ~ ansible_failed_result.msg] }}"

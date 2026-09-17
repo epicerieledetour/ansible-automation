@@ -41,5 +41,6 @@ This repository contains Ansible playbooks and roles for managing the Épicerie 
 
 ## Testing
 - Molecule is used for local testing with libvirt VMs
+- `uv run molecule verify` checks the web services (wordpress, vouchers, membres, grafana) after a converge, see `molecule/default/verify.yml`
 - Web service tests can be accessed via localhost tunneling after SSH connection
 - Services tested with curl against localhost endpoints (e.g., `curl https://vouchers.localhost`)

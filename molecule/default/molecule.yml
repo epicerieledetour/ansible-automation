@@ -33,3 +33,5 @@ provisioner:
     links:
       hosts: "${MOLECULE_PROJECT_DIRECTORY}/inventory/groups.yml"
 
+verifier:
+  name: ansible

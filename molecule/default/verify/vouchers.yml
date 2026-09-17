@@ -1,0 +1,29 @@
+---
+- name: Vouchers
+  block:
+    # ldt-vouchers.service fetches the app with uvx before serving, so it can
+    # lag behind the converge
+    - name: "Vouchers: home page"
+      ansible.builtin.uri:
+        url: https://vouchers.localhost/
+        validate_certs: false
+        return_content: true
+      register: _vouchers_home
+      failed_when: false
+      until: _vouchers_home.status == 200
+      retries: 10
+      delay: 6
+
+    - name: "Vouchers: home page is rendered"
+      ansible.builtin.assert:
+        that:
+          - _vouchers_home.status == 200
+          - "'<title>Bons solidaires</title>' in _vouchers_home.content"
+        fail_msg: >-
+          https://vouchers.localhost/ returned {{ _vouchers_home.status }}:
+          {{ _vouchers_home.content | default('') | truncate(300) }}
+
+  rescue:
+    - name: "Vouchers: record failure"
+      ansible.builtin.set_fact:
+        verify_failures: "{{ verify_failures + ['vouchers: ' ~ ansible_failed_result.msg] }}"

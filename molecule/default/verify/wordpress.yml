@@ -1,0 +1,61 @@
+---
+# Redirects are never followed: wordpress_url is the production domain, so a
+# canonical redirect would take the test off the VM.
+
+- name: Wordpress
+  block:
+    - name: "Wordpress: home page"
+      ansible.builtin.uri:
+        url: https://wordpress.localhost/
+        validate_certs: false
+        follow_redirects: none
+        return_content: true
+      register: _wordpress_home
+      failed_when: false
+
+    - name: "Wordpress: home page is rendered"
+      ansible.builtin.assert:
+        that:
+          - _wordpress_home.status == 200
+          - "'<title>Épicerie Le Détour</title>' in _wordpress_home.content"
+        fail_msg: >-
+          https://wordpress.localhost/ returned {{ _wordpress_home.status }}:
+          {{ _wordpress_home.content | default('') | truncate(300) }}
+
+    # Rendering wp-login.php goes through Caddy, php-fpm and MariaDB
+    - name: "Wordpress: login page"
+      ansible.builtin.uri:
+        url: https://wordpress.localhost/wp-login.php
+        validate_certs: false
+        follow_redirects: none
+        return_content: true
+      register: _wordpress_login
+      failed_when: false
+
+    - name: "Wordpress: login page is rendered"
+      ansible.builtin.assert:
+        that:
+          - _wordpress_login.status == 200
+          - "'user_login' in _wordpress_login.content"
+          - "'wp-submit' in _wordpress_login.content"
+        fail_msg: >-
+          https://wordpress.localhost/wp-login.php returned {{ _wordpress_login.status }}:
+          {{ _wordpress_login.content | default('') | truncate(300) }}
+
+    - name: "Wordpress: static file"
+      ansible.builtin.uri:
+        url: https://wordpress.localhost/wp-includes/js/wp-embed.min.js
+        validate_certs: false
+        follow_redirects: none
+      register: _wordpress_static
+      failed_when: false
+
+    - name: "Wordpress: static file is served"
+      ansible.builtin.assert:
+        that: _wordpress_static.status == 200
+        fail_msg: "wp-embed.min.js returned {{ _wordpress_static.status }}"
+
+  rescue:
+    - name: "Wordpress: record failure"
+      ansible.builtin.set_fact:
+        verify_failures: "{{ verify_failures + ['wordpress: ' ~ ansible_failed_result.msg] }}"

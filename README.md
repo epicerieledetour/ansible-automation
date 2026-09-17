@@ -227,6 +227,19 @@ uv run molecule destroy
 
 ### Testing that the services work
 
+#### Automated checks
+
+After a converge, check that the web services work as expected:
+
+```bash
+$ uv run molecule converge
+$ uv run molecule verify
+```
+
+`molecule/default/verify.yml` checks wordpress, vouchers, membres and grafana from the web server itself, and lists every failing check at the end.
+
+The sections below describe how to test the services by hand, for instance to investigate a failure.
+
 #### Web services
 
 Exposing the web services on dynamic IPs assigned by Molecule over libvirt without modifying the ansible host itself can be tricky, requiring a mix of DNS masquerading, `/etc/hosts` configuration or complex molecule setups.
@@ -237,7 +250,7 @@ The easiest way to test web services is to redirect the web server ports 443 to 
 
 ```bash
 $ ssh -N -L 443:localhost:443 \
-    -i ~/.ansible/tmp/molecule.j0UL.default/id_ssh_rsa \
+    -i ~/.ansible/tmp/molecule.*/id_ssh_rsa \
     molecule@10.10.10.152  # Connect to the webserver virtual machine to get its IP
 ```
 

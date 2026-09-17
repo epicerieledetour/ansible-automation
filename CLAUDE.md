@@ -17,6 +17,7 @@ Use `uv` to run everything (Ansible, ansible-lint, molecule) — dependencies ar
 uv run molecule create        # create the VMs (vps2, pi1) defined in molecule/default/molecule.yml
 uv run molecule prepare       # prepare VMs for the playbook
 uv run molecule converge      # run playbook.yml against the VMs
+uv run molecule verify        # check that wordpress, vouchers, membres and grafana work
 uv run molecule converge -- --tags vouchers --tags borgmatic_create   # run with extra tags
 uv run molecule login --host vps2
 uv run molecule destroy
@@ -37,13 +38,15 @@ ansible-vault view secret.yml
 ansible-vault decrypt secret.yml
 ```
 
-There is no unit test suite; **Molecule is the test harness**. It boots libvirt VMs from Debian 13 (trixie) cloud images and converges the real playbook against them via `molecule/default/converge.yml`, which sets `deployment_is_dev: true` before importing the root `playbook.yml`. Testing a specific service means converging, then curling it — see "Testing web services" below.
+There is no unit test suite; **Molecule is the test harness**. It boots libvirt VMs from Debian 13 (trixie) cloud images and converges the real playbook against them via `molecule/default/converge.yml`, which sets `deployment_is_dev: true` before importing the root `playbook.yml`. `molecule/default/verify.yml` (run by `molecule verify`) checks the web services after a converge; add a `molecule/default/verify/<service>.yml` for each new web app.
 
 Molecule inventory is linked directly to `inventory/groups.yml` (see `molecule/default/molecule.yml`), so VM hostnames (`vps2`, `pi1`) must match group membership there. Molecule uses its own vault_password_file pointing at the same `vault_password.sh`, so vault-encrypted vars work identically in dev and prod.
 
 ### Testing web services after converge
 
-All web services are additionally exposed as `https://<service>.localhost` on the webserver host itself. Tunnel port 443 from the VM to test locally without DNS/masquerading tricks:
+All web services are additionally exposed as `https://<service>.localhost` on the webserver host itself. `molecule verify` relies on this: its `uri` tasks run on the VM, so no tunnel is needed. Each `verify/<service>.yml` records its failure instead of stopping, so one run lists every broken service.
+
+To investigate by hand, tunnel port 443 from the VM:
 
 ```sh
 ssh -N -L 443:localhost:443 -i ~/.ansible/tmp/molecule.*/id_ssh_rsa molecule@<vm-ip>
