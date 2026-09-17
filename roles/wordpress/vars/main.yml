@@ -12,7 +12,7 @@ wordpress_db_password: !vault |
           63333263383134636366383865636562343935396535383965316431313761306264393465613838
           37633564393638666166626134323231623136633336626333326264633632636331383937303938
           30626538333363373336
-wordpress_url: epicerieledetour.org
+wordpress_url: "{{ deployment_is_dev | ternary('https://wordpress.localhost', 'https://epicerieledetour.org') }}"
 wordpress_title: "Épicerie Le Détour"
 wordpress_admin_user: admin
 wordpress_admin_password: !vault |

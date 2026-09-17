@@ -1,6 +1,6 @@
 ---
-# Redirects are never followed: wordpress_url is the production domain, so a
-# canonical redirect would take the test off the VM.
+# Redirects are never followed, so a wrong WP_HOME shows up as a failed
+# assertion instead of a request leaving the VM.
 
 - name: Wordpress
   block:
@@ -38,9 +38,28 @@
           - _wordpress_login.status == 200
           - "'user_login' in _wordpress_login.content"
           - "'wp-submit' in _wordpress_login.content"
+          - "'login-with-google' in _wordpress_login.content"
         fail_msg: >-
           https://wordpress.localhost/wp-login.php returned {{ _wordpress_login.status }}:
           {{ _wordpress_login.content | default('') | truncate(300) }}
+
+    - name: "Wordpress: admin redirect"
+      ansible.builtin.uri:
+        url: https://wordpress.localhost/wp-admin/
+        validate_certs: false
+        follow_redirects: none
+        status_code: [302]
+      register: _wordpress_admin
+      failed_when: false
+
+    - name: "Wordpress: admin redirects to the local login page"
+      ansible.builtin.assert:
+        that:
+          - _wordpress_admin.status == 302
+          - _wordpress_admin.location is match('https://wordpress.localhost/wp-login.php')
+        fail_msg: >-
+          https://wordpress.localhost/wp-admin/ returned {{ _wordpress_admin.status }}
+          to {{ _wordpress_admin.location | default('nowhere') }}
 
     - name: "Wordpress: static file"
       ansible.builtin.uri:

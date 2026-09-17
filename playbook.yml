@@ -28,7 +28,7 @@
     group_suffix: "-server"
   roles:
     - role: common_facts
-      tags: ["common_facts"]
+      tags: ["always", "common_facts"]
     - role: common_packages
       tags: ["common_packages"]
     - role: hostname

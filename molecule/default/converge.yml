@@ -6,6 +6,7 @@
     - name: "Set deployment_is_dev to true"
       ansible.builtin.set_fact:
         deployment_is_dev: true
+      tags: ["always"]  # Otherwise tagged converges would treat the VMs as prod
 
 - name: Execute the root playbook
   ansible.builtin.import_playbook: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/playbook.yml"

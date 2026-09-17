@@ -109,6 +109,52 @@
          - _task.result.rc == 0
          - '_task.result.stdout.startswith("Success")'
 
+    - name: Install and activate plugins
+      ansible.builtin.command:
+        chdir: "{{ wordpress_root_dir }}"
+        cmd: "{{ wordpress_wp_cli }} plugin install {{ wordpress_plugins | join(' ') }} --activate"
+      changed_when:
+        - '"Plugin installed successfully" in _task.result.stdout or "activated." in _task.result.stdout'
+
+    - name: Update plugins
+      ansible.builtin.command:
+        chdir: "{{ wordpress_root_dir }}"
+        cmd: "{{ wordpress_wp_cli }} plugin update {{ wordpress_plugins | join(' ') }}"
+      changed_when:
+        - '"Updated" in _task.result.stdout'
+
+    - name: Enable plugins auto-updates
+      ansible.builtin.command:
+        chdir: "{{ wordpress_root_dir }}"
+        cmd: "{{ wordpress_wp_cli }} plugin auto-updates enable {{ wordpress_plugins | join(' ') }}"
+      changed_when:
+        - '"Success: Enabled" in _task.result.stdout'
+      failed_when:
+        - _task.result.rc != 0
+        - '"No plugin auto-updates enabled." not in _task.result.stderr'
+
+    - name: Deactivate plugins
+      ansible.builtin.command:
+        chdir: "{{ wordpress_root_dir }}"
+        cmd: "{{ wordpress_wp_cli }} plugin deactivate {{ wordpress_plugins_deactivated | join(' ') }}"
+      changed_when:
+        - '"Deactivated" in _task.result.stdout'
+
+    # WP_HOME and WP_SITEURL override the URL stored in the database at install
+    # time, which WordPress uses for every redirect (e.g. wp-login.php)
+    - name: Configure wp-config.php
+      ansible.builtin.blockinfile:
+        path: "{{ wordpress_root_dir }}/wp-config.php"
+        insertbefore: "^/\\* That's all, stop editing"
+        block: |
+          define( 'WP_HOME', '{{ wordpress_url }}' );
+          define( 'WP_SITEURL', '{{ wordpress_url }}' );
+          define( 'WP_GOOGLE_LOGIN_CLIENT_ID', '{{ google_auth_client_id }}' );
+          define( 'WP_GOOGLE_LOGIN_SECRET', '{{ google_auth_client_secret }}' );
+          define( 'WP_GOOGLE_LOGIN_WHITELIST_DOMAINS', 'epicerieledetour.org' );
+          define( 'WP_GOOGLE_LOGIN_USER_REGISTRATION', 'true' );
+      no_log: true
+
 - name: Instanciate caddy file
   become: true
   become_user: caddy

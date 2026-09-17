@@ -1,3 +1,10 @@
 ---
 wordpress_php_version: "8.5"
 wordpress_wp_cli: "php{{ wordpress_php_version }} /usr/local/bin/wp"
+wordpress_plugins:
+  - beautiful-and-responsive-cookie-consent
+  - login-with-google
+  - polylang
+  - duplicate-post
+wordpress_plugins_deactivated:
+  - akismet  # Bundled with WordPress

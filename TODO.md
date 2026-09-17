@@ -1,6 +1,5 @@
 # TODO
 
-- molecule/vps2: setup plugin currently needed by the prod wordpress
 - prod/vps: manual backup wordpress
 - molecule/vps2: site:wordpress backup role
 - molecule/vps2: site:wordpress manual restore
