@@ -4,7 +4,7 @@ auth_enabled: false
 server:
   http_listen_port: 3100
   grpc_listen_port: 9096
-  log_level: debug
+  log_level: info
   grpc_server_max_concurrent_streams: 1000
 
 common:
@@ -29,6 +29,15 @@ query_range:
 limits_config:
   metric_aggregation_enabled: true
   enable_multi_variant_queries: true
+  # Keep at most one week of logs to bound disk usage. Must be a multiple of
+  # the index period (24h), and is only enforced by the compactor below.
+  retention_period: 168h
+
+compactor:
+  working_directory: /var/lib/loki/compactor
+  retention_enabled: true
+  retention_delete_delay: 2h
+  delete_request_store: filesystem
 
 schema_config:
   configs:
