@@ -1,5 +1,12 @@
 # TODO
 
+## libvirt configuration
+
+```bash
+usermod --append --groups libvirt `whoami`
+newgrp libvirt
+```
+
 ## Backups / restore
 
 ```bash
