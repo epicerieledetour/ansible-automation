@@ -29,6 +29,7 @@
         cmd: "borgmatic --config {{ borgmatic_snippet_config }} create"
       when: "'borgmatic_create' in ansible_run_tags"
       tags:
+        - never
         - borgmatic_create
 
     - name: "Restore last backup {{ borgmatic_snippet_name }}"
@@ -36,4 +37,5 @@
         cmd: "borgmatic --config {{ borgmatic_snippet_config }} restore --archive latest"
       when: "'borgmatic_restore' in ansible_run_tags"
       tags:
+        - never
         - borgmatic_restore 

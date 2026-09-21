@@ -10,8 +10,9 @@ newgrp libvirt
 ## Backups / restore
 
 ```bash
-uv run molecule converge -- --tag vouchers --tags borgmatic_create
-uv run molecule converge -- --tag vouchers --tags borgmatic_restore
+uv run molecule converge -- --tags vouchers --tags borgmatic_create
+uv run molecule converge -- --tags vouchers --tags borgmatic_restore
+uv run molecule converge -- --tags wordpress --tags borgmatic_create
 ```
 
 # ansible-automation
