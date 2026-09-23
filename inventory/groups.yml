@@ -1,15 +1,16 @@
 servers:
   hosts:
-    pi1:
+#    pi1:
+    srv1:
     vps2:
 
 backup_destinations:
   hosts:
-    pi1:
+#    pi1:
+    srv1:
 
 backup_sources:
   hosts:
-#    pi1:
     vps2:
 
 webservers:
@@ -19,4 +20,8 @@ webservers:
 vouchers:
   hosts:
     vps2:
+
+grafana:
+  hosts:
+    srv1:
 

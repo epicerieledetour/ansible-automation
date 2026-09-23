@@ -65,6 +65,14 @@
     - backup
     - source
 
+- name: Setup grafana, loki and prometheus, served through the webservers' caddy
+  hosts: grafana
+  roles:
+    - role: systemd_handlers
+    - role: grafana
+      tags: ["grafana"]
+  tags: ["grafana"]
+
 - name: Setup web servers
   hosts: webservers
   roles:
@@ -78,17 +86,17 @@
       tags: ["membres"]
     - role: wordpress
       tags: ['wordpress']
-    - role: prometheus
-      tags: ["prometheus"]
-    - role: grafana
-      tags: ["grafana"]
+    - role: grafana_proxy
+      tags: ["grafana", "grafana_proxy"]
   tags: ['webservers']
 
-- name: Setup node_exporter
+- name: Setup monitoring agents
   hosts: servers
   roles:
     - role: node_exporter
       tags: ["node_exporter"]
+    - role: alloy
+      tags: ["alloy"]
 
   # Everything below is the old setup being migrated
 # ---
