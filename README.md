@@ -125,28 +125,16 @@ ansible-galaxy collection install -r requirements.yml
 
 ### Wireguard on workstations
 
-Servers and workstations are linked together by a wireguard network. Run the playbook with the `workstation` tag (which is never ran by default) to generate a sample wg-quick confiugration file. **Do not let this file laying around:** it contains private informations that should only be seen by your workstation `root` only. 
+Servers and workstations are linked together by a wireguard network, `vps2` being the endpoint every other machine connects to. Workstations are never configured by default (their plays are tagged `never`): add the workstation to the `workstations_networkd` or `workstations_nm` group in `inventory/hosts.yml`, set its `wireguard_*` host vars, then run the playbook limited to that workstation with the matching tag:
 
 ```sh
-ansible-playbook playbook.yml --tags workstation
+# systemd-networkd, creates /etc/systemd/network/wg-ledetour.{netdev,network,key}
+ansible-playbook playbook.yml --limit charles-ws --tags workstations_networkd
+# NetworkManager, creates /etc/NetworkManager/system-connections/wg-ledetour.nmconnection
+ansible-playbook playbook.yml --limit charles-lp --tags workstations_nm
 ```
 
-This will create a `wg-ledetour.conf-the-workstation-name` in the same directy as `playbook.yml`. Check the output for ansible for info on how to use that file:
-```
-...
-TASK [wireguard : Wireguard info] ***************************************************************************
-ok: [charles-xps15] => {
-    "msg": [
-        "Created wireguard config file wg-ledetour.conf-charles-xps15",
-        "Install it as root with `mv wg-ledetour.conf-charles-xps15 /etc/wireguard/wg-ledetour.conf`",
-        "Activate wireguard with:",
-        "- Either directly with wg-quick `wg-quick up wg-ledetour`",
-        "- Or with systemd `sysemctl start wg-quick@wg-ledetour.service`",
-        "Don't forget to open your firewall: UDP outbound port 51820"
-    ]
-}
-...
-```
+Workstations are always local machines (`ansible_connection: local` on the `workstations` inventory group): run the playbook on the workstation itself, ansible never connects to them through ssh. Don't forget to rerun the `wireguard` tag on the servers so that `vps2` knows the new peer, and to open your firewall: UDP outbound port 51820.
 
 ## Production mode
 

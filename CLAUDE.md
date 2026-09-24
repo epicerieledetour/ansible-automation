@@ -28,7 +28,8 @@ uv run yamllint .
 
 # Production (real servers, defined in inventory/hosts.yml)
 ansible-playbook playbook.yml
-ansible-playbook playbook.yml --tags workstation   # generate a workstation Wireguard config (never runs by default, tag is "never")
+ansible-playbook playbook.yml --limit charles-ws --tags workstations_networkd   # configure a workstation Wireguard connection (never runs by default, tag is "never")
+ansible-playbook playbook.yml --limit charles-lp --tags workstations_nm         # same, through NetworkManager
 ansible-playbook playbook.yml --tags <role>         # run one role/tag, e.g. --tags wordpress
 
 # Vault
@@ -61,7 +62,7 @@ curl -skL https://membres.localhost/members.json | jq   # add --cert/--key roles
 
 A sequence of plays, each scoped to an inventory group, applying roles tagged for selective runs:
 
-1. **workstations** (tag `never`, `workstation`) — generates a Wireguard client config file locally; explicitly opt-in only.
+1. **workstations_networkd** / **workstations_nm** (tag `never`, `workstation`) — `workstations_networkd` / `workstations_nm` roles configure the workstation's Wireguard connection to the `vps2` endpoint through systemd-networkd or NetworkManager; explicitly opt-in only, run with `--limit <workstation>` on the workstation itself (the `workstations` parent group in `inventory/hosts.yml` sets `ansible_connection: local`, never ssh).
 2. **servers** — `authorized_keys`, `sshd` (tag `ssh`).
 3. **servers** — `common_facts`, `common_packages`, `hostname`, `timezone`, `upgrade`, `ufw`, `wireguard`, `srv` (tag `common`). Sets `group_suffix: "-server"`.
 4. **backup_destinations** — `borg_destination` (tag `backup`, `destination`).
@@ -73,11 +74,11 @@ Roles run in dependency order within each play; e.g. `caddy` must run before the
 ### Key cross-cutting patterns
 
 - **`deployment_is_dev` / `deployment_is_prod` / `deployment_suffix`**: set once by `roles/common_facts` (defaulting `deployment_is_dev` to `false` unless Molecule's `converge.yml` sets it). Roles branch on these to install dev-only Caddy internal CA certs, etc. When adding new roles that behave differently in Molecule vs. production, follow this pattern rather than inventing a new flag.
-- **`group_suffix`**: set per-play (`"-workstation"`, `"-server"`) and used by the `wireguard` role to `include_tasks: "wireguard{{ group_suffix }}.yml"`, selecting between server- and workstation-specific task files. Same technique to reuse for any role that needs materially different behavior per host class.
+- **`group_suffix`**: set per-play (`"-server"`) and used by the `wireguard` role to `include_tasks: "wireguard{{ group_suffix }}.yml"`, selecting a host-class-specific task file. Same technique to reuse for any role that needs materially different behavior per host class.
 - **Handler pattern**: config-writing roles (`caddy`, `vouchers`, `membres`, etc.) `notify` shared handlers defined in small dedicated `*_handlers` roles (`caddy_handlers`, `systemd_handlers`) rather than each role owning its own handler — this lets multiple roles safely reload the same service (e.g. `caddy changed` → `systemd: name: caddy, state: reloaded`) without duplicate handler definitions.
 - **Backup topology (Borg/borgmatic)**: `borg_destination` role provisions a `borg` user + repo storage on hosts in `backup_destinations`; `borgmatic`+`borgmatic_system` on `backup_sources` hosts creates SSH trust to every destination (`roles/borgmatic/tasks/destination.yml`, looped via `groups['backup_destinations']`, using `delegate_to`) and templates per-source borgmatic config. `borgmatic_snippet` is a reusable sub-role (`include_role`) that other backup roles (e.g. `borgmatic_system`) call with `borgmatic_snippet_name`/`borgmatic_snippet_file` set, to add another backup "set" (a systemd unit + optional service data dir) without duplicating the borgmatic config/repo-init/create/restore logic. `create`/`restore` are gated on `ansible_run_tags` containing `borgmatic_create`/`borgmatic_restore` (opt-in via `--tags`, not run by default).
 - **Caddy vsites**: each web app role (wordpress, vouchers, membres) templates its own `/etc/caddy/sites.d/<app>.caddy` file (Caddyfile with `import sites.d/*.caddy`-style layout, implied) rather than one central vhost file — keep this per-role-owns-its-vsite convention for new web apps.
-- **Inventory** (`inventory/hosts.yml` + `inventory/groups.yml`): `hosts.yml` maps inventory names to `ansible_host`/`ansible_user` (bootstrap connection info); `groups.yml` assigns hosts to functional groups (`servers`, `backup_destinations`, `backup_sources`, `webservers`, `vouchers`, `workstations`) that the playbook's plays target. A host can belong to multiple groups (e.g. `vps2` is a server, a backup source, and a webserver).
+- **Inventory** (`inventory/hosts.yml` + `inventory/groups.yml`): `hosts.yml` maps inventory names to `ansible_host`/`ansible_user` (bootstrap connection info); `groups.yml` assigns hosts to functional groups (`servers`, `backup_destinations`, `backup_sources`, `webservers`, `vouchers`) and, in `hosts.yml`, `workstations_networkd`/`workstations_nm` that the playbook's plays target. A host can belong to multiple groups (e.g. `vps2` is a server, a backup source, and a webserver).
 - **Vault-encrypted values** live inline in `group_vars`/`host_vars`/role `vars` files as `!vault |` blocks (see `roles/wordpress/vars/main.yml`), decrypted via `ansible.cfg`'s `vault_password_file=vault_password.sh`, which in turn calls `age -d` using the SSH private key matching the encrypter's public key in `keys/`.
 
 ### First-time production bootstrap

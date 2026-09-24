@@ -1,16 +1,23 @@
 ---
-- name: "Generate workstation wireguard config"
-  hosts: workstations
-  connection: local
-  vars:
-    group_suffix: "-workstation"
+# Workstations are never configured by default, run for example
+# ansible-playbook playbook.yml --limit charles-ws --tags workstations_networkd
+- name: "Setup workstation wireguard with systemd-networkd"
+  hosts: workstations_networkd
   roles:
-    - role: wireguard
-      tags:
-        - wireguard
-        - workstation
+    - role: workstations_networkd
+      tags: ["workstations_networkd"]
   tags:
     - never
+    - workstation
+
+- name: "Setup workstation wireguard with NetworkManager"
+  hosts: workstations_nm
+  roles:
+    - role: workstations_nm
+      tags: ["workstations_nm"]
+  tags:
+    - never
+    - workstation
 
 - name: "Initial ssh configuration"
   hosts: servers
