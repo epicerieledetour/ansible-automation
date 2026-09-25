@@ -12,7 +12,7 @@ private-key={{ wireguard_private_key }}
 {% for host in groups['all'] if hostvars[host].wireguard_type | default('') == "endpoint" %}
 # {{ host }}
 [wireguard-peer.{{ hostvars[host].wireguard_public_key }}]
-endpoint={{ hostvars[host].ansible_host }}:{{ hostvars[host].wireguard_endpoint_port }}
+endpoint={{ hostvars[host].wireguard_endpoint_host }}:{{ hostvars[host].wireguard_endpoint_port }}
 allowed-ips={{ hostvars[host].wireguard_allowed_ips }};
 persistent-keepalive=25
 

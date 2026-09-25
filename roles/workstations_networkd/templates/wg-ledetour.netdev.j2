@@ -13,7 +13,7 @@ RouteTable=main
 # {{ host }}
 [WireGuardPeer]
 PublicKey={{ hostvars[host].wireguard_public_key }}
-Endpoint={{ hostvars[host].ansible_host }}:{{ hostvars[host].wireguard_endpoint_port }}
+Endpoint={{ hostvars[host].wireguard_endpoint_host }}:{{ hostvars[host].wireguard_endpoint_port }}
 AllowedIPs={{ hostvars[host].wireguard_allowed_ips }}
 PersistentKeepalive=25
 
