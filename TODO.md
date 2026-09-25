@@ -2,8 +2,8 @@
 
 ## migration
 
-- prod/srv1: run playbook
-
+- backup prod vouchers
+- backup prod wordpress
 - prod/vps2: reinstall trixie
 - prod/vps2: run playbook
 - prod/vps2: restore vouchers
