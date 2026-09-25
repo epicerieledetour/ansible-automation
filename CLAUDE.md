@@ -14,7 +14,7 @@ Use `uv` to run everything (Ansible, ansible-lint, molecule) — dependencies ar
 
 ```sh
 # Local dev/testing with libvirt VMs (safe — never touches production)
-uv run molecule create        # create the VMs (vps2, pi1) defined in molecule/default/molecule.yml
+uv run molecule create        # create the VMs (pi1, srv1, vps2) defined in molecule/default/molecule.yml
 uv run molecule prepare       # prepare VMs for the playbook
 uv run molecule converge      # run playbook.yml against the VMs
 uv run molecule verify        # check that wordpress, vouchers, membres and grafana work
@@ -41,7 +41,7 @@ ansible-vault decrypt secret.yml
 
 There is no unit test suite; **Molecule is the test harness**. It boots libvirt VMs from Debian 13 (trixie) cloud images and converges the real playbook against them via `molecule/default/converge.yml`, which sets `deployment_is_dev: true` before importing the root `playbook.yml`. `molecule/default/verify.yml` (run by `molecule verify`) checks the web services after a converge; add a `molecule/default/verify/<service>.yml` for each new web app.
 
-Molecule inventory is linked directly to `inventory/groups.yml` (see `molecule/default/molecule.yml`), so VM hostnames (`vps2`, `pi1`) must match group membership there. Molecule uses its own vault_password_file pointing at the same `vault_password.sh`, so vault-encrypted vars work identically in dev and prod.
+Molecule inventory is linked directly to `inventory/groups.yml` (see `molecule/default/molecule.yml`), so VM hostnames (`pi1`, `srv1`, `vps2`) must match group membership there. Molecule uses its own vault_password_file pointing at the same `vault_password.sh`, so vault-encrypted vars work identically in dev and prod.
 
 ### Testing web services after converge
 
