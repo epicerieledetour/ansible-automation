@@ -46,6 +46,9 @@
       tags: ["upgrade"]
     - role: ufw
       tags: ["ufw"]
+    # After ufw: its rsyslog gives the sshd jail an /var/log/auth.log to read.
+    - role: fail2ban
+      tags: ["fail2ban"]
     - role: wireguard
       tags: ["wireguard"]
     - role: srv
