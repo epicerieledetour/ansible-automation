@@ -47,6 +47,15 @@
     notify:
       - vouchers changed
 
+  # The report emails the real recipients: never run it from a development VM
+  - name: Disable vouchers.epicerieledetour.org report timer in development
+    ansible.builtin.systemd:
+      name: ldt-vouchers-report.timer
+      state: stopped
+      enabled: false
+      daemon_reload: true
+    when: deployment_is_dev | bool
+
 
   # systemd: service
 
