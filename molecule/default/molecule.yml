@@ -32,6 +32,13 @@ platforms:
     qemu_user: "libvirt-qemu"
 
 
+  - name: b72
+    image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
+    memory_size: 2 # GB
+    vcpu: 1
+    disk_size: "16G"
+    qemu_user: "libvirt-qemu"
+
 provisioner:
   name: ansible
   config_options:

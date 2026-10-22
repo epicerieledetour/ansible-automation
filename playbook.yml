@@ -105,6 +105,16 @@
       tags: ["grafana", "grafana_proxy"]
   tags: ['webservers']
 
+- name: Setup mattermost
+  hosts: mattermost
+  roles:
+    - role: caddy_handlers
+    - role: caddy
+      tags: ["caddy"]
+    - role: mattermost
+      tags: ["mattermost"]
+  tags: ["mattermost"]
+
 - name: Setup monitoring agents
   hosts: servers
   roles:

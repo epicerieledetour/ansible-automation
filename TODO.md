@@ -213,3 +213,155 @@ After:
       partially enabled plugins
 - [ ] Delete `tmp_migration` (production data in clear) and destroy the molecule VMs
 - [ ] Raise the `epicerieledetour.org` TTL back to 3600
+
+## b72 migration
+
+Reinstall `b72` (Bâtiment 7's chat.batiment7.org, OVH VPS `51.79.25.187`,
+Debian 11, Mattermost 10.6.0 enterprise build unlicensed, PostgreSQL 13) with
+Debian 13, configured by this playbook: Mattermost 12.0.0 Team Edition,
+PostgreSQL 17, caddy instead of nginx + certbot.
+
+### What gets migrated
+
+| data | from | how |
+|---|---|---|
+| database `mattermost` (279 active users, 182391 posts on 2026-10-21) | PostgreSQL 13 | `pg_dump --format=custom`, loaded by `mattermost-import` |
+| attachments, emojis, profile pictures (12 GB) | `/opt/mattermost/data` | rsync, copied by `mattermost-import` |
+| settings (site name, SMTP relay, push server…) | `/opt/mattermost/current/config/config.json` | copied by `mattermost-import`; the settings in `/etc/mattermost.env` override it |
+
+Not migrated, on purpose:
+
+- the old local borg repository `/opt/mattermost/borg_backups` and
+  `pg_dumps`: on the same disk as what they back up. borgmatic now backs up to
+  srv1
+- the ssh host key: the playbook reinstalls the same one (vault, `host_vars/b72`)
+- the nginx config and the certbot certificates: caddy gets new ones
+- `chat.test.batiment7.org`: only a stale certificate is left of it
+
+### Decisions
+
+- Team Edition instead of the enterprise build: since v11 an unlicensed
+  enterprise build runs as "Entry", which only shows the last 10,000 messages
+  of the whole server. Team Edition has no message limit. What it lacks is not
+  used on b72: SSO (only email login is on) and plugins (`PluginSettings.Enable`
+  is false, so Playbooks, Boards, Calls are already off)
+- Since 11.7, any server without a license, Team Edition included, refuses to
+  create or reactivate an account once 250 are active (`maxUsersHardLimit` in
+  `server/channels/app/limits.go`; it was 5000 up to 10.11). Logins, history
+  and everything else keep working: rehearsed on molecule with the production
+  database on 2026-10-22. b72 has 279 active accounts (278 people, 1 bot):
+  115 active in the last 6 months, 15 in 6-12 months, 25 in 1-2 years, 19
+  more than 2 years ago, 104 never. Decided: the 123 accounts never active or
+  inactive for more than 2 years get deactivated after the migration, which
+  leaves about 155. Until then no new member can join
+- The database goes 10.6 → 10.11.24 → 11.7.13 → 12.0.0, one Extended Support
+  Release at a time, as Mattermost recommends (`mattermost_import_steps`)
+- Only the keys in `authorized_keys_users` get a shell on the new b72: whoever
+  else uses `root@b72` today loses it
+
+### Checklist
+
+Before:
+
+- [ ] Rehearse on molecule with the production data (see below)
+- [ ] Tell the users about the downtime (a few hours: copy, reinstall, migration)
+- [ ] Lower the TTL of `chat.batiment7.org`. The IP should not change with an
+      OVH reinstall, but just in case
+- [ ] Take an OVH snapshot of b72: the way back if anything goes wrong
+
+Copy the data, from the workstation, in the repo root. A first copy while the
+server runs, then a second one, much shorter, once it's stopped:
+
+      mkdir -p tmp_migration/b72/bundle
+      rsync -a --info=progress2 b72:/opt/mattermost/data/ tmp_migration/b72/bundle/data/
+      ssh b72 systemctl stop b7-mattermost
+      rsync -a --delete b72:/opt/mattermost/data/ tmp_migration/b72/bundle/data/
+      ssh b72 'cd /tmp && sudo -u postgres pg_dump --format=custom mattermost' > tmp_migration/b72/bundle/mattermost.pgdump
+      scp b72:/opt/mattermost/current/config/config.json tmp_migration/b72/bundle/
+
+- [ ] Check the copy: `pg_restore --list tmp_migration/b72/bundle/mattermost.pgdump | grep -c 'TABLE DATA'`
+      is not 0, and `du -sh tmp_migration/b72/bundle/data` matches
+      `ssh b72 du -sh /opt/mattermost/data`
+- [ ] Note the counts to compare after:
+      `ssh b72 "cd /tmp && sudo -u postgres psql -d mattermost -Atc 'select count(*) from users where deleteat = 0' -c 'select count(*) from posts' -c 'select count(*) from fileinfo'"`
+
+Reinstall b72:
+
+- [ ] OVH panel: reinstall b72 with Debian 13, with my ssh key for `debian`
+- [ ] `ssh debian@51.79.25.187 sudo -n true` works. If not, follow README
+      "First setup of a production machine"
+- [ ] First run, over the public address since wireguard doesn't exist yet on
+      b72. The host key changed with the reinstall until the `sshd` role puts
+      the vaulted one back:
+      `ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook playbook.yml --limit b72 -e "ansible_host=51.79.25.187"`
+      The backup tasks fail on this run: srv1 doesn't know b72 yet
+- [ ] Add b72 as a wireguard peer of vps2: `ansible-playbook playbook.yml --limit vps2 --tags wireguard`
+- [ ] `ping 192.168.211.72` from the workstation
+- [ ] `ansible-playbook playbook.yml --limit b72,srv1` (backup destination
+      folder on srv1, prometheus target on srv1)
+- [ ] `https://chat.batiment7.org` answers with a Let's Encrypt certificate:
+      `ssh debian@192.168.211.72 journalctl -u caddy | grep -i "certificate obtained"`
+
+Import:
+
+- [ ] `rsync -a tmp_migration/b72/bundle/ debian@192.168.211.72:bundle/`
+- [ ] `ssh debian@192.168.211.72 sudo mattermost-import bundle`: the counts it
+      prints match the ones noted before
+- [ ] Take a first backup: `ssh debian@192.168.211.72 sudo borgmatic --config /etc/borgmatic.d/mattermost.yaml create --stats`
+- [ ] `ssh debian@192.168.211.72 rm -rf bundle`
+
+Verify:
+
+- [ ] Log in at https://chat.batiment7.org with an existing account
+- [ ] Old messages are there: scroll a channel back to 2023, search a word from
+      an old message
+- [ ] Attachments and pictures of old messages open, custom emojis show up
+- [ ] The mobile app connects and gets push notifications
+- [ ] An email notification arrives (`smtp-relay.gmail.com` must accept the
+      new b72: same IP, but check the relay's allowed senders)
+- [ ] System Console > About: Mattermost Team Edition 12.0.0
+- [ ] Grafana: b72's logs and metrics show up
+- [ ] Backups: `ssh debian@192.168.211.72 sudo borgmatic --config /etc/borgmatic.d/mattermost.yaml repo-list`
+
+After:
+
+- [ ] Deactivate the accounts never active or inactive for more than 2 years
+      (123 on 2026-10-22), to get under the 250 active accounts limit. List
+      them, check the list, then deactivate them:
+
+      ssh debian@192.168.211.72 "cd /tmp && sudo -u postgres psql -d mattermost -Atc \"
+          select u.username from users u left join status s on s.userid = u.id
+          where u.deleteat = 0 and u.id not in (select userid from bots)
+          and coalesce(s.lastactivityat, 0) < extract(epoch from now() - interval '2 years') * 1000
+          order by 1\"" > tmp_migration/b72/inactive.txt
+      wc -l tmp_migration/b72/inactive.txt
+      ssh debian@192.168.211.72 "sudo -u mattermost /opt/mattermost/current/bin/mmctl --local user deactivate $(tr '\n' ' ' < tmp_migration/b72/inactive.txt)"
+
+      Rehearsed on molecule: 122 of the 123 get deactivated, 157 accounts stay
+      active, and creating an account works again. One account
+      (`oabn8f4rnidq3xsxnxsyk1to3e`) has an email Mattermost now considers
+      invalid, which blocks its deactivation: fix its email (System Console >
+      Users), then deactivate it. Reactivating an account later works as long
+      as less than 250 are active
+- [ ] Remove the `b72` entry from `~/.ssh/config` (root, public IP): use
+      `debian@192.168.211.72`
+- [ ] Delete `tmp_migration/b72` (the whole chat history in clear) and destroy
+      the molecule VMs
+- [ ] Delete the OVH snapshot a few days later
+
+### Molecule rehearsal
+
+With the bundle copied as above (no need to stop the production server for a
+rehearsal):
+
+      uv run molecule converge
+      virsh -c qemu:///system domifaddr b72    # the VM's <b72 ip>
+      rsync -a -e "ssh -i ~/.ansible/tmp/molecule.*/id_ssh_rsa" tmp_migration/b72/bundle/ molecule@<b72 ip>:bundle/
+      uv run molecule login --host b72    # then: sudo mattermost-import bundle
+      uv run molecule verify
+      uv run molecule converge -- --limit b72 --tags mattermost --tags borgmatic_create
+      uv run molecule converge -- --limit b72 --tags mattermost --tags borgmatic_restore
+
+`molecule verify` checks the version and the site URL, so it passes with the
+imported config.json too. Log in through the tunnel (`https://chat.localhost`)
+with a production account to check the history and the attachments.
