@@ -85,6 +85,8 @@ echo "### Files"
 find "$ROOT/data" -mindepth 1 -delete
 cp -a "$BUNDLE/data/." "$ROOT/data/"
 chown -R mattermost:mattermost "$ROOT/data"
+# cp -a also copied the bundle folder's own mode: back to the role's
+chmod u=rwx,g=rx,o= "$ROOT/data"
 
 echo "### Configuration"
 # The other server's database password has no use here: the database

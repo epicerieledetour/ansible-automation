@@ -365,3 +365,22 @@ rehearsal):
 `molecule verify` checks the version and the site URL, so it passes with the
 imported config.json too. Log in through the tunnel (`https://chat.localhost`)
 with a production account to check the history and the attachments.
+
+Notes from the molecule rehearsal (2026-10-22, production database of
+2026-10-21, attachments of the last 3 days only: the VM disk is 16 GB):
+
+- `mattermost-import` went through 10.11.24 and 11.7.13 without an error, and
+  12.0.0 starts on the result. Counts match production: 279 active users,
+  182393 posts, 4279 files, 7 teams
+- An existing user logs in, reads a channel back to its first posts (2019),
+  and search finds a 2019 message: Team Edition hides nothing
+- Backup and restore, through the playbook: `borgmatic_create` puts the
+  database dump and `/srv/mattermost` on srv1 (119 MB). After wiping b72's
+  mattermost (database, `/srv/mattermost`, `/opt/mattermost`) and converging a
+  new empty one, `borgmatic_restore` brings back every count, `config.json`
+  and every file byte for byte. A restore extracts over what's there: files
+  written after the backup stay (here, one profile picture of the empty
+  install's default user), mattermost just doesn't reference them
+- In molecule, `--limit b72` alone fails in the wireguard role: vps2's
+  `wireguard_endpoint_host` only exists once converge.yml ran on vps2. With
+  `--tags mattermost` the wireguard role is skipped, so it doesn't matter there

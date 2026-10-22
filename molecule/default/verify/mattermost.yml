@@ -66,11 +66,15 @@
       register: _mattermost_login
       failed_when: false
 
+    # The title is the site name: "Mattermost" on a new server, the old
+    # server's own after mattermost-import
     - name: "Mattermost: web app is served"
       ansible.builtin.assert:
         that:
           - _mattermost_login.status == 200
-          - "'<title>Mattermost</title>' in _mattermost_login.content"
+          - >-
+            ('<title>' ~ (_mattermost_client_config.content | from_json).SiteName ~ '</title>')
+            in _mattermost_login.content
         fail_msg: >-
           https://chat.localhost/login returned {{ _mattermost_login.status }}:
           {{ _mattermost_login.content | default('') | truncate(300) }}
