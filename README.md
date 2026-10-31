@@ -259,7 +259,7 @@ This `playbook.yml` will setup all machines described in `hosts` according to th
 4. Ensure openssh server is running
 5. `ssh-copy-id` for the user / machine ansible will be ran from
 6. Install `sudo`: `apt install sudo`
-6. Configure user `debian` for passwordless sudo. Create a new file `/etc/sudoers.d/admin` with this content: `debian ALL = NOPASSWD: ALL`
+6. Configure user `debian` for passwordless sudo. Create a new file `/etc/sudoers.d/admin` with this content: `debian ALL=(ALL:ALL) NOPASSWD: ALL` (`(ALL:ALL)` matters: without it sudo only reaches root, and the backup tasks run as `borg`)
 7. Run ansible against a first time with the LAN IP of the machine. This will bootstrap the Wireguard connection that will be used by default next time: `ansible-playbook -e "ansible_host=[LAN IP] ansible_user=debian" playbook.yml --limit [hostname]`, for example `ansible-playbook -e "ansible_user=debian ansible_host=192.168.1.42" playbook.yml --limit laptopserver`
 8. The machine is likely to reboot on first ansible run: be ready to enter disk decryption keys
 

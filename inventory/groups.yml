@@ -8,7 +8,7 @@ servers:
 backup_destinations:
   hosts:
     pi1:
-#    srv1:
+    srv1:
 
 backup_sources:
   hosts:
