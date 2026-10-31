@@ -22,7 +22,9 @@
       ansible.builtin.command:
         cmd: "borgmatic --config {{ borgmatic_snippet_config }} repo-create --encryption repokey"
       register: command_result
-      changed_when: command_result.stderr | length > 0
+      # borg reports a missing repository before creating it, and stays silent
+      # otherwise. Don't test for any stderr: ssh warnings land there too.
+      changed_when: "'does not exist' in command_result.stderr"
 
     - name: "Create new backup {{ borgmatic_snippet_name }}"
       ansible.builtin.command:
