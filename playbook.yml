@@ -155,13 +155,6 @@
 #     - influxdata-common
 #     - influxdata-influxdb
 #
-# - name: Setup telegraf
-#   hosts: servers
-#   become: true
-#   roles:
-#     - influxdata-common
-#     - influxdata-telegraf
-#
 # - name: "Setup web applications"
 #   hosts: webservers
 #   become: true

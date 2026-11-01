@@ -164,9 +164,7 @@ Workstation plays are tagged `never` and run only when explicitly asked for, see
 [Wireguard on workstations](#wireguard-on-workstations).
 
 Some hosts still hold a `host_vars` entry — and therefore a reserved Wireguard
-address — without being part of the active inventory: `vps` (`.10`, the previous
-VPS, being retired in favour of `vps2`, see `TODO.md`), `pi1` (`.30`, a backup
-destination currently commented out of `inventory/groups.yml`), `pi2` (`.20`),
+address — without being part of the active inventory: `pi2` (`.20`),
 `mauriandres-workstation` (`.50`) and `kiosk1` (`.80`). Keep those addresses in
 mind before handing one out to a new machine.
 

@@ -208,7 +208,7 @@ After:
       `dig +short vouchers2.epicerieledetour.org` returns nothing. Tell anyone
       still using `vouchers2.` links to use `vouchers.`
 - [ ] A few days later: destroy vps (OVH), delete the DNS record `vps`
-- [ ] Remove `host_vars/vps` and the `vps` mention in README
+- [x] Remove `host_vars/vps` and the `vps` mention in README
 - [ ] Fix the wordpress role's "Enable plugins auto-updates" `failed_when` for
       partially enabled plugins
 - [ ] Delete `tmp_migration` (production data in clear) and destroy the molecule VMs
