@@ -3,10 +3,6 @@ wg-ledetour.conf-*
 *.qcow2
 tmp_migration/
 
-# Vagrant
-.ssh.config
-.vagrant
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

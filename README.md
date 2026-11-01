@@ -1,20 +1,3 @@
-# TODO
-
-## libvirt configuration
-
-```bash
-usermod --append --groups libvirt `whoami`
-newgrp libvirt
-```
-
-## Backups / restore
-
-```bash
-uv run molecule converge -- --tags vouchers --tags borgmatic_create
-uv run molecule converge -- --tags vouchers --tags borgmatic_restore
-uv run molecule converge -- --tags wordpress --tags borgmatic_create
-```
-
 # ansible-automation
 
 This repository contains the [Ansible](https://docs.ansible.com/projects/ansible/latest/getting_started/introduction.html) playbook and roles of the [Épicerie Le Détour](https://epicerieledetour.org/). It configures the different servers (VPS or self-hosted) and services (custom software, backup setups or third-party open source softwares) needed for the épicerie's mission, for example:
@@ -23,9 +6,7 @@ This repository contains the [Ansible](https://docs.ansible.com/projects/ansible
 - Wordpress, Grafana and Mattermost instances
 - Custom applications to [check members status](https://github.com/epicerieledetour/ledetour-membres) or to [scan the food vouchers](https://github.com/epicerieledetour/ledetour-vouchers) of the [Nourrir la Pointe](https://www.nourrirlapointe.ca/bons-solidaires) program.
 
-A [Vagrant](https://developer.hashicorp.com/vagrant) setup allows development, experimentation, tests and staging deployment on safe, local virtual machines. Actual server deployment and upgrades are only ran when they are deemed to work well locally on a virtual network.
-
-This Ansible and Vagrant setups are currently in a bad state and cannot be fully ran as-is: this problem is currently being worked on as part of the [Ansible setup upgrade project](https://github.com/orgs/epicerieledetour/projects/2/views/2).
+A [Molecule](https://docs.ansible.com/projects/molecule/) setup allows development, experimentation and tests on safe, local virtual machines. Actual server deployment and upgrades are only ran when they are deemed to work well locally on a virtual network.
 
 
 ## Core values
@@ -84,6 +65,8 @@ flowchart LR
         direction TB
         vps2["<b>vps2</b> &nbsp; .90<br/><i>endpoint, routes the whole /24</i>"]
         srv1["<b>srv1</b> &nbsp; .60"]
+        pi1["<b>pi1</b> &nbsp; .30"]
+        b72["<b>b72</b> &nbsp; .72<br/><i>not migrated yet</i>"]
         ws["<b>charles-ws</b> &nbsp; .70<br/><i>systemd-networkd</i>"]
         lp["<b>charles-lp</b> &nbsp; .40<br/><i>NetworkManager</i>"]
     end
@@ -91,6 +74,8 @@ flowchart LR
     internet -->|"vps-53fcb87d.vps.ovh.ca:51820"| vps2
 
     srv1 -. peer .- vps2
+    pi1 -. peer .- vps2
+    b72 -. peer .- vps2
     ws -. peer .- vps2
     lp -. peer .- vps2
 ```
@@ -131,19 +116,44 @@ flowchart TB
         agents1["node_exporter tcp 9100<br/>alloy"]
     end
 
+    subgraph pi1["pi1 &nbsp; 192.168.211.30 &nbsp; self-hosted"]
+        rclone["<b>rclone</b><br/>Google Drive sync"]
+        borgmaticpi["<b>borgmatic</b><br/>system, gdrive"]
+        borgpi["<b>borg repositories</b><br/>/srv/borg"]
+        agentspi["node_exporter tcp 9100<br/>alloy"]
+    end
+
+    subgraph b72["b72 &nbsp; 192.168.211.72 &nbsp; OVH VPS, not migrated yet"]
+        caddyb7["<b>caddy</b><br/>tcp 443, Let's Encrypt"]
+        mattermost["<b>mattermost</b><br/>postgresql"]
+        borgmaticb7["<b>borgmatic</b><br/>system, mattermost"]
+        agentsb7["node_exporter tcp 9100<br/>alloy"]
+    end
+
     internet -->|"epicerieledetour.org<br/>vouchers. &nbsp; membres. &nbsp; grafana."| caddy
+    internet -->|"chat.batiment7.org"| caddyb7
 
     caddy --> wordpress
     caddy --> vouchers
     caddy --> membres
     caddy -->|"reverse_proxy over wireguard"| grafana
+    caddyb7 --> mattermost
 
-    borgmatic -->|"ssh borg@srv1 over wireguard"| borg
+    borgmatic -->|"ssh borg@ over wireguard"| borg
+    borgmatic -->|"ssh borg@ over wireguard"| borgpi
+    borgmaticb7 --> borg
+    borgmaticb7 --> borgpi
+    borgmaticpi --> borg
+    borgmaticpi --> borgpi
 
     agents2 -->|"logs, over wireguard"| loki
     agents1 --> loki
+    agentspi --> loki
+    agentsb7 --> loki
     prometheus -->|"scrape, over wireguard"| agents2
     prometheus --> agents1
+    prometheus --> agentspi
+    prometheus --> agentsb7
     grafana --> loki
     grafana --> prometheus
 ```
@@ -153,20 +163,23 @@ Wireguard network, and `roles/grafana_proxy` templates a Caddy vsite on the web
 server that reverse-proxies `grafana.epicerieledetour.org` to it. The same holds
 for Loki and Prometheus, which are reachable from the Wireguard network only.
 
+Every backup source writes to both `pi1` and `srv1`. `pi1` syncs the Google
+Drives at 01:00 and all machines run their backups at 04:00, Montreal time.
+
 | host | Wireguard IP | inventory groups | what runs on it |
 |---|---|---|---|
 | `vps2` | `192.168.211.90` | `servers`, `webservers`, `vouchers`, `backup_sources` | Wireguard endpoint, caddy, wordpress, vouchers, membres, grafana reverse proxy, borgmatic, node_exporter, alloy, ufw, fail2ban |
 | `srv1` | `192.168.211.60` | `servers`, `grafana`, `backup_destinations` | grafana, loki, prometheus, borg repositories, node_exporter, alloy, ufw, fail2ban |
+| `pi1` | `192.168.211.30` | `servers`, `backup_destinations`, `backup_sources`, `dataproxies` | borg repositories, Google Drive sync, borgmatic, node_exporter, alloy, ufw, fail2ban |
+| `b72` | `192.168.211.72` | `servers`, `backup_sources`, `mattermost` | **Not migrated yet: production `b72` doesn't run this playbook.** Target state: Bâtiment 7's Mattermost (chat.batiment7.org), caddy, postgresql, borgmatic, node_exporter, alloy, ufw, fail2ban |
 | `charles-ws` | `192.168.211.70` | `workstations_networkd` | Wireguard client only, configured through systemd-networkd |
 | `charles-lp` | `192.168.211.40` | `workstations_nm` | Wireguard client only, configured through NetworkManager |
 
 Workstation plays are tagged `never` and run only when explicitly asked for, see
 [Wireguard on workstations](#wireguard-on-workstations).
 
-Some hosts still hold a `host_vars` entry — and therefore a reserved Wireguard
-address — without being part of the active inventory: `pi2` (`.20`),
-`mauriandres-workstation` (`.50`) and `kiosk1` (`.80`). Keep those addresses in
-mind before handing one out to a new machine.
+`kiosk1` holds a `host_vars` entry, and therefore the reserved Wireguard address
+`.80`, without being part of the active inventory yet.
 
 ## The Ansible setup
 
@@ -247,7 +260,7 @@ ansible-playbook playbook.yml
 
 ```
 
-This `playbook.yml` will setup all machines described in `hosts` according to the configuration described in `/roles`. 
+This `playbook.yml` will setup all machines described in `inventory/` according to the configuration described in `/roles`. 
 
 ## First setup of a production machine
 
@@ -258,7 +271,7 @@ This `playbook.yml` will setup all machines described in `hosts` according to th
 5. `ssh-copy-id` for the user / machine ansible will be ran from
 6. Install `sudo`: `apt install sudo`
 6. Configure user `debian` for passwordless sudo. Create a new file `/etc/sudoers.d/admin` with this content: `debian ALL=(ALL:ALL) NOPASSWD: ALL` (`(ALL:ALL)` matters: without it sudo only reaches root, and the backup tasks run as `borg`)
-7. Run ansible against a first time with the LAN IP of the machine. This will bootstrap the Wireguard connection that will be used by default next time: `ansible-playbook -e "ansible_host=[LAN IP] ansible_user=debian" playbook.yml --limit [hostname]`, for example `ansible-playbook -e "ansible_user=debian ansible_host=192.168.1.42" playbook.yml --limit laptopserver`
+7. Run ansible against a first time with the LAN IP of the machine. This will bootstrap the Wireguard connection that will be used by default next time: `ansible-playbook -e "ansible_host=[LAN IP] ansible_user=debian" playbook.yml --limit [hostname]`, for example `ansible-playbook -e "ansible_user=debian ansible_host=192.168.1.42" playbook.yml --limit srv1`
 8. The machine is likely to reboot on first ansible run: be ready to enter disk decryption keys
 
 ## Encrypt Sensitive Files
@@ -293,18 +306,15 @@ sudo wg-quick up wg-ledetour
 sudo wg show
 ```
 
-You can now ping other machines in the vpn according to the IPs specified in the file `hosts`.
+You can now ping other machines in the vpn according to the IPs specified in `host_vars`.
 
-If Ansible has added your public ssh keys to other machines in the wireguard network, you can now ssh into them using the username specified in the file `hosts`.
+If Ansible has added your public ssh keys to other machines in the wireguard network, you can now ssh into them using the username specified in `inventory/hosts.yml`.
 
 ## Developement
 
 ### Development environment
 
-Debian:
-- pkg-config (probably build-essential ?)
-- libvirt ?
-
+See [Install system dependencies](#install-system-dependencies) for the required packages.
 
 We're using [Molecule](https://docs.ansible.com/projects/molecule/) to safely develop the Ansible playbook on local virtual machines without modifying the production servers.
 
@@ -325,6 +335,18 @@ uv run molecule login --host vps2
 uv run molecule destroy
 ```
 
+On a workstation with a restrictive firewall, `bin/open-charles-workstation-firewall-for-molecule.sh` temporarily lets the virtual machines through. It's specific to Charles's nftables and VPN setup: adapt it to yours.
+
+### Backups and restore
+
+Creating and restoring backups are opt-in tags:
+
+```bash
+uv run molecule converge -- --tags vouchers --tags borgmatic_create
+uv run molecule converge -- --tags vouchers --tags borgmatic_restore
+uv run molecule converge -- --tags wordpress --tags borgmatic_create
+```
+
 ### Testing that the services work
 
 #### Automated checks
@@ -336,7 +358,7 @@ $ uv run molecule converge
 $ uv run molecule verify
 ```
 
-`molecule/default/verify.yml` checks wordpress, vouchers, membres and grafana from the web server itself, and lists every failing check at the end.
+`molecule/default/verify.yml` checks wordpress, vouchers, membres, grafana and mattermost, and lists every failing check at the end.
 
 The sections below describe how to test the services by hand, for instance to investigate a failure.
 
@@ -406,20 +428,9 @@ $ curl -kL https://wordpress.localhost
 
 Default login on a Molecule/dev environment is username `admin`, with the password stored (vault-encrypted) in `wordpress_admin_password` in `roles/wordpress/vars/main.yml` — view it with `ansible-vault view roles/wordpress/vars/main.yml`. In production, regular Wordpress users log in with their `@epicerieledetour.org` Google account; this `admin` account remains as a fallback.
 
-#### Wordpress backup info
+#### Wordpress backups
 
-The plugin used for backups of the wordpress documents and databases is
-[UpDraftPlus](https://wordpress.org/plugins/updraftplus/). To change the google drive recipient
-account of the wordpress backups. You may go to the
-[settings](https://epicerieledetour.org/wp-admin/options-general.php?page=updraftplus) page.
-
-Go to the `settings` tab showed below
-
-![](pictures/settings_tab.png)
-
-Scroll down until you reach the `Google Drive` section
-
-![](pictures/gdrive_options.png)
+Wordpress is backed up by borgmatic like the other services: the `wp-content` folder and a dump of the database, see `roles/wordpress/files/wordpress.yaml`.
 
 #### Grafana
 
