@@ -22,6 +22,9 @@ Environment="LDTVOUCHERS_HACK_EMISSIONTOKEN={{ ldtvouchers_hack_emissiontoken }}
 Environment="LDTVOUCHERS_DBPATH=ldt-vouchers.sqlite3"
 Environment="LDTVOUCHERS_FILESPATH=files"
 
+# IPv4 only: smtp.gmail.com drops vps2's logins over IPv6 (#158)
+RestrictAddressFamilies=AF_INET AF_UNIX AF_NETLINK
+
 ExecStart=uvx --from git+https://github.com/epicerieledetour/ledetour-vouchers ldtvouchers --db ldt-vouchers.sqlite3 emissions odsreport files/emissions/{{ ldtvouchers_hack_emissiontoken }}/report.ods
 {% if deployment_is_prod %}
 ExecStart=uvx --from git+https://github.com/epicerieledetour/ledetour-vouchers ldtvouchers --db ldt-vouchers.sqlite3 emissions emailreport
