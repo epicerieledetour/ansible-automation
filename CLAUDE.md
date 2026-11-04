@@ -20,9 +20,10 @@ uv run molecule converge -- --tags vouchers --tags borgmatic_create   # run with
 uv run molecule login --host vps2
 uv run molecule destroy
 
-# Linting
-uv run ansible-lint
-uv run yamllint .
+# Linting (ansible-lint also checks YAML formatting)
+git config core.hooksPath .githooks   # once per clone: lint staged files + syntax check before each commit
+uv run ansible-lint                   # whole repository, ~25 s
+uv run ansible-lint --fix             # fix what it can, then review the diff
 
 # Production (real servers, defined in inventory/hosts.yml)
 ansible-playbook playbook.yml

@@ -240,6 +240,14 @@ ansible-galaxy collection install -r requirements.yml
 # ansible-galaxy install -r requirements.yml
 ```
 
+### Enable the pre-commit hook
+
+Once per clone, let git run the repository's hooks, which lint each commit (see [Linting](#linting)):
+
+```sh
+git config core.hooksPath .githooks
+```
+
 ### Wireguard on workstations
 
 Servers and workstations are linked together by a wireguard network, `vps2` being the endpoint every other machine connects to. Workstations are never configured by default (their plays are tagged `never`): add the workstation to the `workstations_networkd` or `workstations_nm` group in `inventory/hosts.yml`, set its `wireguard_*` host vars, then run the playbook limited to that workstation with the matching tag:
@@ -336,6 +344,27 @@ uv run molecule destroy
 ```
 
 On a workstation with a restrictive firewall, `bin/open-charles-workstation-firewall-for-molecule.sh` temporarily lets the virtual machines through. It's specific to Charles's nftables and VPN setup: adapt it to yours.
+
+### Linting
+
+[ansible-lint](https://docs.ansible.com/projects/lint/) checks both the Ansible code and the YAML formatting:
+
+```sh
+# Whole repository, takes about 25 seconds
+uv run ansible-lint
+
+# Let ansible-lint fix what it can, then review the changes with git diff
+uv run ansible-lint --fix
+```
+
+The pre-commit hook `.githooks/pre-commit` is versioned with the repository, but git only runs it once enabled in each clone with `git config core.hooksPath .githooks`. Before each commit, it:
+
+1. runs ansible-lint on the staged `.yml` and `.yaml` files only, which takes a few seconds instead of the whole repository's 25;
+2. syntax checks `playbook.yml`, which loads every role it uses, so a broken role is caught even when only a template is committed.
+
+If either fails, the commit is aborted. When ansible-lint fails, the hook prints the `uv run ansible-lint --fix <files>` command to run on the staged files; review its changes, stage them and commit again. Files are linted as they are on disk, including unstaged changes. `git commit --no-verify` skips the hook in an emergency.
+
+`.ansible-lint-ignore` lists the violations that predate the hook, so that it only blocks new ones. Fix them over time and remove their lines, but don't add new ones.
 
 ### Backups and restore
 

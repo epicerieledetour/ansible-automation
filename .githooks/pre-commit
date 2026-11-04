@@ -1,0 +1,50 @@
+#!/bin/sh
+# Lints the YAML files staged for commit with ansible-lint, then syntax checks
+# playbook.yml, which loads every role it uses.
+#
+# Enable it once per clone with:
+#   git config core.hooksPath .githooks
+#
+# Bypass it in an emergency with: git commit --no-verify
+#
+# Running ansible-lint on the whole repository takes about 25 seconds, mostly
+# spent syntax checking each role and playbook separately; linting only the
+# staged files takes about 3. Run "uv run ansible-lint" for a full check.
+# Files are linted as they are on disk, including changes that are not staged.
+
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+failed=0
+
+# File names are assumed to contain no whitespace, which holds in this repo
+files=$(git diff --cached --name-only --diff-filter=ACMR -- '*.yml' '*.yaml' | tr '\n' ' ')
+
+if [ -n "$files" ]; then
+    # shellcheck disable=SC2086  # $files is a list of file names
+    if ! output=$(uv run ansible-lint --nocolor --offline $files 2>&1); then
+        printf '%s\n' "$output" >&2
+        cat >&2 <<EOF
+
+ansible-lint failed: commit aborted.
+
+To let ansible-lint fix what it can, run:
+
+    uv run ansible-lint --fix $files
+
+then review the changes with "git diff", stage them and commit again.
+EOF
+        failed=1
+    fi
+fi
+
+if ! output=$(uv run ansible-playbook --syntax-check playbook.yml 2>&1); then
+    printf '%s\n' "$output" >&2
+    cat >&2 <<'EOF'
+
+playbook.yml syntax check failed: commit aborted.
+ansible-lint --fix cannot fix this, see the error above.
+EOF
+    failed=1
+fi
+
+exit "$failed"
