@@ -17,6 +17,8 @@
       ansible.builtin.git:
         repo: "https://github.com/epicerieledetour/ledetour-membres.git"
         dest: "{{ membres_root_dir }}"
+        # Deploys whatever the application's master branch holds
+        version: master
 
 
     - name: Copy Client SSL CA certificate
@@ -37,6 +39,7 @@
     dest: /etc/caddy/sites.d/membres.caddy
     owner: caddy
     group: caddy
+    mode: "0644"
   notify:
     - caddy changed
 
@@ -56,6 +59,7 @@
       ansible.builtin.template:
         src: ldt-membres.service.j2
         dest: /etc/systemd/system/ldt-membres.service
+        mode: "0644"
       notify:
         - systemd changed
 
@@ -63,6 +67,7 @@
       ansible.builtin.copy:
         src: ldt-membres.timer
         dest: /etc/systemd/system/ldt-membres.timer
+        mode: "0644"
       notify:
         - systemd changed
 

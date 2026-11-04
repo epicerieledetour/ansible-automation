@@ -85,7 +85,7 @@
     - name: Create wp-config.php
       ansible.builtin.command:
         chdir: "{{ wordpress_root_dir }}"
-        cmd: "{{ wordpress_wp_cli }} config create --dbname={{ wordpress_db_name}} --dbuser={{ wordpress_db_user }} --dbpass={{ wordpress_db_password }}"
+        cmd: "{{ wordpress_wp_cli }} config create --dbname={{ wordpress_db_name }} --dbuser={{ wordpress_db_user }} --dbpass={{ wordpress_db_password }}"
       changed_when:
         - _task.result.rc == 0
       failed_when:
@@ -172,6 +172,7 @@
     dest: /etc/caddy/sites.d/wordpress.caddy
     owner: caddy
     group: caddy
+    mode: "0644"
   notify: caddy changed
 
 - name: Setup backup

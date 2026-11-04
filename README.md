@@ -364,7 +364,7 @@ The pre-commit hook `.githooks/pre-commit` is versioned with the repository, but
 
 If either fails, the commit is aborted. When ansible-lint fails, the hook prints the `uv run ansible-lint --fix <files>` command to run on the staged files; review its changes, stage them and commit again. Files are linted as they are on disk, including unstaged changes. `git commit --no-verify` skips the hook in an emergency.
 
-`.ansible-lint-ignore` lists the violations that predate the hook, so that it only blocks new ones. Fix them over time and remove their lines, but don't add new ones.
+The repository passes ansible-lint without exceptions: fix new violations rather than ignoring them.
 
 ### Backups and restore
 

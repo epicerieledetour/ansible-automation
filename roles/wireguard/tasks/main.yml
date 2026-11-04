@@ -1,5 +1,5 @@
 ---
-- name: "Configure wireguard by including wireguard{{ group_suffix }}.yml"
+- name: "Configure wireguard for the host class {{ group_suffix }}"
   ansible.builtin.include_tasks:
     file: "wireguard{{ group_suffix }}.yml"
   tags:

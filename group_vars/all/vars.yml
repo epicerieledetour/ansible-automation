@@ -1,4 +1,10 @@
 ---
+# Production unless Molecule's converge.yml sets deployment_is_dev, whose
+# set_fact takes precedence over these group vars.
+deployment_is_dev: false
+deployment_is_prod: "{{ not (deployment_is_dev | bool) }}"
+deployment_suffix: "{{ '-dev' if deployment_is_dev | bool else '-prod' }}"
+
 # Google OAuth app, shared by every service using Google auth (wordpress on
 # the webservers, grafana on the grafana hosts).
 google_auth_client_id: 666389311813-bkam02fjjruohg1hb6qt4mc61qf6rhn6.apps.googleusercontent.com

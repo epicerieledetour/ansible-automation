@@ -63,6 +63,7 @@
         dest: /etc/caddy/Caddyfile
         owner: caddy
         group: caddy
+        mode: "0644"
       notify:
         - caddy changed
 
@@ -72,6 +73,7 @@
         dest: /etc/caddy/global.d/00-local_certs.caddy
         owner: caddy
         group: caddy
+        mode: "0644"
       when: deployment_is_dev
       notify:
         - caddy changed

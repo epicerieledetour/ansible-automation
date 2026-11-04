@@ -22,9 +22,6 @@
 - name: "Initial ssh configuration"
   hosts: servers
   roles:
-    # Before authorized_keys: it installs a different key set per deployment.
-    - role: common_facts
-      tags: ["always", "common_facts"]
     - role: authorized_keys
       tags: ["authorized_keys"]
     - role: sshd
@@ -32,13 +29,11 @@
   tags:
     - ssh
 
-- name: "Setup common facts for all machines in the inventory"
+- name: "Common setup for all servers"
   hosts: servers
   vars:
     group_suffix: "-server"
   roles:
-    - role: common_facts
-      tags: ["always", "common_facts"]
     - role: common_packages
       tags: ["common_packages"]
     - role: hostname

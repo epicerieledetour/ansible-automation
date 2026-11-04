@@ -41,6 +41,7 @@
       ansible.builtin.copy:
         src: firefox-wayland.sh
         dest: /etc/profile.d/firefox-wayland.sh
+        mode: "0644"
       tags:
         - kiosk
 
@@ -66,13 +67,13 @@
     - name: "Get current systemd default target"
       ansible.builtin.command: "systemctl get-default"
       changed_when: false
-      register: systemddefaulttarget
+      register: kiosk_systemd_default_target
       tags:
         - kiosk
 
     - name: "Set default to graphical target"
       ansible.builtin.command: "systemctl set-default graphical.target"
-      when: "'graphical' not in systemddefaulttarget.stdout"
+      when: "'graphical' not in kiosk_systemd_default_target.stdout"
       changed_when: true
       tags:
         - kiosk
@@ -83,6 +84,7 @@
         dest: /home/kiosk/.kiosk-wallpaper.svg
         owner: kiosk
         group: kiosk
+        mode: "0644"
       tags:
         - kiosk
 
@@ -102,5 +104,6 @@
         dest: /home/kiosk/.config/wayfire.ini
         owner: kiosk
         group: kiosk
+        mode: "0644"
       tags:
         - kiosk

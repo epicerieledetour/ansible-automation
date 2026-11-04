@@ -44,6 +44,7 @@
       ansible.builtin.copy:
         src: ldt-vouchers-report.timer
         dest: /etc/systemd/system/
+        mode: "0644"
       notify:
         - vouchers changed
 
@@ -63,6 +64,7 @@
       ansible.builtin.copy:
         src: ldt-vouchers.service
         dest: /etc/systemd/system/
+        mode: "0644"
       notify:
         - vouchers changed
 
@@ -79,5 +81,6 @@
     dest: /etc/caddy/sites.d/vouchers.caddy
     owner: caddy
     group: caddy
+    mode: "0644"
   notify:
     - caddy changed

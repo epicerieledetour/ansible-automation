@@ -12,23 +12,26 @@
       ansible.builtin.copy:
         src: "{{ borgmatic_snippet_file }}"
         dest: "{{ borgmatic_snippet_snippet }}"
+        mode: "0644"
 
     - name: Instanciate borgmatic configuration
       ansible.builtin.template:
         src: borgmatic_config.yaml.j2
         dest: "{{ borgmatic_snippet_config }}"
+        mode: "0644"
 
     - name: Initialize repositories
       ansible.builtin.command:
         cmd: "borgmatic --config {{ borgmatic_snippet_config }} repo-create --encryption repokey"
-      register: command_result
+      register: borgmatic_snippet_repo_create
       # borg reports a missing repository before creating it, and stays silent
       # otherwise. Don't test for any stderr: ssh warnings land there too.
-      changed_when: "'does not exist' in command_result.stderr"
+      changed_when: "'does not exist' in borgmatic_snippet_repo_create.stderr"
 
     - name: "Create new backup {{ borgmatic_snippet_name }}"
       ansible.builtin.command:
         cmd: "borgmatic --config {{ borgmatic_snippet_config }} create"
+      changed_when: true
       when: "'borgmatic_create' in ansible_run_tags"
       tags:
         - never
@@ -41,6 +44,7 @@
         cmd: >-
           borgmatic --config {{ borgmatic_snippet_config }} extract --archive latest --destination /
           {% for path in borgmatic_snippet_extract_paths %} --path {{ path | regex_replace('^/', '') }}{% endfor %}
+      changed_when: true
       when:
         - "'borgmatic_restore' in ansible_run_tags"
         - borgmatic_snippet_extract_paths | default([]) | length > 0
@@ -51,6 +55,7 @@
     - name: "Restore last backup {{ borgmatic_snippet_name }}"
       ansible.builtin.command:
         cmd: "borgmatic --config {{ borgmatic_snippet_config }} restore --archive latest"
+      changed_when: true
       when: "'borgmatic_restore' in ansible_run_tags"
       tags:
         - never

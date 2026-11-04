@@ -7,7 +7,7 @@
         pkg:
           - rclone
 
-    - name: Make {{ rclone_etc_dir }} directory
+    - name: Make rclone configuration directory {{ rclone_etc_dir }}
       ansible.builtin.file:
         path: "{{ rclone_etc_dir }}"
         state: directory
@@ -35,6 +35,7 @@
       ansible.builtin.copy:
         src: rclone-ldt.service
         dest: /etc/systemd/system/
+        mode: "0644"
       notify:
         - systemd changed
 
@@ -42,6 +43,7 @@
       ansible.builtin.copy:
         src: rclone-ldt.timer
         dest: /etc/systemd/system/
+        mode: "0644"
       notify:
         - systemd changed
 

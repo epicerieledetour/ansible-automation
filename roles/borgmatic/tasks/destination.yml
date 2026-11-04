@@ -1,10 +1,10 @@
 ---
-- name: "Register backup destination {{ borgmatic_destination_hostname }} to hosts file"
+- name: "Add backup destination to /etc/hosts: {{ borgmatic_destination_hostname }}"
   ansible.builtin.lineinfile:
     path: /etc/hosts
     line: "{{ hostvars[borgmatic_destination_hostname].wireguard_address }}\t{{ borgmatic_destination_hostname }}"
 
-- name: "Adding {{ borgmatic_destination_hostname }} to ssh known hosts"
+- name: "Add backup destination to ssh known hosts: {{ borgmatic_destination_hostname }}"
   ansible.builtin.known_hosts:
     name: "{{ borgmatic_destination_hostname }}"
     key: >-
@@ -20,6 +20,7 @@
       ansible.builtin.file:
         path: "/srv/borg/{{ inventory_hostname }}"
         state: directory
+        mode: "0700"
 
     - name: "Add borg ssh key to borg user"
       ansible.posix.authorized_key:
