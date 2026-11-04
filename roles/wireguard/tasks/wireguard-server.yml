@@ -2,31 +2,30 @@
 - name: Wireguard
   become: true
   block:
-  - name: Install wireguard
-    ansible.builtin.apt:
-      pkg:
-        - iproute2  # For wg-quick, missing from minimal containers
-        - wireguard
-      update_cache: true
-      state: present
+    - name: Install wireguard
+      ansible.builtin.apt:
+        pkg:
+          - iproute2  # For wg-quick, missing from minimal containers
+          - wireguard
+        update_cache: true
+        state: present
 
-  - name: Instanciate wireguard config wg-ledetour.conf
-    ansible.builtin.template:
-      src: wg-ledetour-{{ wireguard_type }}.conf.j2
-      dest: /etc/wireguard/wg-ledetour.conf
-      mode: u=r,g=,o=
-    notify:
-      - wireguard changed
+    - name: Instanciate wireguard config wg-ledetour.conf
+      ansible.builtin.template:
+        src: wg-ledetour-{{ wireguard_type }}.conf.j2
+        dest: /etc/wireguard/wg-ledetour.conf
+        mode: u=r,g=,o=
+      notify:
+        - wireguard changed
 
-  - name: Open wireguard port
-    community.general.ufw:
-      rule: allow
-      proto: udp
-      port: '"{{ wireguard_endpoint_port }}"'
+    - name: Open wireguard port
+      community.general.ufw:
+        rule: allow
+        proto: udp
+        port: '"{{ wireguard_endpoint_port }}"'
 
-  - name: Start wireguard systemd service wg-quick@wg-ledetour.service
-    ansible.builtin.systemd:
-      name: wg-quick@wg-ledetour.service
-      enabled: true
-      state: started
-
+    - name: Start wireguard systemd service wg-quick@wg-ledetour.service
+      ansible.builtin.systemd:
+        name: wg-quick@wg-ledetour.service
+        enabled: true
+        state: started

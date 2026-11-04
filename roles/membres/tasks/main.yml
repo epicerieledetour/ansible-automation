@@ -12,22 +12,22 @@
   become_user: www-data
   block:
 
-  - name: Clone membres git repository
-    become: true
-    ansible.builtin.git:
-      repo: "https://github.com/epicerieledetour/ledetour-membres.git"
-      dest: "{{ membres_root_dir }}"
+    - name: Clone membres git repository
+      become: true
+      ansible.builtin.git:
+        repo: "https://github.com/epicerieledetour/ledetour-membres.git"
+        dest: "{{ membres_root_dir }}"
 
 
-  - name: Copy Client SSL CA certificate
-    ansible.builtin.copy:
-      src: client-ca.crt
-      dest: "{{ membres_client_ca_path }}"
-      owner: www-data
-      group: www-data
-      mode: u=r,g=r,o=
-    notify:
-      - caddy changed
+    - name: Copy Client SSL CA certificate
+      ansible.builtin.copy:
+        src: client-ca.crt
+        dest: "{{ membres_client_ca_path }}"
+        owner: www-data
+        group: www-data
+        mode: u=r,g=r,o=
+      notify:
+        - caddy changed
 
 - name: Instanciate caddy setup
   become: true

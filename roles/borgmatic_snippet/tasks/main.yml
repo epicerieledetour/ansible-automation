@@ -54,4 +54,4 @@
       when: "'borgmatic_restore' in ansible_run_tags"
       tags:
         - never
-        - borgmatic_restore 
+        - borgmatic_restore

@@ -6,4 +6,3 @@
       ansible.builtin.file:
         path: /srv
         state: directory
-

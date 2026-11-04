@@ -22,4 +22,3 @@
 - name: "Fact: deployment_suffix"
   ansible.builtin.debug:
     var: deployment_suffix
-

@@ -1,3 +1,4 @@
+---
 sqlite_databases:
   - name: ldt-vouchers.sqlite3
     path: /srv/www/vouchers.epicerieledetour.org/ldt-vouchers.sqlite3

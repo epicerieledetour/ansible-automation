@@ -3,72 +3,72 @@
   become: true
   block:
 
-  # Dependencies
-  
-  - name: Enable extrepo source latest-debs
-    ansible.builtin.command: "extrepo enable latest-debs"
-    args:
-      creates: "/etc/apt/sources.list.d/extrepo_latest-debs.sources"
+    # Dependencies
 
-  - name: Install vouchers dependencies
-    ansible.builtin.apt:
-      pkg:
-        - git
-        - libcairo2
-        - sqlite3
-        - uv
-      update_cache: true
+    - name: Enable extrepo source latest-debs
+      ansible.builtin.command: "extrepo enable latest-debs"
+      args:
+        creates: "/etc/apt/sources.list.d/extrepo_latest-debs.sources"
 
-  # Run folder
+    - name: Install vouchers dependencies
+      ansible.builtin.apt:
+        pkg:
+          - git
+          - libcairo2
+          - sqlite3
+          - uv
+        update_cache: true
 
-  - name: Make vouchers.epicerieledetour.org installation folder hierarchy
-    ansible.builtin.file:
-      path: "/srv/www/vouchers.epicerieledetour.org/files/emissions/{{ ldtvouchers_hack_emissiontoken }}"
-      state: directory
-      # setgid bit so files created by caddy are group owned by www-data
-      mode: "u=rwx,g=rwxs,o=rx"
-      owner: "www-data"
-      group: "www-data"
+    # Run folder
 
-  # systemd: report
+    - name: Make vouchers.epicerieledetour.org installation folder hierarchy
+      ansible.builtin.file:
+        path: "/srv/www/vouchers.epicerieledetour.org/files/emissions/{{ ldtvouchers_hack_emissiontoken }}"
+        state: directory
+        # setgid bit so files created by caddy are group owned by www-data
+        mode: "u=rwx,g=rwxs,o=rx"
+        owner: "www-data"
+        group: "www-data"
 
-  - name: Instanciate vouchers.epicerieledetour.org ldt-vouchers-report.service
-    ansible.builtin.template:
-      src: ldt-vouchers-report.service.j2
-      dest: /etc/systemd/system/ldt-vouchers-report.service
-      mode: u=r,g=r,o=
-    notify:
-      - vouchers changed
+    # systemd: report
 
-  - name: Copying vouchers.epicerieledetour.org report timer file
-    ansible.builtin.copy:
-      src: ldt-vouchers-report.timer
-      dest: /etc/systemd/system/
-    notify:
-      - vouchers changed
+    - name: Instanciate vouchers.epicerieledetour.org ldt-vouchers-report.service
+      ansible.builtin.template:
+        src: ldt-vouchers-report.service.j2
+        dest: /etc/systemd/system/ldt-vouchers-report.service
+        mode: u=r,g=r,o=
+      notify:
+        - vouchers changed
 
-  # The report emails the real recipients: never run it from a development VM
-  - name: Disable vouchers.epicerieledetour.org report timer in development
-    ansible.builtin.systemd:
-      name: ldt-vouchers-report.timer
-      state: stopped
-      enabled: false
-      daemon_reload: true
-    when: deployment_is_dev | bool
+    - name: Copying vouchers.epicerieledetour.org report timer file
+      ansible.builtin.copy:
+        src: ldt-vouchers-report.timer
+        dest: /etc/systemd/system/
+      notify:
+        - vouchers changed
+
+    # The report emails the real recipients: never run it from a development VM
+    - name: Disable vouchers.epicerieledetour.org report timer in development
+      ansible.builtin.systemd:
+        name: ldt-vouchers-report.timer
+        state: stopped
+        enabled: false
+        daemon_reload: true
+      when: deployment_is_dev | bool
 
 
-  # systemd: service
+    # systemd: service
 
-  - name: Copying vouchers.epicerieledetour.org systemd service file
-    ansible.builtin.copy:
-      src: ldt-vouchers.service
-      dest: /etc/systemd/system/
-    notify:
-      - vouchers changed
+    - name: Copying vouchers.epicerieledetour.org systemd service file
+      ansible.builtin.copy:
+        src: ldt-vouchers.service
+        dest: /etc/systemd/system/
+      notify:
+        - vouchers changed
 
-  - name: Setup backup
-    ansible.builtin.include_tasks:
-      file: backup.yml
+    - name: Setup backup
+      ansible.builtin.include_tasks:
+        file: backup.yml
 
 
 - name: Register vouchers caddy file
@@ -81,4 +81,3 @@
     group: caddy
   notify:
     - caddy changed
-
