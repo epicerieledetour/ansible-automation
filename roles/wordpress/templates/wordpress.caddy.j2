@@ -2,7 +2,12 @@ epicerieledetour.org, wordpress.localhost {
 	root * {{ wordpress_root_dir }}
     file_server
     encode zstd gzip
-    php_fastcgi unix//run/php/php{{ wordpress_php_version }}-fpm.sock
+    php_fastcgi unix//run/php/php{{ wordpress_php_version }}-fpm.sock {
+        # Since Caddy 2.11.8, the default "{path} {path}/index.php index.php"
+        # matches directories on {path} first, and file_server then answers
+        # 404 to /wp-admin/: try the directory's index.php first
+        try_files {path}/index.php {path} index.php
+    }
 }
 
 wordpress.epicerieledetour.org, www.epicerieledetour.org {
