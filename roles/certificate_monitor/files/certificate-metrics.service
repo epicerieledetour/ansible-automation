@@ -1,0 +1,7 @@
+[Unit]
+Description=Update local Caddy certificate expiry metrics
+After=caddy.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/certificate-metrics

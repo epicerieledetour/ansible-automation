@@ -1,0 +1,56 @@
+---
+- name: Apply Caddy site changes before probing its certificates
+  ansible.builtin.meta: flush_handlers
+
+- name: Configure local Caddy certificate monitoring
+  become: true
+  block:
+    - name: Install OpenSSL for reading served certificates
+      ansible.builtin.apt:
+        name: openssl
+        state: present
+
+    - name: Create certificate monitor configuration directory
+      ansible.builtin.file:
+        path: /etc/certificate-monitor
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Install certificate metrics collector
+      ansible.builtin.copy:
+        src: certificate-metrics.py
+        dest: /usr/local/sbin/certificate-metrics
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Configure local Caddy certificate targets
+      ansible.builtin.template:
+        src: targets.json.j2
+        dest: /etc/certificate-monitor/targets.json
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Install certificate metrics systemd service and timer
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "/etc/systemd/system/{{ item }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop:
+        - certificate-metrics.service
+        - certificate-metrics.timer
+
+    - name: Refresh certificate metrics and enable the timer
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: "{{ item == 'certificate-metrics.timer' }}"
+        state: started
+        daemon_reload: true
+      loop:
+        - certificate-metrics.service
+        - certificate-metrics.timer
