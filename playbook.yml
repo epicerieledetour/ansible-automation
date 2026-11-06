@@ -111,6 +111,8 @@
       tags: ['wordpress']
     - role: grafana_proxy
       tags: ["grafana", "grafana_proxy"]
+    - role: certificate_monitor
+      tags: ["certificate_monitor"]
   tags: ['webservers']
 
 - name: Setup mattermost
@@ -121,6 +123,12 @@
       tags: ["caddy"]
     - role: mattermost
       tags: ["mattermost"]
+    - role: certificate_monitor
+      vars:
+        certificate_monitor_targets:
+          - service: Mattermost
+            hostname: "{{ 'chat.localhost' if deployment_is_dev | bool else 'chat.batiment7.org' }}"
+      tags: ["certificate_monitor"]
   tags: ["mattermost"]
 
 - name: Setup monitoring agents
