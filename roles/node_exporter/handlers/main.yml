@@ -1,0 +1,6 @@
+---
+- name: Restart prometheus-node-exporter
+  become: true
+  ansible.builtin.systemd:
+    name: prometheus-node-exporter
+    state: restarted

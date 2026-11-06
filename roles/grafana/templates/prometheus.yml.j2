@@ -9,4 +9,5 @@ scrape_configs:
           - "{{ hostvars[host].wireguard_address }}:9100"
         labels:
           instance: "{{ host }}"
+          host: "{{ host }}"
 {% endfor %}

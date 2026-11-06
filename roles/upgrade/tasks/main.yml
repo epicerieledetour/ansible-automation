@@ -7,10 +7,52 @@
 - name: Upgrade
   become: true
   block:
+    - name: Create Node Exporter textfile collector directory
+      ansible.builtin.file:
+        path: /var/lib/prometheus/node-exporter
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Install APT upgrade metrics collector
+      ansible.builtin.copy:
+        src: apt-upgrade-metrics.py
+        dest: /usr/local/sbin/apt-upgrade-metrics
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Install APT upgrade metrics systemd service and timer
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "/etc/systemd/system/{{ item }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop:
+        - apt-upgrade-metrics.service
+        - apt-upgrade-metrics.timer
+
+    - name: Refresh APT upgrade metric now and enable its timer
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: "{{ item == 'apt-upgrade-metrics.timer' }}"
+        state: started
+        daemon_reload: true
+      loop:
+        - apt-upgrade-metrics.service
+        - apt-upgrade-metrics.timer
+
     - name: Upgrade all packages
       ansible.builtin.apt:
         update_cache: true
         upgrade: dist
+
+    - name: Refresh the last actual package-upgrade metric
+      ansible.builtin.command:
+        cmd: /usr/local/sbin/apt-upgrade-metrics
+      changed_when: false
 
     - name: Check if a reboot is required
       register: upgrade_rebootrequired
