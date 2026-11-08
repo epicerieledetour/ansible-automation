@@ -1,0 +1,40 @@
+---
+- name: Configure Borg repository backup monitoring
+  become: true
+  block:
+    - name: Create Borg backup monitor state directory
+      ansible.builtin.file:
+        path: /var/lib/borg-backup-monitor
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
+
+    - name: Install Borg repository metrics collector
+      ansible.builtin.copy:
+        src: borg-repository-metrics.py
+        dest: /usr/local/sbin/borg-repository-metrics
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Install Borg backup monitoring systemd units
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "/etc/systemd/system/{{ item }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop:
+        - borg-backup-monitor.service
+        - borg-backup-monitor.timer
+
+    - name: Run Borg repository metrics collector and enable its timer
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: "{{ item == 'borg-backup-monitor.timer' }}"
+        state: started
+        daemon_reload: true
+      loop:
+        - borg-backup-monitor.service
+        - borg-backup-monitor.timer

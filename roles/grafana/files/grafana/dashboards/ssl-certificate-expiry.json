@@ -208,6 +208,17 @@
                     "type": "range",
                     "options": {
                       "from": -1000000000000,
+                      "to": -0.99999999,
+                      "result": {
+                        "text": "EXPIRED",
+                        "color": "dark-red"
+                      }
+                    }
+                  },
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 0,
                       "to": 6.999999,
                       "result": {
                         "text": "CRITICAL",
