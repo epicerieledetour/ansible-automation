@@ -1,0 +1,10 @@
+---
+certificate_monitor_targets:
+  - service: Grafana
+    hostname: "{{ 'grafana.localhost' if deployment_is_dev | bool else 'grafana.epicerieledetour.org' }}"
+  - service: Membres
+    hostname: "{{ 'membres.localhost' if deployment_is_dev | bool else 'membres.epicerieledetour.org' }}"
+  - service: WordPress
+    hostname: "{{ 'wordpress.localhost' if deployment_is_dev | bool else 'epicerieledetour.org' }}"
+  - service: Vouchers
+    hostname: "{{ 'vouchers.localhost' if deployment_is_dev | bool else 'vouchers.epicerieledetour.org' }}"
