@@ -18,6 +18,25 @@
         src: borgmatic_config.yaml.j2
         dest: "{{ borgmatic_snippet_config }}"
 
+    - name: Create Borg repository monitor configuration directory
+      ansible.builtin.file:
+        path: /etc/borg-backup-monitor/repositories.d
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
+
+    - name: Configure Borg repository monitor targets
+      ansible.builtin.template:
+        src: repository.json.j2
+        dest: "/etc/borg-backup-monitor/repositories.d/{{ item }}-{{ borgmatic_snippet_name }}.json"
+        owner: root
+        group: root
+        mode: "0600"
+      loop: "{{ groups['backup_destinations'] }}"
+      vars:
+        borg_backup_monitor_store: "{{ item }}"
+
     - name: Initialize repositories
       ansible.builtin.command:
         cmd: "borgmatic --config {{ borgmatic_snippet_config }} repo-create --encryption repokey"

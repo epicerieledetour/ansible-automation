@@ -1,0 +1,9 @@
+[Unit]
+Description=Collect Borg repository backup freshness metrics
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/borg-repository-metrics
+TimeoutStartSec=10min
