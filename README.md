@@ -172,7 +172,6 @@ Drives at 01:00 and all machines run their backups at 04:00, Montreal time.
 |---|---|---|---|
 | `vps2` | `192.168.211.90` | `servers`, `webservers`, `vouchers`, `backup_sources` | Wireguard endpoint, caddy, wordpress, vouchers, membres, grafana reverse proxy, borgmatic, node_exporter, alloy, ufw, fail2ban |
 | `srv1` | `192.168.211.60` | `servers`, `grafana`, `backup_destinations`, `slack_metrics` | grafana, loki, prometheus, slack-metrics timer, borg repositories, node_exporter, alloy, ufw, fail2ban |
-| `srv1` | `192.168.211.60` | `servers`, `grafana`, `backup_destinations` | grafana, loki, prometheus, borg repositories, node_exporter, alloy, ufw, fail2ban |
 | `pi1` | `192.168.211.30` | `servers`, `backup_destinations`, `backup_sources`, `dataproxies` | borg repositories, Google Drive sync, borgmatic, node_exporter, alloy, ufw, fail2ban |
 | `b72` | `192.168.211.72` | `servers`, `backup_sources`, `mattermost` | **Not migrated yet: production `b72` doesn't run this playbook.** Target state: Bâtiment 7's Mattermost (chat.batiment7.org), caddy, postgresql, borgmatic, node_exporter, alloy, ufw, fail2ban |
 | `charles-ws` | `192.168.211.70` | `workstations_networkd` | Wireguard client only, configured through systemd-networkd |
