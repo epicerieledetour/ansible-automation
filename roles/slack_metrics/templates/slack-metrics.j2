@@ -1,0 +1,131 @@
+#!/usr/bin/python3
+# {{ ansible_managed }}
+#
+# Counts the members of the Slack workspace by type and pushes the counts to
+# prometheus, through its remote write receiver. Run by slack-metrics.service,
+# which passes the bot token as the slack-token credential.
+import json
+import os
+import struct
+import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+
+import snappy
+
+PROMETHEUS_WRITE_URL = "{{ slack_metrics_prometheus_write_url }}"
+SLACK_USERS_URL = "https://slack.com/api/users.list"
+# Every type, even at 0, so that no series disappears
+TYPES = ["full", "multi_channel_guest", "single_channel_guest", "bot", "deleted"]
+
+
+def request(req, attempts=3):
+    """urlopen, retried on network errors and 5xx like curl --retry"""
+    for attempt in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return resp.read()
+        except (urllib.error.URLError, OSError) as e:
+            final = isinstance(e, urllib.error.HTTPError) and e.code < 500
+            if final or attempt == attempts:
+                raise
+            print(f"{req.full_url}: {e}, retrying", file=sys.stderr)
+            time.sleep(2 * attempt)
+
+
+# Slack
+
+
+def members(token):
+    """Every member of every page of users.list"""
+    cursor = ""
+    while True:
+        query = urllib.parse.urlencode({"limit": 200, "cursor": cursor})
+        req = urllib.request.Request(f"{SLACK_USERS_URL}?{query}",
+                                     headers={"Authorization": f"Bearer {token}"})
+        resp = json.loads(request(req))
+        # Slack answers errors (invalid_auth, missing_scope...) with HTTP 200
+        if not resp.get("ok"):
+            sys.exit(f"users.list: {json.dumps(resp)}")
+        yield from resp["members"]
+        cursor = resp.get("response_metadata", {}).get("next_cursor", "")
+        if not cursor:
+            return
+
+
+def kind(member):
+    if member.get("deleted"):
+        return "deleted"
+    if member.get("is_bot") or member["id"] == "USLACKBOT":
+        return "bot"
+    if member.get("is_ultra_restricted"):
+        return "single_channel_guest"
+    if member.get("is_restricted"):
+        return "multi_channel_guest"
+    return "full"
+
+
+# Prometheus remote write 1.0, hand encoded rather than pulling in protobuf:
+#   WriteRequest { repeated TimeSeries timeseries = 1 }
+#   TimeSeries { repeated Label labels = 1, repeated Sample samples = 2 }
+#   Label { string name = 1, string value = 2 }
+#   Sample { double value = 1, int64 timestamp = 2 }
+
+
+def varint(n):
+    out = bytearray()
+    while True:
+        byte, n = n & 0x7F, n >> 7
+        out.append(byte | 0x80 if n else byte)
+        if not n:
+            return bytes(out)
+
+
+def field(number, data):
+    """A length delimited field"""
+    return varint(number << 3 | 2) + varint(len(data)) + data
+
+
+def label(name, value):
+    return field(1, name.encode()) + field(2, value.encode())
+
+
+def sample(value, timestamp_ms):
+    return (varint(1 << 3 | 1) + struct.pack("<d", value)
+            + varint(2 << 3) + varint(timestamp_ms))
+
+
+def timeseries(labels, value, timestamp_ms):
+    # Prometheus requires the labels sorted by name
+    labels = b"".join(field(1, label(k, v)) for k, v in sorted(labels.items()))
+    return field(1, labels + field(2, sample(value, timestamp_ms)))
+
+
+def push(series):
+    """series: (labels, value) pairs, all sampled now"""
+    timestamp_ms = int(time.time() * 1000)
+    body = snappy.compress(
+        b"".join(timeseries(labels, value, timestamp_ms) for labels, value in series))
+    request(urllib.request.Request(PROMETHEUS_WRITE_URL, data=body, method="POST", headers={
+        "Content-Type": "application/x-protobuf",
+        "Content-Encoding": "snappy",
+        "X-Prometheus-Remote-Write-Version": "0.1.0",
+    }))
+
+
+def main():
+    with open(os.path.join(os.environ["CREDENTIALS_DIRECTORY"], "slack-token")) as f:
+        token = f.read().strip()
+
+    counts = dict.fromkeys(TYPES, 0)
+    for member in members(token):
+        counts[kind(member)] += 1
+
+    push([({"__name__": "slack_workspace_members", "type": t}, n) for t, n in counts.items()])
+    print(" ".join(f"{t}={n}" for t, n in counts.items()))
+
+
+if __name__ == "__main__":
+    main()

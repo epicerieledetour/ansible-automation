@@ -27,6 +27,10 @@ grafana:
   hosts:
     srv1:
 
+slack_metrics:
+  hosts:
+    srv1:
+
 mattermost:
   hosts:
     b72:

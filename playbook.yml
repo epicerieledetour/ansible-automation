@@ -123,6 +123,15 @@
     - role: alloy
       tags: ["alloy"]
 
+# After grafana, whose prometheus receives the pushes
+- name: Setup Slack workspace metrics
+  hosts: slack_metrics
+  roles:
+    - role: systemd_handlers
+    - role: slack_metrics
+      tags: ["slack_metrics"]
+  tags: ["slack_metrics"]
+
   # Everything below is the old setup being migrated
 # ---
 # - name: "Setup Wireguard"

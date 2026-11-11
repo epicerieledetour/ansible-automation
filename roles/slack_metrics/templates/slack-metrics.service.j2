@@ -1,0 +1,17 @@
+[Unit]
+Description=Count the members of the Slack workspace for prometheus
+Wants=network-online.target
+After=network-online.target prometheus.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/slack-metrics
+# Readable only by this service, in $CREDENTIALS_DIRECTORY
+LoadCredential=slack-token:/etc/slack-metrics/token
+# It only talks to Slack and prometheus: a throwaway unprivileged user, with
+# a read-only view of the system
+DynamicUser=yes
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
