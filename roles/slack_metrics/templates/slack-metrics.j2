@@ -22,13 +22,14 @@ TYPES = ["full", "multi_channel_guest", "single_channel_guest", "bot", "deleted"
 
 
 def request(req, attempts=3):
-    """urlopen helper, retried on network errors and 5xx like curl --retry"""
+    """urlopen helper, retried on network errors, 5xx and 429 like curl --retry"""
     for attempt in range(1, attempts + 1):
         try:
             with urllib.request.urlopen(req, timeout=30) as resp:
                 return resp.read()
         except (urllib.error.URLError, OSError) as e:
-            final = isinstance(e, urllib.error.HTTPError) and e.code < 500
+            final = (isinstance(e, urllib.error.HTTPError)
+                     and e.code < 500 and e.code != 429)
             if final or attempt == attempts:
                 raise
             print(f"{req.full_url}: {e}, retrying", file=sys.stderr)
@@ -38,18 +39,33 @@ def request(req, attempts=3):
 # Slack
 
 
+# Errors where Slack answers with HTTP 200 but asks to retry, seen in the wild
+# as a fatal_error that lasted twenty minutes
+SLACK_TRANSIENT_ERRORS = {"fatal_error", "internal_error", "service_unavailable"}
+
+
+def users_page(token, cursor, attempts=3):
+    """One page of users.list, retried on Slack's transient errors"""
+    query = urllib.parse.urlencode({"limit": 200, "cursor": cursor}) # max limit of 200
+    req = urllib.request.Request(f"{SLACK_USERS_URL}?{query}",
+                                 headers={"Authorization": f"Bearer {token}"})
+    for attempt in range(1, attempts + 1):
+        resp = json.loads(request(req))
+        if resp.get("ok"):
+            return resp
+        # Slack answers errors (invalid_auth, missing_scope...) with HTTP 200
+        if resp.get("error") not in SLACK_TRANSIENT_ERRORS or attempt == attempts:
+            sys.exit(f"users.list: {json.dumps(resp)}")
+        print(f"users.list: {resp['error']}, retrying", file=sys.stderr)
+        time.sleep(10 * attempt)
+
+
 def members(token):
     """Every member of every page of users.list.
     Returns an iterator of every member fetched"""
     cursor = ""
     while True:
-        query = urllib.parse.urlencode({"limit": 200, "cursor": cursor}) # max limit of 200
-        req = urllib.request.Request(f"{SLACK_USERS_URL}?{query}",
-                                     headers={"Authorization": f"Bearer {token}"})
-        resp = json.loads(request(req))
-        # Slack answers errors (invalid_auth, missing_scope...) with HTTP 200
-        if not resp.get("ok"):
-            sys.exit(f"users.list: {json.dumps(resp)}")
+        resp = users_page(token, cursor)
         yield from resp["members"] #iterative return
         cursor = resp.get("response_metadata", {}).get("next_cursor", "")
         if not cursor:
