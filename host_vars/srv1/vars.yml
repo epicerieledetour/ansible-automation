@@ -1,5 +1,4 @@
 ---
-borg_passphrase: "{{ vault_borg_passphrase }}"
 # Second 300 GB SSD (/dev/sdb1 at the time of writing), dedicated to the
 # borg repositories.
 borg_storage_uuid: e147d65c-7a50-4c70-b245-6df61b47e24b

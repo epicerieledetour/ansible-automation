@@ -1,9 +1,12 @@
 ---
-- name: "Setting the borgmatic snippet path and name"
+# Resolved here: in the include's vars, role_path would be borgmatic_snippet's
+- name: "Setting the borgmatic snippet path"
   ansible.builtin.set_fact:
-    borgmatic_snippet_file: "{{ role_path }}/files/wordpress.yaml"
-    borgmatic_snippet_name: wordpress
+    wordpress_borgmatic_snippet_file: "{{ role_path }}/files/wordpress.yaml"
 
 - name: Setup borgmatic wordpress backup
   ansible.builtin.include_role:
     name: borgmatic_snippet
+  vars:
+    borgmatic_snippet_file: "{{ wordpress_borgmatic_snippet_file }}"
+    borgmatic_snippet_name: wordpress

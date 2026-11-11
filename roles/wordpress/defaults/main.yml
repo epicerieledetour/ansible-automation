@@ -6,5 +6,5 @@ wordpress_plugins:
   - login-with-google
   - polylang
   - duplicate-post
-wordpress_plugins_deactivated:
+wordpress_plugins_deleted:
   - akismet  # Bundled with WordPress

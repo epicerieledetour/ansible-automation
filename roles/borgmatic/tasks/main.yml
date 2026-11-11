@@ -29,6 +29,30 @@
         pkg:
           - borgmatic
 
+    - name: Make borgmatic timer drop-in directory
+      ansible.builtin.file:
+        path: /etc/systemd/system/borgmatic.timer.d
+        state: directory
+        mode: "0755"
+
+    # After the Google Drive sync, which starts at 1:00
+    - name: Schedule borgmatic
+      ansible.builtin.copy:
+        content: |
+          [Timer]
+          OnCalendar=
+          OnCalendar=*-*-* 4:00:00 America/Montreal
+          RandomizedDelaySec=0
+        dest: /etc/systemd/system/borgmatic.timer.d/schedule.conf
+        mode: "0644"
+
+    - name: Register borgmatic timer
+      ansible.builtin.systemd:
+        name: borgmatic.timer
+        enabled: true
+        state: started
+        daemon_reload: true
+
     - name: "Create backup folder on borg destinations"
       ansible.builtin.include_tasks:
         file: destination.yml

@@ -1,5 +1,6 @@
 ---
-borg_passphrase: "{{ vault_borg_passphrase }}"
+borgmatic_ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIH5ZlhqL9nNCxUVgxeDBs05hrvapMUMKPHuJZgZqwWE borgmatic@pi1"
+borgmatic_ssh_private_key: "{{ vault_borgmatic_ssh_private_key }}"
 ssh_host_private_ed25519_key: "{{ vault_ssh_host_private_ed25519_key }}"
 ssh_host_public_ed25519_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHI09EDIkejhEZxxNYusOwZKHbBzk4xUSiKxcthJ03YO root@(none)"
 wireguard_type: client

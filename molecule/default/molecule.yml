@@ -12,21 +12,21 @@ platforms:
 
   - name: pi1
     image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
-    memory_size: 2 # GB
+    memory_size: 2  # GB
     vcpu: 1
     disk_size: "16G"
     qemu_user: "libvirt-qemu"
 
   - name: srv1
     image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
-    memory_size: 2 # GB
+    memory_size: 2  # GB
     vcpu: 1
     disk_size: "16G"
     qemu_user: "libvirt-qemu"
 
   - name: vps2
     image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
-    memory_size: 2 # GB - bumped from 1: grafana+loki+alloy+prometheus stack OOMs the webserver VM at 1G
+    memory_size: 2  # GB - bumped from 1: grafana+loki+alloy+prometheus stack OOMs the webserver VM at 1G
     vcpu: 1
     disk_size: "16G"
     qemu_user: "libvirt-qemu"
@@ -34,7 +34,7 @@ platforms:
 
   - name: b72
     image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
-    memory_size: 2 # GB
+    memory_size: 2  # GB
     vcpu: 1
     disk_size: "16G"
     qemu_user: "libvirt-qemu"

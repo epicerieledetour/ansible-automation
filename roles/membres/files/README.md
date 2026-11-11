@@ -2,7 +2,7 @@
 
 ## Testing the certificates
 
-The following command ran on the Vagrant host should return a JSON file containing non-anonymized data:
+The following command ran on the Molecule host should return a JSON file containing non-anonymized data:
 
 ```
 curl --cert-type P12 --cert ledetour-membres-client.p12 -Lk https://membres.localhost:4430/members.json

@@ -22,6 +22,7 @@
       ansible.builtin.copy:
         src: "00-ldt-ed25519-only.conf"
         dest: /etc/ssh/sshd_config.d/00-ldt-ed25519-only.conf
+        mode: "0644"
       notify:
         - sshd changed
 

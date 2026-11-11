@@ -79,6 +79,14 @@
           https://chat.localhost/login returned {{ _mattermost_login.status }}:
           {{ _mattermost_login.content | default('') | truncate(300) }}
 
+    # The service has less capabilities than a root shell, so a backup that
+    # works by hand can still fail at night
+    - name: "Mattermost: the nightly backup service runs"
+      become: true
+      ansible.builtin.systemd_service:
+        name: borgmatic.service
+        state: started
+
   rescue:
     - name: "Mattermost: record failure"
       ansible.builtin.set_fact:

@@ -1,49 +1,61 @@
 ---
-- name: Install rclone for Raspberry Pi OS
-  ansible.builtin.apt:
-    pkg:
-      - rclone
+- name: Google Drive sync
+  become: true
+  block:
+    - name: Install rclone
+      ansible.builtin.apt:
+        pkg:
+          - rclone
 
-- name: Make {{ rclone_etc_dir }} directory
-  ansible.builtin.file:
-    path: "{{ rclone_etc_dir }}"
-    state: directory
-    mode: "0700"
+    - name: Make rclone configuration directory {{ rclone_etc_dir }}
+      ansible.builtin.file:
+        path: "{{ rclone_etc_dir }}"
+        state: directory
+        mode: "0700"
 
-- name: Instanciate rclone config
-  ansible.builtin.template:
-    src: rclone-ldt.conf.j2
-    dest: "{{ rclone_etc_dir }}/rclone-ldt.conf"
-    mode: "0400"
+    - name: Instanciate rclone config
+      ansible.builtin.template:
+        src: rclone-ldt.conf.j2
+        dest: "{{ rclone_etc_dir }}/rclone-ldt.conf"
+        mode: "0400"
 
-- name: Copying auth key for Le Détour Google Drives
-  ansible.builtin.copy:
-    src: drive-sync-on-ovh-server-50a335a0b68b.json
-    dest: "{{ rclone_etc_dir }}"
-    mode: "0400"
+    - name: Copying auth key for Le Détour Google Drives
+      ansible.builtin.copy:
+        src: drive-sync-on-ovh-server-50a335a0b68b.json
+        dest: "{{ rclone_etc_dir }}"
+        mode: "0400"
 
-- name: Make /srv/rclone directory
-  ansible.builtin.file:
-    path: /srv/rclone
-    state: directory
-    mode: "0700"
+    - name: Make /srv/rclone directory
+      ansible.builtin.file:
+        path: /srv/rclone
+        state: directory
+        mode: "0700"
 
-- name: Copying rclone sync systemd service
-  ansible.builtin.copy:
-    src: rclone-ldt.service
-    dest: /etc/systemd/system/
-  notify:
-    - systemd changed
+    - name: Copying rclone sync systemd service
+      ansible.builtin.copy:
+        src: rclone-ldt.service
+        dest: /etc/systemd/system/
+        mode: "0644"
+      notify:
+        - systemd changed
 
-- name: Copying rclone sync systemd timer
-  ansible.builtin.copy:
-    src: rclone-ldt.timer
-    dest: /etc/systemd/system/
-  notify:
-    - systemd changed
+    - name: Copying rclone sync systemd timer
+      ansible.builtin.copy:
+        src: rclone-ldt.timer
+        dest: /etc/systemd/system/
+        mode: "0644"
+      notify:
+        - systemd changed
 
-- name: Register rclone sync timers
-  ansible.builtin.systemd:
-    name: rclone-ldt.timer
-    enabled: true
-    state: started
+    # The sync downloads every drive: never run it from a development VM
+    - name: Register rclone sync timers
+      ansible.builtin.systemd:
+        name: rclone-ldt.timer
+        enabled: true
+        state: started
+        daemon_reload: true
+      when: deployment_is_prod | bool
+
+- name: Setup backup
+  ansible.builtin.include_tasks:
+    file: backup.yml

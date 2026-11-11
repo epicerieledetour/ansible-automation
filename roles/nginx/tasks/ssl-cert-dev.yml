@@ -1,5 +1,0 @@
----
-- name: Install ssl-cert for self-signed certificate
-  ansible.builtin.apt:
-    pkg:
-      - ssl-cert

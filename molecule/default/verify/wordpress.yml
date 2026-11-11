@@ -4,6 +4,48 @@
 
 - name: Wordpress
   block:
+    - name: "Wordpress: list PHP modules"
+      ansible.builtin.command:
+        cmd: php -m
+      changed_when: false
+      register: _wordpress_php_modules
+      failed_when: false
+
+    # https://make.wordpress.org/hosting/handbook/server-environment/#php-extensions
+    - name: "Wordpress: PHP extensions are loaded"
+      vars:
+        _wordpress_php_modules_expected:
+          - apcu
+          - bcmath
+          - curl
+          - dom
+          - exif
+          - fileinfo
+          - gd
+          - hash
+          - iconv
+          - igbinary
+          - imagick
+          - intl
+          - json
+          - mbstring
+          - mysqli
+          - openssl
+          - pcre
+          - shmop
+          - SimpleXML
+          - sodium
+          - xml
+          - xmlreader
+          - zip
+          - zlib
+          - "Zend OPcache"
+      ansible.builtin.assert:
+        that: _wordpress_php_modules_expected | difference(_wordpress_php_modules.stdout_lines) | length == 0
+        fail_msg: >-
+          Missing PHP extensions:
+          {{ _wordpress_php_modules_expected | difference(_wordpress_php_modules.stdout_lines) | join(', ') }}
+
     - name: "Wordpress: home page"
       ansible.builtin.uri:
         url: https://wordpress.localhost/

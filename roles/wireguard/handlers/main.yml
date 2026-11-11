@@ -4,4 +4,4 @@
   ansible.builtin.systemd:
     name: wg-quick@wg-ledetour.service
     state: restarted
-  listen: wireguard changed 
+  listen: wireguard changed

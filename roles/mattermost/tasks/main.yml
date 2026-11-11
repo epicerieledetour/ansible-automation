@@ -49,6 +49,16 @@
         encoding: UTF8
         template: template0
 
+    # borgmatic.service can't change user, so its pg_dump connects as root
+    - name: Create PostgreSQL user root
+      community.postgresql.postgresql_user:
+        name: root
+
+    - name: Let PostgreSQL user root read the database
+      community.postgresql.postgresql_membership:
+        groups: pg_read_all_data
+        target_roles: root
+
 - name: Mattermost as mattermost
   become: true
   become_user: mattermost

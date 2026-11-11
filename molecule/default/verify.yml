@@ -6,6 +6,21 @@
 # Each verify/<service>.yml records its failure in verify_failures instead of
 # aborting, so a single run reports every broken service.
 
+- name: Verify data proxies
+  hosts: dataproxies
+  gather_facts: false
+  vars:
+    verify_failures: []
+  tasks:
+    - name: Verify gdrivesync
+      ansible.builtin.include_tasks: verify/gdrivesync.yml
+
+    - name: Report
+      ansible.builtin.assert:
+        that: verify_failures | length == 0
+        fail_msg: "Failing checks: {{ verify_failures }}"
+        success_msg: "Data proxies verified"
+
 - name: Verify web services
   hosts: webservers
   gather_facts: false

@@ -5,12 +5,17 @@ membres.epicerieledetour.org, membres.localhost {
 
     tls {
         client_auth {
-            mode request
+            # Not "request": it accepts any certificate without checking it
+            mode verify_if_given
             trust_pool file {{ membres_client_ca_path }}
         }
     }
 
     route {
+        # The same URL serves anonymized or private data depending on the
+        # client certificate: never let a browser reuse a stored copy
+        header /members.json Cache-Control "no-store"
+
         @has_cert {
             path /members.json
             expression {http.request.tls.client.subject} != ""
@@ -21,14 +26,11 @@ membres.epicerieledetour.org, membres.localhost {
             expression {http.request.tls.client.subject} == ""
         }
 
+        # The JSON files live outside the web root: only this rewrite reaches them
+        root @has_cert {{ membres_root_dir }}
+        root @no_cert {{ membres_root_dir }}
         rewrite @has_cert /{{ membres_db_non_anonymized_name }}
         rewrite @no_cert /{{ membres_db_anonymized_name }}
-
-        @direct_access {
-            path /{{ membres_db_non_anonymized_name }} /{{ membres_db_anonymized_name }}
-            not vars_regexp {http.request.orig_uri} ^/members\.json$
-        }
-        respond @direct_access 404
     }
 }
 

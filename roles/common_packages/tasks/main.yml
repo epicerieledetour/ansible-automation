@@ -8,6 +8,13 @@
       - aptitude
       - ca-certificates
       - extrepo
+      - locales
       - python3
       - vim
 
+# ssh forwards the workstation's LANG. Without that locale, ls and other tools
+# fall back to C and escape accented file names.
+- name: Generate the en_CA.UTF-8 locale
+  become: true
+  community.general.locale_gen:
+    name: en_CA.UTF-8

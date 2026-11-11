@@ -1,0 +1,71 @@
+---
+# Checks the rclone setup against the real drives without syncing them: the
+# drives are only listed, and the one sync is a dry run limited to their top
+# level. Nothing is downloaded, and the output is never printed.
+- name: Gdrivesync
+  become: true
+  vars:
+    _rclone: rclone --config /usr/local/etc/rclone/rclone-ldt.conf
+  block:
+    - name: "Gdrivesync: the sync timer"
+      ansible.builtin.systemd_service:
+        name: rclone-ldt.timer
+      register: _gdrivesync_timer
+
+    - name: "Gdrivesync: the sync timer never runs in development"
+      ansible.builtin.assert:
+        that:
+          - _gdrivesync_timer.status.ActiveState == 'inactive'
+          - _gdrivesync_timer.status.UnitFileState == 'disabled'
+        fail_msg: >-
+          rclone-ldt.timer is {{ _gdrivesync_timer.status.ActiveState }} and
+          {{ _gdrivesync_timer.status.UnitFileState }}
+
+    - name: "Gdrivesync: units are valid"
+      ansible.builtin.command:
+        cmd: systemd-analyze verify rclone-ldt.service rclone-ldt.timer
+      changed_when: false
+
+    - name: "Gdrivesync: every remote is configured"
+      ansible.builtin.command:
+        cmd: "{{ _rclone }} listremotes"
+      register: _gdrivesync_remotes
+      changed_when: false
+
+    - name: "Gdrivesync: AllDrives is configured"
+      ansible.builtin.assert:
+        that: "'AllDrives:' in _gdrivesync_remotes.stdout_lines"
+        fail_msg: AllDrives is missing from the rclone config
+
+    - name: "Gdrivesync: the service account reads every drive"
+      ansible.builtin.command:
+        cmd: "{{ _rclone }} lsd {{ item }}"
+      loop: >-
+        {{ _gdrivesync_remotes.stdout_lines
+           | reject('in', ['AllDrives:', 'DETOUR-BASE:']) }}
+      changed_when: false
+      no_log: true
+
+    - name: "Gdrivesync: the sync command works, as a dry run"
+      ansible.builtin.command:
+        cmd: "{{ _rclone }} sync --dry-run --max-depth 1 AllDrives: /srv/rclone"
+      changed_when: false
+      no_log: true
+
+    - name: "Gdrivesync: find what the sync left behind"
+      ansible.builtin.find:
+        paths: /srv/rclone
+        file_type: any
+        hidden: true
+      register: _gdrivesync_files
+
+    - name: "Gdrivesync: nothing was downloaded"
+      ansible.builtin.assert:
+        that: _gdrivesync_files.matched == 0
+        fail_msg: "/srv/rclone holds {{ _gdrivesync_files.matched }} entries"
+
+  rescue:
+    - name: "Gdrivesync: record failure"
+      ansible.builtin.set_fact:
+        verify_failures: >-
+          {{ verify_failures + ['gdrivesync: ' ~ ansible_failed_task.name] }}

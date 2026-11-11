@@ -14,5 +14,4 @@
       tags: ["always"]
 
 - name: Execute the root playbook
-  ansible.builtin.import_playbook: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/playbook.yml"
-
+  ansible.builtin.import_playbook: ../../playbook.yml

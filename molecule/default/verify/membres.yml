@@ -18,6 +18,32 @@
           https://membres.localhost/ returned {{ _membres_home.status }}:
           {{ _membres_home.content | default('') | truncate(300) }}
 
+    - name: "Membres: public members.json"
+      ansible.builtin.uri:
+        url: https://membres.localhost/members.json
+        validate_certs: false
+        return_content: true
+      register: _membres_json
+      failed_when: false
+
+    - name: "Membres: public members.json is anonymized"
+      ansible.builtin.assert:
+        that:
+          - _membres_json.status == 200
+          - (_membres_json.content | from_json).contains_private_data == false
+        fail_msg: >-
+          https://membres.localhost/members.json returned
+          {{ _membres_json.status }}
+
+    - name: "Membres: the data files are not served directly"
+      ansible.builtin.uri:
+        url: "https://membres.localhost/{{ item }}"
+        validate_certs: false
+        status_code: 404
+      loop:
+        - members-non_anonymized.json
+        - members-anonymized.json
+
   rescue:
     - name: "Membres: record failure"
       ansible.builtin.set_fact:

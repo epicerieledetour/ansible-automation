@@ -1,0 +1,14 @@
+---
+# Resolved here: in the include's vars, role_path would be borgmatic_snippet's
+- name: "Setting the borgmatic snippet path"
+  ansible.builtin.set_fact:
+    gdrivesync_borgmatic_snippet_file: "{{ role_path }}/files/gdrive.yaml"
+
+- name: Setup borgmatic Google Drive backup
+  ansible.builtin.include_role:
+    name: borgmatic_snippet
+  vars:
+    borgmatic_snippet_file: "{{ gdrivesync_borgmatic_snippet_file }}"
+    borgmatic_snippet_name: gdrive
+    borgmatic_snippet_extract_paths:
+      - /srv/rclone

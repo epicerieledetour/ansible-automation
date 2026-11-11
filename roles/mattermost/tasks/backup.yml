@@ -11,15 +11,17 @@
     - never
     - borgmatic_restore
 
-- name: "Setting the borgmatic snippet path and name"
+# Resolved here: in the include's vars, role_path would be borgmatic_snippet's
+- name: "Setting the borgmatic snippet path"
   ansible.builtin.set_fact:
-    borgmatic_snippet_file: "{{ role_path }}/files/mattermost.yaml"
-    borgmatic_snippet_name: mattermost
+    mattermost_borgmatic_snippet_file: "{{ role_path }}/files/mattermost.yaml"
 
 - name: Setup borgmatic mattermost backup
   ansible.builtin.include_role:
     name: borgmatic_snippet
   vars:
+    borgmatic_snippet_file: "{{ mattermost_borgmatic_snippet_file }}"
+    borgmatic_snippet_name: mattermost
     # The attachments and config.json, next to the database
     borgmatic_snippet_extract_paths:
       - "{{ mattermost_root_dir }}"

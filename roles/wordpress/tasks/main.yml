@@ -14,11 +14,16 @@
       ansible.builtin.apt:
         update_cache: true
         pkg:
+          - ghostscript  # For PDF thumbnails through imagick
           - mariadb-server
+          - "php{{ wordpress_php_version }}-apcu"
+          - "php{{ wordpress_php_version }}-bcmath"
           - "php{{ wordpress_php_version }}-cli"
           - "php{{ wordpress_php_version }}-curl"
           - "php{{ wordpress_php_version }}-fpm"
           - "php{{ wordpress_php_version }}-gd"
+          - "php{{ wordpress_php_version }}-igbinary"
+          - "php{{ wordpress_php_version }}-imagick"
           - "php{{ wordpress_php_version }}-intl"
           - "php{{ wordpress_php_version }}-mbstring"
           - "php{{ wordpress_php_version }}-mysql"
@@ -27,6 +32,7 @@
           - "php{{ wordpress_php_version }}-xmlrpc"
           - "php{{ wordpress_php_version }}-zip"
           - python3-pymysql  # For the community.mysql.* modules
+          - tzdata-legacy  # Deprecated time zone names are fatal to WordPress without it
 
     # Wordpress CLI
 
@@ -79,7 +85,7 @@
     - name: Create wp-config.php
       ansible.builtin.command:
         chdir: "{{ wordpress_root_dir }}"
-        cmd: "{{ wordpress_wp_cli }} config create --dbname={{ wordpress_db_name}} --dbuser={{ wordpress_db_user }} --dbpass={{ wordpress_db_password }}"
+        cmd: "{{ wordpress_wp_cli }} config create --dbname={{ wordpress_db_name }} --dbuser={{ wordpress_db_user }} --dbpass={{ wordpress_db_password }}"
       changed_when:
         - _task.result.rc == 0
       failed_when:
@@ -104,10 +110,13 @@
     - name: Initialize wordpress
       ansible.builtin.command:
         chdir: "{{ wordpress_root_dir }}"
-        cmd: "{{ wordpress_wp_cli }} core install --skip-email --url={{ wordpress_url }} --title=\"{{ wordpress_title }}\" --admin_user={{ wordpress_admin_user }} --admin_password={{ wordpress_admin_password }} --admin_email={{ wordpress_admin_email }}"
+        cmd: >-
+          {{ wordpress_wp_cli }} core install --skip-email --url={{ wordpress_url }} --title="{{ wordpress_title }}"
+          --admin_user={{ wordpress_admin_user }} --admin_password={{ wordpress_admin_password }}
+          --admin_email={{ wordpress_admin_email }}
       changed_when:
-         - _task.result.rc == 0
-         - '_task.result.stdout.startswith("Success")'
+        - _task.result.rc == 0
+        - '_task.result.stdout.startswith("Success")'
 
     - name: Install and activate plugins
       ansible.builtin.command:
@@ -133,12 +142,12 @@
         - _task.result.rc != 0
         - '"No plugin auto-updates enabled." not in _task.result.stderr'
 
-    - name: Deactivate plugins
+    - name: Delete plugins
       ansible.builtin.command:
         chdir: "{{ wordpress_root_dir }}"
-        cmd: "{{ wordpress_wp_cli }} plugin deactivate {{ wordpress_plugins_deactivated | join(' ') }}"
+        cmd: "{{ wordpress_wp_cli }} plugin delete {{ wordpress_plugins_deleted | join(' ') }}"
       changed_when:
-        - '"Deactivated" in _task.result.stdout'
+        - '"Deleted" in _task.result.stdout'
 
     # WP_HOME and WP_SITEURL override the URL stored in the database at install
     # time, which WordPress uses for every redirect (e.g. wp-login.php)
@@ -163,6 +172,7 @@
     dest: /etc/caddy/sites.d/wordpress.caddy
     owner: caddy
     group: caddy
+    mode: "0644"
   notify: caddy changed
 
 - name: Setup backup
