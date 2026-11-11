@@ -6,7 +6,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Active, non-guest, human members",
+      "description": "Active, non-guest, human members. The Slack for Nonprofits free Pro plan covers workspaces of 250 or fewer members.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -21,18 +21,18 @@
               },
               {
                 "color": "orange",
-                "value": 450
+                "value": 200
               },
               {
                 "color": "red",
-                "value": 500
+                "value": 250
               }
             ]
           },
           "decimals": 0,
           "unit": "none",
           "min": 0,
-          "max": 500
+          "max": 250
         },
         "overrides": []
       },
