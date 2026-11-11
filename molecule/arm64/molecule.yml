@@ -11,23 +11,36 @@ driver:
 
 platforms:
 
-  - name: vps2
+  - name: pi1
     arch: aarch64
     domain_type: qemu   # no /dev/kvm in the Fusion VM -> software emulation
     image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-arm64.qcow2"
-    memory_size: 2 # GB - bumped from 1: grafana+loki+alloy+prometheus stack OOMs the webserver VM at 1G
+    memory_size: 2 # GB
     vcpu: 1
     disk_size: "16G"
     qemu_user: "libvirt-qemu"
 
-  - name: pi1
+  - name: srv1
     arch: aarch64
     domain_type: qemu
     image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-arm64.qcow2"
-    memory_size: 1 # GB
+    memory_size: 2 # GB - the grafana+loki+alloy+prometheus stack OOMs at 1G
     vcpu: 1
     disk_size: "16G"
     qemu_user: "libvirt-qemu"
+
+  - name: vps2
+    arch: aarch64
+    domain_type: qemu
+    image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-arm64.qcow2"
+    memory_size: 2 # GB
+    vcpu: 1
+    disk_size: "16G"
+    qemu_user: "libvirt-qemu"
+
+  # b72 is omitted on purpose: its 40 GB disk and the Mattermost import do not
+  # fit alongside three emulated VMs on a 16 GB laptop. The mattermost play
+  # reports "no hosts matched" here, which is harmless.
 
 provisioner:
   name: ansible
