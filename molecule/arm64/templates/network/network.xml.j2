@@ -2,9 +2,12 @@
   <name>{{ molecule_network_name }}</name>
   <bridge name="{{ item.molecule_bridge if item.molecule_bridge is defined else molecule_bridge }}"/>
   <forward/>
+  <!-- Fusion's NAT resolver returns malformed responses to EDNS queries, and
+       dhcpcd drops the host's resolv.conf on every lease renewal. Explicit
+       forwarders make dnsmasq independent of both. -->
   <dns>
-    <forwarder addr="1.1.1.1"/>
     <forwarder addr="9.9.9.9"/>
+    <forwarder addr="149.112.112.112"/>
   </dns>
   <ip address="{{ (item.molecule_network_cidr if item.molecule_network_cidr is defined else molecule_network_cidr ) | ansible.utils.ipaddr('next_usable') }}" netmask="{{ (item.molecule_network_cidr if item.molecule_network_cidr is defined else molecule_network_cidr ) | ansible.utils.ipaddr('netmask') }}">
     <dhcp>
