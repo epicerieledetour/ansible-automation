@@ -71,3 +71,18 @@
         that: verify_failures | length == 0
         fail_msg: "Failing checks: {{ verify_failures }}"
         success_msg: "Mattermost verified"
+
+- name: Verify slack metrics
+  hosts: slack_metrics
+  gather_facts: false
+  vars:
+    verify_failures: []
+  tasks:
+    - name: Verify slack metrics
+      ansible.builtin.include_tasks: verify/slack_metrics.yml
+
+    - name: Report
+      ansible.builtin.assert:
+        that: verify_failures | length == 0
+        fail_msg: "Failing checks: {{ verify_failures }}"
+        success_msg: "Slack metrics verified"

@@ -107,6 +107,19 @@
             mode: u=rw,g=r,o=r
           notify: prometheus changed
 
+        # The remote write receiver takes the pushes of the slack_metrics role
+        - name: Set prometheus flags
+          ansible.builtin.lineinfile:
+            path: /etc/default/prometheus
+            regexp: "^ARGS="
+            line: >-
+              ARGS="--storage.tsdb.retention.time={{
+              grafana_prometheus_retention_time }}
+              --storage.tsdb.retention.size={{
+              grafana_prometheus_retention_size }}
+              --web.enable-remote-write-receiver"
+          notify: prometheus changed
+
         - name: Start prometheus
           ansible.builtin.systemd:
             name: prometheus
