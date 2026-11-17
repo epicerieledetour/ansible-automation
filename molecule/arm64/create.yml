@@ -1,0 +1,315 @@
+---
+- name: Create
+  hosts: localhost
+  gather_facts: false
+  no_log: "{{ molecule_no_log }}"
+
+  vars:
+    molecule_scenario_name: "{{ lookup('env', 'MOLECULE_SCENARIO_NAME') }}"
+    user_home_directory: "{{ lookup('env', 'HOME') }}"
+    molecule_dns_suffix: "molecule.lab"
+    molecule_network_name: "molecule-libvirt"
+    molecule_bridge: "molecule-br0"
+    molecule_ssh_user: "molecule"
+    molecule_private_key_path: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/id_ssh_rsa"
+    libvirt_default_image_path: "{{ user_home_directory }}/.local/molecule/{{ molecule_scenario_name }}/vms"
+    libvirt_vm_arch: "x86_64"
+    libvirt_uri: "qemu:///system"
+    image_url: "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
+    default_disk_size: "15G"
+    default_memory_size: "1"
+    default_vcpu: "1"
+    default_ssh_port: "22"
+    qemu_user: "qemu"
+    mac: "52:54:00:ab:cd:"  # first 5 two-digit hexadecimal numbers
+    molecule_network_cidr: "10.10.10.0/24"
+    temp_folder: "/tmp"
+
+  tasks:
+    - name: Ensure default vm folder exists
+      ansible.builtin.file:
+        path: "{{ libvirt_default_image_path }}"
+        state: directory
+        mode: "0755"
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ item.libvirt_host if item.libvirt_host is defined else 'localhost' }}"
+
+    - name: Allow qemu process read qcow2 images in home directory
+      ansible.posix.acl:
+        path: "{{ user_home_directory }}"
+        entity: "{{ item.qemu_user | default(qemu_user) }}"
+        etype: user
+        permissions: x
+        state: present
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ item.libvirt_host if item.libvirt_host is defined else 'localhost' }}"
+
+    - name: Allow qemu process read qcow2 images in .local directory
+      ansible.posix.acl:
+        path: "{{ user_home_directory }}/.local"
+        entity: "{{ item.qemu_user | default(qemu_user) }}"
+        etype: user
+        permissions: x
+        state: present
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ item.libvirt_host if item.libvirt_host is defined else 'localhost' }}"
+
+    - name: Create network molecule network
+      community.libvirt.virt_net:
+        command: define
+        name: "{{ molecule_network_name }}"
+        xml: "{{ lookup('template', 'network/network.xml.j2') }}"
+        uri: "{{ qemu_uri }}"
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: (item.network_name is not defined) and (item.bridge_name is not defined)
+      vars:
+        qemu_uri: >-
+          {{ 'qemu+ssh://' + item.libvirt_user + '@' + item.libvirt_host + '/system'
+          if item.libvirt_host is defined else libvirt_uri }}
+
+    - name: Start network molecule network
+      community.libvirt.virt_net:
+        command: start
+        name: "{{ molecule_network_name }}"
+        uri: >-
+          {{ 'qemu+ssh://' + item.libvirt_user + '@' + item.libvirt_host + '/system'
+          if item.libvirt_host is defined else libvirt_uri }}
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: (item.network_name is not defined) and (item.bridge_name is not defined)
+
+    - name: Get qcow2 image
+      ansible.builtin.get_url:
+        url: "{{ item.image_url | default(image_url) }}"
+        dest: "{{ libvirt_default_image_path }}/{{ item.name }}.qcow2"
+        mode: "0660"
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ item.libvirt_host | default('localhost') }}"
+
+    - name: Generate OpenSSH key pair
+      community.crypto.openssh_keypair:
+        path: "{{ molecule_private_key_path }}"
+        size: 4096
+      register: ssh_key
+      delegate_to: "localhost"
+
+    - name: Create temporary folder
+      ansible.builtin.file:
+        path: "{{ temp_folder }}/{{ item.name }}-molecule"
+        state: directory
+        mode: "0755"
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ item.libvirt_host | default('localhost') }}"
+
+    - name: Create user-data from template
+      ansible.builtin.template:
+        src: user-data.j2
+        dest: "{{ temp_folder }}/{{ item.name }}-molecule/user-data"
+        mode: "0644"
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ item.libvirt_host | default('localhost') }}"
+
+    - name: Create meta-data from template
+      ansible.builtin.template:
+        src: meta-data.j2
+        dest: "{{ temp_folder }}/{{ item.name }}-molecule/meta-data"
+        mode: "0644"
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ item.libvirt_host | default('localhost') }}"
+
+    - name: Create cloud-init iso file
+      community.general.iso_create:
+        src_files:
+          - "{{ temp_folder }}/{{ item.name }}-molecule/user-data"
+          - "{{ temp_folder }}/{{ item.name }}-molecule/meta-data"
+        dest_iso: "{{ libvirt_default_image_path }}/{{ item.name }}-cloud-init.iso"
+        interchange_level: 4
+        joliet: 3
+        rock_ridge: "1.09"
+        vol_ident: "cidata"
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ item.libvirt_host | default('localhost') }}"
+
+    - name: Remove temporary folder
+      ansible.builtin.file:
+        path: "{{ temp_folder }}/{{ item.name }}-molecule"
+        state: absent
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ item.libvirt_host | default('localhost') }}"
+
+    - name: Create an image shell with the desired size
+      ansible.builtin.command:
+        cmd: >-
+          qemu-img create -f qcow2 -o preallocation=metadata
+          {{ item.name }}-temp.qcow2
+          {{ item.disk_size | default(default_disk_size) }}
+        chdir: "{{ libvirt_default_image_path }}"
+      environment:
+        LIBGUESTFS_BACKEND: direct
+      changed_when: true
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ item.libvirt_host | default('localhost') }}"
+
+    - name: Expand original image on the new sized volume
+      ansible.builtin.shell: |
+        set -e
+        umask 0002
+        virt-resize --quiet --expand {{ item.image_volume | default('/dev/sda1') }} {{ item.name }}.qcow2 {{ item.name }}-temp.qcow2
+        touch "{{ libvirt_default_image_path }}/.{{ item.name }}-expanded"
+      args:
+        chdir: "{{ libvirt_default_image_path }}"
+        creates: "{{ libvirt_default_image_path }}/.{{ item.name }}-expanded"
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ item.libvirt_host | default('localhost') }}"
+
+    - name: Move temporary file to main image
+      ansible.builtin.command:
+        cmd: "mv {{ item.name }}-temp.qcow2 {{ item.name }}.qcow2"
+        chdir: "{{ libvirt_default_image_path }}"
+      changed_when: true
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ item.libvirt_host if item.libvirt_host is defined else 'localhost' }}"
+
+    - name: Define vm from xml file
+      community.libvirt.virt:
+        command: define
+        xml: "{{ lookup('template', 'vm/vm.xml.j2') }}"
+        uri: >-
+          {{ 'qemu+ssh://' + item.libvirt_user + '@' + item.libvirt_host + '/system'
+          if item.libvirt_host is defined else libvirt_uri }}
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Start molecule vm(s)
+      community.libvirt.virt:
+        name: "{{ item.name }}"
+        command: start
+        uri: >-
+          {{ 'qemu+ssh://' + item.libvirt_user + '@' + item.libvirt_host + '/system'
+          if item.libvirt_host is defined else libvirt_uri }}
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      register: server
+
+    - name: Get instance(s) ip address from DHCP leases
+      community.libvirt.virt_net:
+        command: info
+        name: "{{ network_name }}"
+        uri: "{{ qemu_uri }}"
+      register: net_lease_info
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      vars:
+        qemu_uri: >-
+          {{ 'qemu+ssh://' + item.libvirt_user + '@' + item.libvirt_host + '/system'
+          if item.libvirt_host is defined else libvirt_uri }}
+        network_name: "{{ item.network_name | default(molecule_network_name) }}"
+        sanitized_name: "{{ item.name | regex_replace('[^a-zA-Z0-9-]', '') }}"
+      when: item.bridge_name is not defined
+      until: >-
+        net_lease_info.networks is defined and
+        network_name in (net_lease_info.networks | default({})) and
+        (net_lease_info.networks[network_name].dhcp_leases | default([]) |
+        selectattr('hostname', 'equalto', sanitized_name) | list | length) > 0
+      retries: 30
+      delay: 5
+
+    - name: Extract instance IP from DHCP leases
+      ansible.builtin.set_fact:
+        instance_ip_local: "{{ instance_ip_local | default([]) + [{'name': item.item.name, 'stdout': ip_addr}] }}"
+      loop: "{{ net_lease_info.results }}"
+      loop_control:
+        label: "{{ item.item.name | default('skipped') }}"
+      vars:
+        network_name: "{{ item.item.network_name | default(molecule_network_name) }}"
+        sanitized_name: "{{ item.item.name | regex_replace('[^a-zA-Z0-9-]', '') }}"
+        ip_addr: >-
+          {{ item.networks[network_name].dhcp_leases |
+          selectattr('hostname', 'equalto', sanitized_name) |
+          map(attribute='ipaddr') | first }}
+      when: item.networks is defined
+
+    - name: Wait 35 seconds for arp table update
+      ansible.builtin.pause:
+        seconds: 35
+      vars:
+        jmesquery: "[].bridge_name"
+      when: (molecule_yml.platforms | json_query(jmesquery)) != []
+
+    - name: Get instance(s) running on remote host(s)  # noqa: risky-shell-pipe
+      ansible.builtin.shell:
+        cmd: |
+          arp -n {{ item.name }} |
+          grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b"
+      changed_when: false
+      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      register: instance_ip_address_remote
+      when: item.bridge_name is defined
+
+    - name: Merge ip address list
+      ansible.builtin.set_fact:
+        instance_ip_address: "{{ (instance_ip_local | default([])) +
+          (instance_ip_address_remote.results |
+          json_query('[?stdout].{name: item.name, stdout: stdout}')) }}"
+
+    - name: Write instance config  # noqa: name[missing]
+      when: instance_ip_address != []
+      block:
+
+        - name: Populate instance config dict
+          ansible.builtin.set_fact:
+            instance_conf_dict: {
+              'instance': "{{ item.name }}",
+              'address': "{{ instance_ip_address | json_query(ip_query) }}",
+              'user': "{{ molecule_ssh_user }}",
+              'port': "{{ item.ssh_port | default(default_ssh_port) }}",
+              'identity_file': "{{ molecule_private_key_path }}",
+            }
+          loop: "{{ molecule_yml.platforms }}"
+          loop_control:
+            label: "{{ item.name }}"
+          register: instance_config_dict
+          vars:
+            ip_query: "[?name=='{{ item.name }}'].stdout | [0]"
+
+        - name: Convert instance config dict to a list
+          ansible.builtin.set_fact:
+            instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
+
+        - name: Dump instance config
+          ansible.builtin.copy:
+            content: "{{ instance_conf | to_json | from_json | to_yaml }}"
+            dest: "{{ molecule_instance_config }}"
+            mode: "0600"

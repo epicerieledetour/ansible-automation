@@ -1,0 +1,14 @@
+<network>
+  <name>{{ molecule_network_name }}</name>
+  <bridge name="{{ item.molecule_bridge if item.molecule_bridge is defined else molecule_bridge }}"/>
+  <forward/>
+  <dns>
+    <forwarder addr="1.1.1.1"/>
+    <forwarder addr="9.9.9.9"/>
+  </dns>
+  <ip address="{{ (item.molecule_network_cidr if item.molecule_network_cidr is defined else molecule_network_cidr ) | ansible.utils.ipaddr('next_usable') }}" netmask="{{ (item.molecule_network_cidr if item.molecule_network_cidr is defined else molecule_network_cidr ) | ansible.utils.ipaddr('netmask') }}">
+    <dhcp>
+      <range start="{{ (item.molecule_network_cidr if item.molecule_network_cidr is defined else molecule_network_cidr) | ansible.utils.next_nth_usable(2) }}" end="{{ (item.molecule_network_cidr if item.molecule_network_cidr is defined else molecule_network_cidr) | ansible.utils.ipaddr('last_usable') }}"/>
+    </dhcp>
+  </ip>
+</network>

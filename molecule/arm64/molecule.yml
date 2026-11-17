@@ -1,0 +1,47 @@
+---
+# arm64 variant of the default scenario, for Apple Silicon (no nested KVM).
+# Reuses default's converge/verify; only the VM layer differs.
+dependency:
+  name: galaxy
+  options:
+    requirements-file: requirements.yml
+
+driver:
+  name: libvirt
+
+platforms:
+
+  - name: vps2
+    arch: aarch64
+    domain_type: qemu   # no /dev/kvm in the Fusion VM -> software emulation
+    image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-arm64.qcow2"
+    memory_size: 2 # GB - bumped from 1: grafana+loki+alloy+prometheus stack OOMs the webserver VM at 1G
+    vcpu: 1
+    disk_size: "16G"
+    qemu_user: "libvirt-qemu"
+
+  - name: pi1
+    arch: aarch64
+    domain_type: qemu
+    image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-arm64.qcow2"
+    memory_size: 1 # GB
+    vcpu: 1
+    disk_size: "16G"
+    qemu_user: "libvirt-qemu"
+
+provisioner:
+  name: ansible
+  playbooks:
+    create: create.yml
+    destroy: destroy.yml
+    converge: ../default/converge.yml
+    verify: ../default/verify.yml
+  config_options:
+    defaults:
+      vault_password_file: "${MOLECULE_PROJECT_DIRECTORY}/vault_password.sh"
+  inventory:
+    links:
+      hosts: "${MOLECULE_PROJECT_DIRECTORY}/inventory/groups.yml"
+
+verifier:
+  name: ansible

@@ -4,7 +4,9 @@ global:
 scrape_configs:
   - job_name: node
     static_configs:
-      - targets:
 {% for host in groups['servers'] %}
+      - targets:
           - "{{ hostvars[host].wireguard_address }}:9100"
+        labels:
+          instance: "{{ host }}"
 {% endfor %}
