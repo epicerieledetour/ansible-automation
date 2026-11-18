@@ -1,0 +1,9 @@
+---
+# A oneshot: started means run to completion, so that a bad token or
+# unreachable Slack fails the deployment rather than the next hourly timer
+- name: Run slack-metrics
+  become: true
+  ansible.builtin.systemd:
+    name: slack-metrics.service
+    state: started
+  listen: slack-metrics changed

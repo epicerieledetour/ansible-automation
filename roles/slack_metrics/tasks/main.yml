@@ -1,0 +1,59 @@
+---
+- name: Slack metrics
+  become: true
+  block:
+
+    - name: Install python3-snappy
+      ansible.builtin.apt:
+        pkg:
+          - python3
+          - python3-snappy  # Remote write bodies are snappy compressed
+
+    - name: Make /etc/slack-metrics directory
+      ansible.builtin.file:
+        path: /etc/slack-metrics
+        state: directory
+        mode: u=rwx,g=,o=
+
+    - name: Instanciate slack token
+      ansible.builtin.copy:
+        content: "{{ slack_metrics_token }}"
+        dest: /etc/slack-metrics/token
+        mode: u=rw,g=,o=
+      no_log: true
+      notify:
+        - slack-metrics changed
+
+    - name: Instanciate slack-metrics script
+      ansible.builtin.template:
+        src: slack-metrics.j2
+        dest: /usr/local/bin/slack-metrics
+        mode: u=rwx,g=rx,o=rx
+      notify:
+        - slack-metrics changed
+
+    - name: Instanciate slack-metrics systemd service
+      ansible.builtin.template:
+        src: slack-metrics.service.j2
+        dest: /etc/systemd/system/slack-metrics.service
+        mode: u=rw,g=r,o=r
+      notify:
+        - systemd changed
+        - slack-metrics changed
+
+    - name: Instanciate slack-metrics systemd timer
+      ansible.builtin.copy:
+        src: slack-metrics.timer
+        dest: /etc/systemd/system/slack-metrics.timer
+        mode: u=rw,g=r,o=r
+      notify:
+        - systemd changed
+
+    - name: Force handlers to run immediately
+      ansible.builtin.meta: flush_handlers
+
+    - name: Enable slack-metrics systemd timer
+      ansible.builtin.systemd:
+        name: slack-metrics.timer
+        enabled: true
+        state: started

@@ -1,0 +1,3 @@
+---
+# Bot token (xoxb-) of the "member count" Slack app, scope users:read only
+slack_metrics_token: "{{ vault_slack_metrics_token }}"

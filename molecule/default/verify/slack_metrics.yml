@@ -1,0 +1,37 @@
+---
+# Runs slack-metrics once, calls the real Slack API with the vault's
+# token and pushes to prometheus, then queries prometheus for the result.
+
+- name: Slack metrics
+  block:
+    - name: "Slack metrics: run slack-metrics"
+      become: true
+      ansible.builtin.systemd:
+        name: slack-metrics.service
+        state: started
+
+    - name: "Slack metrics: query prometheus"
+      ansible.builtin.uri:
+        url: >-
+          http://localhost:9090/api/v1/query?query={{
+          _slack_query | urlencode }}
+        return_content: true
+      vars:
+        _slack_query: 'max(slack_workspace_members{type="full"})'
+      register: _slack_metrics
+
+    - name: "Slack metrics: member count was pushed"
+      ansible.builtin.assert:
+        that:
+          - _slack_metrics.json.data.result | length == 1
+          - _slack_metrics.json.data.result[0].value[1] | int > 0
+        fail_msg: >-
+          No slack_workspace_members{type="full"} in prometheus,
+          see journalctl -u slack-metrics
+
+  rescue:
+    - name: "Slack metrics: record failure"
+      ansible.builtin.set_fact:
+        verify_failures: >-
+          {{ verify_failures
+          + ['slack_metrics: ' ~ ansible_failed_result.msg] }}

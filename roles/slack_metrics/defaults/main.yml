@@ -1,0 +1,3 @@
+---
+# Remote write destination of the prometheus of the grafana role, on this host
+slack_metrics_prometheus_write_url: http://localhost:9090/api/v1/write
