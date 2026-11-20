@@ -16,15 +16,6 @@
         group: root
         mode: "0755"
 
-    - name: Enable Node Exporter textfile collector
-      ansible.builtin.lineinfile:
-        path: /etc/default/prometheus-node-exporter
-        regexp: '^ARGS='
-        line: 'ARGS="--collector.textfile.directory=/var/lib/prometheus/node-exporter"'
-        create: true
-        mode: "0644"
-      notify: Restart prometheus-node-exporter
-
     - name: Start prometheus-node-exporter
       ansible.builtin.systemd:
         name: prometheus-node-exporter
