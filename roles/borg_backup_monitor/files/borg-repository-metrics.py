@@ -1,19 +1,18 @@
 #!/usr/bin/python3
-"""Publish Borg repository freshness and reachability metrics."""
+"""Update Borg backup freshness metrics when borgmatic hooks fire."""
 
+import fcntl
 import json
 import os
-import signal
-import subprocess
 import tempfile
-from datetime import datetime
+import time
 from pathlib import Path
 
 
 TARGETS_DIR = Path("/etc/borg-backup-monitor/repositories.d")
 STATE_PATH = Path("/var/lib/borg-backup-monitor/state.json")
+LOCK_PATH = Path("/var/lib/borg-backup-monitor/metrics.lock")
 METRIC_PATH = Path("/var/lib/prometheus/node-exporter/borg-backups.prom")
-COMMAND_TIMEOUT_SECONDS = 30
 
 
 def escape_label(value: str) -> str:
@@ -25,70 +24,33 @@ def load_state() -> dict[str, dict[str, float | bool]]:
         content = json.loads(STATE_PATH.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError, OSError):
         return {}
-    return content if isinstance(content, dict) else {}
+    if not isinstance(content, dict):
+        return {}
+
+    # Preserve successful-backup timestamps written by the previous poller.
+    state: dict[str, dict[str, float | bool]] = {}
+    for repository, value in content.items():
+        if not isinstance(value, dict):
+            continue
+        timestamp = value.get("last_success_timestamp", value.get("last_archive_timestamp", 0.0))
+        has_archive = value.get("has_archive", timestamp > 0)
+        state[str(repository)] = {
+            "last_success_timestamp": float(timestamp),
+            "has_archive": bool(has_archive),
+            "last_attempt_timestamp": float(value.get("last_attempt_timestamp", 0.0)),
+            "last_attempt_success": bool(value.get("last_attempt_success", True)),
+        }
+    return state
 
 
-def parse_archives(payload: object) -> list[dict[str, object]]:
-    if isinstance(payload, list):
-        archives: list[dict[str, object]] = []
-        for item in payload:
-            archives.extend(parse_archives(item))
-        return archives
-    if isinstance(payload, dict):
-        archives = payload.get("archives")
-        if isinstance(archives, list):
-            return [item for item in archives if isinstance(item, dict)]
-        if any(key in payload for key in ("end", "start", "time")):
-            return [payload]
-    raise ValueError("Borgmatic returned JSON without an archive list")
-
-
-def archive_timestamp(archive: dict[str, object]) -> float:
-    value = archive.get("end") or archive.get("time") or archive.get("start")
-    if not isinstance(value, str):
-        raise ValueError("Borg archive has no recognized timestamp")
-    if value.endswith("Z"):
-        value = value[:-1] + "+00:00"
-    timestamp = datetime.fromisoformat(value)
-    if timestamp.tzinfo is None:
-        # Borg 1.x JSON timestamps use local time without an offset.
-        # Interpret them in this host's configured timezone, not as UTC.
-        timestamp = timestamp.astimezone()
-    return timestamp.timestamp()
-
-
-def query_repository(target: dict[str, object]) -> list[dict[str, object]]:
-    command = [
-        "/usr/bin/borgmatic",
-        "--config",
-        str(target["config"]),
-        "list",
-        "--json",
-        "--last",
-        "1",
-        "--repository",
-        str(target["repository_label"]),
-    ]
-    process = subprocess.Popen(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        start_new_session=True,
-        text=True,
-    )
-    try:
-        stdout, _stderr = process.communicate(timeout=COMMAND_TIMEOUT_SECONDS)
-    except subprocess.TimeoutExpired:
-        os.killpg(process.pid, signal.SIGTERM)
-        try:
-            process.communicate(timeout=5)
-        except subprocess.TimeoutExpired:
-            os.killpg(process.pid, signal.SIGKILL)
-            process.communicate()
-        raise TimeoutError("Borg repository query timed out")
-    if process.returncode != 0:
-        raise RuntimeError(f"Borgmatic exited with status {process.returncode}")
-    return parse_archives(json.loads(stdout))
+def load_targets() -> list[dict[str, object]]:
+    targets = []
+    for path in sorted(TARGETS_DIR.glob("*.json")):
+        target = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(target, dict):
+            raise ValueError(f"Invalid Borg metrics target in {path}")
+        targets.append(target)
+    return targets
 
 
 def atomic_write(path: Path, content: str, mode: int) -> None:
@@ -108,16 +70,18 @@ def atomic_write(path: Path, content: str, mode: int) -> None:
 
 def render_metrics(
     targets: list[dict[str, object]], state: dict[str, dict[str, float | bool]]
-) -> tuple[str, dict[str, dict[str, float | bool]]]:
+) -> str:
     lines = [
-        "# HELP maintenance_borg_repository_last_archive_timestamp_seconds End timestamp of the latest known successful archive in a Borg repository.",
+        "# HELP maintenance_borg_repository_last_archive_timestamp_seconds Unix timestamp of the last successful Borg backup.",
         "# TYPE maintenance_borg_repository_last_archive_timestamp_seconds gauge",
-        "# HELP maintenance_borg_repository_probe_success Whether the Borg repository was reachable and queried successfully.",
-        "# TYPE maintenance_borg_repository_probe_success gauge",
-        "# HELP maintenance_borg_repository_has_archive Whether a latest archive is known to exist in the repository.",
+        "# HELP maintenance_borg_repository_has_archive Whether a successful Borg backup is known to exist.",
         "# TYPE maintenance_borg_repository_has_archive gauge",
         "# HELP maintenance_borg_repository_stale_after_seconds Configured age after which a Borg repository backup is stale.",
         "# TYPE maintenance_borg_repository_stale_after_seconds gauge",
+        "# HELP maintenance_borg_repository_last_attempt_timestamp_seconds Unix timestamp of the last borgmatic run outcome recorded by a hook.",
+        "# TYPE maintenance_borg_repository_last_attempt_timestamp_seconds gauge",
+        "# HELP maintenance_borg_repository_last_attempt_success Whether the last borgmatic run outcome recorded by a hook succeeded.",
+        "# TYPE maintenance_borg_repository_last_attempt_success gauge",
     ]
 
     for target in targets:
@@ -127,54 +91,71 @@ def render_metrics(
             for name in ("store", "source", "backup_set", "repository")
         )
         previous = state.get(repository, {})
-        last_archive = float(previous.get("last_archive_timestamp", 0.0))
-        has_archive = bool(previous.get("has_archive", False))
-        probe_success = 0
-
-        try:
-            archives = query_repository(target)
-            probe_success = 1
-            if archives:
-                last_archive = max(archive_timestamp(archive) for archive in archives)
-                has_archive = True
-            else:
-                has_archive = False
-            state[repository] = {
-                "last_archive_timestamp": last_archive,
-                "has_archive": has_archive,
-            }
-        except (
-            OSError,
-            RuntimeError,
-            TimeoutError,
-            ValueError,
-            subprocess.SubprocessError,
-        ):
-            # Retain the last known archive timestamp, while reporting the
-            # current failed probe separately so Grafana can show ERROR.
-            pass
-
+        last_success = float(previous.get("last_success_timestamp", 0.0))
+        has_archive = bool(previous.get("has_archive", last_success > 0))
+        last_attempt = float(previous.get("last_attempt_timestamp", 0.0))
+        attempt_success = int(bool(previous.get("last_attempt_success", True)))
         lines.extend(
             [
-                f"maintenance_borg_repository_last_archive_timestamp_seconds{{{labels}}} {last_archive}",
-                f"maintenance_borg_repository_probe_success{{{labels}}} {probe_success}",
+                f"maintenance_borg_repository_last_archive_timestamp_seconds{{{labels}}} {last_success}",
                 f"maintenance_borg_repository_has_archive{{{labels}}} {int(has_archive)}",
                 f"maintenance_borg_repository_stale_after_seconds{{{labels}}} {int(target['stale_after_seconds'])}",
+                f"maintenance_borg_repository_last_attempt_timestamp_seconds{{{labels}}} {last_attempt}",
+                f"maintenance_borg_repository_last_attempt_success{{{labels}}} {attempt_success}",
             ]
         )
 
-    return "\n".join(lines) + "\n", state
+    return "\n".join(lines) + "\n"
+
+
+def update_metrics(action: str, repository_path: str | None = None) -> None:
+    LOCK_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with LOCK_PATH.open("a", encoding="utf-8") as lock_file:
+        fcntl.flock(lock_file, fcntl.LOCK_EX)
+        targets = load_targets()
+        state = load_state()
+
+        if action != "initialize":
+            if repository_path is None:
+                raise ValueError("A repository path is required for hook updates")
+            target = next(
+                (
+                    target
+                    for target in targets
+                    if str(target.get("repository_path")) == repository_path
+                ),
+                None,
+            )
+            if target is None:
+                raise ValueError(f"No Borg metrics target matches repository {repository_path!r}")
+
+            repository = str(target["repository"])
+            previous = state.get(repository, {})
+            now = time.time()
+            has_archive = bool(previous.get("has_archive", False))
+            last_success = float(previous.get("last_success_timestamp", 0.0))
+            if action == "success":
+                has_archive = True
+                last_success = now
+            state[repository] = {
+                "last_success_timestamp": last_success,
+                "has_archive": has_archive,
+                "last_attempt_timestamp": now,
+                "last_attempt_success": action == "success",
+            }
+
+        atomic_write(STATE_PATH, json.dumps(state, sort_keys=True) + "\n", 0o600)
+        atomic_write(METRIC_PATH, render_metrics(targets, state), 0o644)
 
 
 def main() -> None:
-    targets = [
-        json.loads(path.read_text(encoding="utf-8"))
-        for path in sorted(TARGETS_DIR.glob("*.json"))
-    ]
-    state = load_state()
-    metrics, state = render_metrics(targets, state)
-    atomic_write(STATE_PATH, json.dumps(state, sort_keys=True) + "\n", 0o600)
-    atomic_write(METRIC_PATH, metrics, 0o644)
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("action", choices=("initialize", "success", "failure"))
+    parser.add_argument("repository_path", nargs="?")
+    arguments = parser.parse_args()
+    update_metrics(arguments.action, arguments.repository_path)
 
 
 if __name__ == "__main__":

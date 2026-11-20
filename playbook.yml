@@ -69,6 +69,8 @@
   roles:
     - systemd_handlers
     - borgmatic
+    - role: borg_backup_monitor
+      tags: ["borg_backup_monitor", "borgmatic_create"]
     - role: borgmatic_system
       tags: ["borgmatic_system"]
   tags:
@@ -133,10 +135,3 @@
       tags: ["node_exporter"]
     - role: alloy
       tags: ["alloy"]
-
-- name: Setup Borg backup monitoring
-  hosts: backup_sources
-  roles:
-    - role: borg_backup_monitor
-      tags: ["borg_backup_monitor"]
-  tags: ["backup", "borg_backup_monitor"]

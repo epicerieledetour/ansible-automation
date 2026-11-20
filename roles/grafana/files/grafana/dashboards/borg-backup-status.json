@@ -191,7 +191,7 @@
             "uid": "${ds_prometheus}"
           },
           "editorMode": "code",
-          "expr": "3 * (1 - maintenance_borg_repository_probe_success{job=\"node\"}) + 2 * maintenance_borg_repository_probe_success{job=\"node\"} * (1 - maintenance_borg_repository_has_archive{job=\"node\"}) + maintenance_borg_repository_probe_success{job=\"node\"} * maintenance_borg_repository_has_archive{job=\"node\"} * ((time() - maintenance_borg_repository_last_archive_timestamp_seconds{job=\"node\"}) > bool maintenance_borg_repository_stale_after_seconds{job=\"node\"})",
+          "expr": "3 * (1 - maintenance_borg_repository_last_attempt_success{job=\"node\"}) + maintenance_borg_repository_last_attempt_success{job=\"node\"} * (2 * (1 - maintenance_borg_repository_has_archive{job=\"node\"}) + maintenance_borg_repository_has_archive{job=\"node\"} * ((time() - maintenance_borg_repository_last_archive_timestamp_seconds{job=\"node\"}) > bool maintenance_borg_repository_stale_after_seconds{job=\"node\"}))",
           "format": "table",
           "instant": true,
           "refId": "C"
@@ -257,7 +257,7 @@
         }
       ],
       "title": "Borg backup status by repository",
-      "description": "Shows the latest archive in each Borg repository. A repository is stale when it exceeds its configured backup age threshold. ERROR means the repository could not be queried; the last known archive date is retained when available.",
+      "description": "Shows the last successful backup recorded by borgmatic hooks. A repository is stale when it exceeds its configured backup age threshold. ERROR means the latest borgmatic run outcome recorded by a hook failed.",
       "type": "table"
     }
   ],
