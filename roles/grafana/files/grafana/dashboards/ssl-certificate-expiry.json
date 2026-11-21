@@ -91,7 +91,7 @@
             "uid": "${ds_prometheus}"
           },
           "editorMode": "code",
-          "expr": "maintenance_tls_certificate_expiry_timestamp_seconds{job=\"node\"} - time()",
+          "expr": "probe_ssl_earliest_cert_expiry{job=\"blackbox\"} - time()",
           "format": "time_series",
           "instant": true,
           "legendFormat": "{{service}}",
@@ -320,7 +320,7 @@
             "uid": "${ds_prometheus}"
           },
           "editorMode": "code",
-          "expr": "maintenance_tls_certificate_expiry_timestamp_seconds{job=\"node\"} * 1000",
+          "expr": "probe_ssl_earliest_cert_expiry{job=\"blackbox\"} * 1000",
           "format": "table",
           "instant": true,
           "refId": "A"
@@ -331,7 +331,7 @@
             "uid": "${ds_prometheus}"
           },
           "editorMode": "code",
-          "expr": "maintenance_tls_certificate_expiry_timestamp_seconds{job=\"node\"} - time()",
+          "expr": "probe_ssl_earliest_cert_expiry{job=\"blackbox\"} - time()",
           "format": "table",
           "instant": true,
           "refId": "B"
@@ -342,7 +342,7 @@
             "uid": "${ds_prometheus}"
           },
           "editorMode": "code",
-          "expr": "(maintenance_tls_certificate_expiry_timestamp_seconds{job=\"node\"} - time()) / 86400",
+          "expr": "(probe_ssl_earliest_cert_expiry{job=\"blackbox\"} - time()) / 86400",
           "format": "table",
           "instant": true,
           "refId": "C"
@@ -353,7 +353,7 @@
             "uid": "${ds_prometheus}"
           },
           "editorMode": "code",
-          "expr": "maintenance_tls_certificate_probe_success{job=\"node\"}",
+          "expr": "probe_success{job=\"blackbox\"}",
           "format": "table",
           "instant": true,
           "refId": "D"
@@ -415,7 +415,7 @@
         }
       ],
       "title": "Certificate details",
-      "description": "Shows the certificates served by Caddy for the configured service hostnames. Development uses local .localhost certificates; production uses the public service hostnames.",
+      "description": "Shows certificate expiry and HTTPS probe results. Development probes the Caddy VMs using their local hostnames; production probes the public service hostnames.",
       "type": "table"
     }
   ],

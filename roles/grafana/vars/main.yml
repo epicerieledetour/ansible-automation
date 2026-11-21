@@ -1,2 +1,22 @@
 ---
 grafana_url: grafana.epicerieledetour.org
+
+# In development, connect to the Caddy VMs over WireGuard and use the local
+# hostname for both the HTTP Host header and TLS SNI. Production probes use
+# the public hostnames directly.
+blackbox_probe_targets:
+  - service: Grafana
+    hostname: "{{ 'grafana.localhost' if deployment_is_dev | bool else 'grafana.epicerieledetour.org' }}"
+    url: "{{ 'https://' ~ hostvars[groups['webservers'] | first].wireguard_address if deployment_is_dev | bool else 'https://grafana.epicerieledetour.org' }}"
+  - service: Membres
+    hostname: "{{ 'membres.localhost' if deployment_is_dev | bool else 'membres.epicerieledetour.org' }}"
+    url: "{{ 'https://' ~ hostvars[groups['webservers'] | first].wireguard_address if deployment_is_dev | bool else 'https://membres.epicerieledetour.org' }}"
+  - service: WordPress
+    hostname: "{{ 'wordpress.localhost' if deployment_is_dev | bool else 'epicerieledetour.org' }}"
+    url: "{{ 'https://' ~ hostvars[groups['webservers'] | first].wireguard_address if deployment_is_dev | bool else 'https://epicerieledetour.org' }}"
+  - service: Vouchers
+    hostname: "{{ 'vouchers.localhost' if deployment_is_dev | bool else 'vouchers.epicerieledetour.org' }}"
+    url: "{{ 'https://' ~ hostvars[groups['webservers'] | first].wireguard_address if deployment_is_dev | bool else 'https://vouchers.epicerieledetour.org' }}"
+  - service: Mattermost
+    hostname: "{{ 'chat.localhost' if deployment_is_dev | bool else 'chat.batiment7.org' }}"
+    url: "{{ 'https://' ~ hostvars[groups['mattermost'] | first].wireguard_address if deployment_is_dev | bool else 'https://chat.batiment7.org' }}"

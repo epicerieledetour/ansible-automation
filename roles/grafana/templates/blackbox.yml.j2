@@ -1,0 +1,14 @@
+modules:
+  http_2xx:
+    prober: http
+    timeout: 10s
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      fail_if_not_ssl: true
+{% if deployment_is_dev | bool %}
+      # Molecule Caddy uses its own local CA, so in dev we collect the served
+      # certificate and reachability even though Prometheus does not trust it.
+      tls_config:
+        insecure_skip_verify: true
+{% endif %}
