@@ -99,6 +99,7 @@
           ansible.builtin.apt:
             pkg:
               - prometheus
+              - prometheus-blackbox-exporter
 
         - name: Instanciate prometheus config
           ansible.builtin.template:
@@ -106,6 +107,21 @@
             dest: /etc/prometheus/prometheus.yml
             mode: u=rw,g=r,o=r
           notify: prometheus changed
+
+        - name: Configure Blackbox Exporter probes
+          ansible.builtin.template:
+            src: blackbox.yml.j2
+            dest: /etc/prometheus/blackbox.yml
+            owner: root
+            group: root
+            mode: u=rw,g=r,o=r
+          notify: blackbox exporter changed
+
+        - name: Start Blackbox Exporter
+          ansible.builtin.systemd:
+            name: prometheus-blackbox-exporter
+            enabled: true
+            state: started
 
         - name: Start prometheus
           ansible.builtin.systemd:

@@ -1,2 +1,41 @@
 ---
 grafana_url: grafana.epicerieledetour.org
+
+blackbox_dev_webserver_url: "https://{{ hostvars[groups['webservers'] | first].wireguard_address }}"
+blackbox_dev_mattermost_url: "https://{{ hostvars[groups['mattermost'] | first].wireguard_address }}"
+
+blackbox_probe_targets_dev:
+  - service: Grafana
+    hostname: grafana.localhost
+    url: "{{ blackbox_dev_webserver_url }}"
+  - service: Membres
+    hostname: membres.localhost
+    url: "{{ blackbox_dev_webserver_url }}"
+  - service: WordPress
+    hostname: wordpress.localhost
+    url: "{{ blackbox_dev_webserver_url }}"
+  - service: Vouchers
+    hostname: vouchers.localhost
+    url: "{{ blackbox_dev_webserver_url }}"
+  - service: Mattermost
+    hostname: chat.localhost
+    url: "{{ blackbox_dev_mattermost_url }}"
+
+blackbox_probe_targets_prod:
+  - service: Grafana
+    hostname: grafana.epicerieledetour.org
+    url: https://grafana.epicerieledetour.org
+  - service: Membres
+    hostname: membres.epicerieledetour.org
+    url: https://membres.epicerieledetour.org
+  - service: WordPress
+    hostname: epicerieledetour.org
+    url: https://epicerieledetour.org
+  - service: Vouchers
+    hostname: vouchers.epicerieledetour.org
+    url: https://vouchers.epicerieledetour.org
+  - service: Mattermost
+    hostname: chat.batiment7.org
+    url: https://chat.batiment7.org
+
+blackbox_probe_targets: "{{ blackbox_probe_targets_dev if deployment_is_dev | bool else blackbox_probe_targets_prod }}"
