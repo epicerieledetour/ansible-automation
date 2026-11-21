@@ -18,7 +18,7 @@
     - name: Install APT upgrade metrics collector
       ansible.builtin.copy:
         src: apt-upgrade-metrics.py
-        dest: /usr/local/sbin/apt-upgrade-metrics
+        dest: /usr/local/sbin/apt-upgrade-metrics.py
         owner: root
         group: root
         mode: "0755"
@@ -48,11 +48,6 @@
       ansible.builtin.apt:
         update_cache: true
         upgrade: dist
-
-    - name: Refresh the last actual package-upgrade metric
-      ansible.builtin.command:
-        cmd: /usr/local/sbin/apt-upgrade-metrics
-      changed_when: false
 
     - name: Check if a reboot is required
       register: upgrade_rebootrequired

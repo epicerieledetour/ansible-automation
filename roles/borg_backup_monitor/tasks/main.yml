@@ -13,7 +13,7 @@
     - name: Install Borg repository metrics hook helper
       ansible.builtin.copy:
         src: borg-repository-metrics.py
-        dest: /usr/local/sbin/borg-repository-metrics
+        dest: /usr/local/sbin/borg-repository-metrics.py
         owner: root
         group: root
         mode: "0755"
