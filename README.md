@@ -153,7 +153,7 @@ flowchart TB
     agentsb7 --> loki
     prometheus -->|"scrape, over wireguard"| agents2
     prometheus --> agents1
-    slack -->|"remote write"| prometheus
+    slack -->|"textfile"| agents1
     prometheus --> agentspi
     prometheus --> agentsb7
     grafana --> loki
@@ -266,9 +266,9 @@ Workstations are always local machines (`ansible_connection: local` on the `work
 ### Slack member count
 
 The `slack_metrics` role (group `slack_metrics`, on `srv1`) counts the members
-of the Slack workspace every hour and pushes the count to Prometheus, shown on
-Grafana's "Slack" dashboard. It authenticates to Slack with a bot token stored
-in the vault.
+of the Slack workspace every hour and writes the counts to
+`/var/lib/prometheus/node-exporter/slack.prom`, where node_exporter's textfile
+collector serves them to Prometheus, shown on Grafana's "Slack" dashboard. It authenticates to Slack with a bot token stored in the vault.
 
 #### Creating the Slack app and its token
 

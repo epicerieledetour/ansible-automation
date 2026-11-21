@@ -60,7 +60,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "max(last_over_time(slack_workspace_members{type=\"full\"}[2h]))",
+          "expr": "max(slack_workspace_members{type=\"full\"})",
           "instant": true,
           "range": false,
           "refId": "A"

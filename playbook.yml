@@ -126,7 +126,7 @@
     - role: alloy
       tags: ["alloy"]
 
-# After grafana, whose prometheus receives the pushes
+# After the monitoring agents, whose node_exporter serves the counts
 - name: Setup Slack workspace metrics
   hosts: slack_metrics
   roles:

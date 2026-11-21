@@ -1,3 +1,4 @@
 ---
-# Remote write destination of the prometheus of the grafana role, on this host
-slack_metrics_prometheus_write_url: http://localhost:9090/api/v1/write
+# Textfile collector directory of the node_exporter role, which prometheus
+# scrapes; Debian's prometheus-node-exporter default
+slack_metrics_textfile_dir: /var/lib/prometheus/node-exporter
