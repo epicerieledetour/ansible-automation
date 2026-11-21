@@ -2,13 +2,12 @@
 apiVersion: 1
 # Giving an already provisioned datasource a uid makes Grafana see a
 # different datasource, and it refuses to start on the conflict: delete the
-# old entry first, which costs nothing as it is recreated on every start.
-# Remove this block once production has started Grafana with this file, or
-# right away after deleting the datasource by hand in production's Grafana.
+# old entry first. Only needed once, the first time production starts Grafana
+# with this file, but harmless to keep: the entry is recreated right after,
+# with the same uid, at every start.
 deleteDatasources:
   - name: prometheus
     orgId: 1
-# delete down to here
 datasources:
   - name: prometheus
     # Fixed, referenced by the panels of dashboards/slack.json

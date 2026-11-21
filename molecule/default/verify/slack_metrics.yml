@@ -31,6 +31,6 @@
       ansible.builtin.set_fact:
         verify_failures: >-
           {{ verify_failures
-          + ['slack_metrics: no slack_workspace_members{type="full"} in'
-          ~ ' prometheus, see journalctl -u slack-metrics and'
-          ~ ' /var/lib/prometheus/node-exporter/slack.prom'] }}
+          + [ansible_failed_task.name ~ ': '
+          ~ (ansible_failed_result.msg | default('failed'))
+          ~ ', see journalctl -u slack-metrics'] }}

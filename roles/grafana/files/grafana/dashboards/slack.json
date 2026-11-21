@@ -37,7 +37,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 5,
         "x": 0,
         "y": 0
@@ -68,6 +68,113 @@
       ],
       "title": "Slack Members",
       "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "id": 2,
+      "title": "",
+      "type": "stat",
+      "gridPos": {
+        "h": 2,
+        "w": 5,
+        "x": 0,
+        "y": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"}) * 1000 and on() ((time() - max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"})) < 7200)",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"}) * 1000 and on() ((time() - max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"})) >= 7200 < 21600)",
+          "instant": true,
+          "range": false,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"}) * 1000 and on() ((time() - max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"})) >= 21600)",
+          "instant": true,
+          "range": false,
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeFromNow",
+          "displayName": "Updated",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "graphMode": "none",
+        "colorMode": "value",
+        "textMode": "value_and_name",
+        "text": {
+          "titleSize": 12,
+          "valueSize": 14
+        }
+      },
+      "transparent": true,
+      "description": "Orange once the count is more than 2 hours old (a missed hourly run), red after 6 hours."
     }
   ],
   "schemaVersion": 41,

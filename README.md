@@ -266,9 +266,11 @@ Workstations are always local machines (`ansible_connection: local` on the `work
 ### Slack member count
 
 The `slack_metrics` role (group `slack_metrics`, on `srv1`) counts the members
-of the Slack workspace every hour and writes the counts to
-`/var/lib/prometheus/node-exporter/slack.prom`, where node_exporter's textfile
-collector serves them to Prometheus, shown on Grafana's "Slack" dashboard. It authenticates to Slack with a bot token stored in the vault.
+of the Slack workspace every hour and writes the counts to `slack.prom` in
+node_exporter's textfile collector directory (`slack_metrics_textfile_dir`,
+Debian's `/var/lib/prometheus/node-exporter` by default), which serves them to
+Prometheus, shown on Grafana's "Slack" dashboard. It authenticates to Slack
+with a bot token stored in the vault.
 
 #### Creating the Slack app and its token
 
@@ -284,7 +286,7 @@ The token belongs to a Slack app that only has the right to list members:
 
 #### Setting or rotating the token
 
-The token is the `vault_slack_metrics_token` v  ariable of
+The token is the `vault_slack_metrics_token` variable of
 `group_vars/slack_metrics/vault.yml`, an Ansible Vault encrypted file. Edit it
 in place, it opens decrypted in `$EDITOR` and is re-encrypted on save:
 

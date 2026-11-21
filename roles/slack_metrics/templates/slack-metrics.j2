@@ -43,7 +43,8 @@ SLACK_TRANSIENT_ERRORS = {"fatal_error", "internal_error", "service_unavailable"
 
 def users_page(token, cursor, attempts=3):
     """One page of users.list, retried on Slack's transient errors"""
-    query = urllib.parse.urlencode({"limit": 200, "cursor": cursor}) # max limit of 200
+    # Slack accepts up to 1000 members per page, but recommends no more than 200
+    query = urllib.parse.urlencode({"limit": 200, "cursor": cursor})
     req = urllib.request.Request(f"{SLACK_USERS_URL}?{query}",
                                  headers={"Authorization": f"Bearer {token}"})
     for attempt in range(1, attempts + 1):
@@ -63,7 +64,8 @@ def members(token):
     cursor = ""
     while True:
         resp = users_page(token, cursor)
-        yield from resp["members"] #iterative return
+        # Hands this page's members out one by one, then fetches the next page
+        yield from resp["members"]
         cursor = resp.get("response_metadata", {}).get("next_cursor", "")
         if not cursor:
             return
@@ -72,13 +74,16 @@ def members(token):
 def kind(member):
     if member.get("deleted"):
         return "deleted"
-    if member.get("is_bot") or member["id"] == "USLACKBOT": # slackbot isn't a bot we we count it as one
+    # Slackbot has is_bot false, like a human member, and the same USLACKBOT id
+    # in every workspace: count it as the bot it is
+    if member.get("is_bot") or member["id"] == "USLACKBOT":
         return "bot"
     if member.get("is_ultra_restricted"):
         return "single_channel_guest"
     if member.get("is_restricted"):
         return "multi_channel_guest"
     return "full"
+
 
 # node_exporter textfile
 
