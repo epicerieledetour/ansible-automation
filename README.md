@@ -66,7 +66,7 @@ flowchart LR
         vps2["<b>vps2</b> &nbsp; .90<br/><i>endpoint, routes the whole /24</i>"]
         srv1["<b>srv1</b> &nbsp; .60"]
         pi1["<b>pi1</b> &nbsp; .30"]
-        b72["<b>b72</b> &nbsp; .72<br/><i>not migrated yet</i>"]
+        b74["<b>b74</b> &nbsp; .74"]
         ws["<b>charles-ws</b> &nbsp; .70<br/><i>systemd-networkd</i>"]
         lp["<b>charles-lp</b> &nbsp; .40<br/><i>NetworkManager</i>"]
     end
@@ -75,7 +75,7 @@ flowchart LR
 
     srv1 -. peer .- vps2
     pi1 -. peer .- vps2
-    b72 -. peer .- vps2
+    b74 -. peer .- vps2
     ws -. peer .- vps2
     lp -. peer .- vps2
 ```
@@ -124,7 +124,7 @@ flowchart TB
         agentspi["node_exporter tcp 9100<br/>alloy"]
     end
 
-    subgraph b72["b72 &nbsp; 192.168.211.72 &nbsp; OVH VPS, not migrated yet"]
+    subgraph b74["b74 &nbsp; 192.168.211.74 &nbsp; OVH VPS"]
         caddyb7["<b>caddy</b><br/>tcp 443, Let's Encrypt"]
         mattermost["<b>mattermost</b><br/>postgresql"]
         borgmaticb7["<b>borgmatic</b><br/>system, mattermost"]
@@ -173,7 +173,7 @@ Drives at 01:00 and all machines run their backups at 04:00, Montreal time.
 | `vps2` | `192.168.211.90` | `servers`, `webservers`, `vouchers`, `backup_sources` | Wireguard endpoint, caddy, wordpress, vouchers, membres, grafana reverse proxy, borgmatic, node_exporter, alloy, ufw, fail2ban |
 | `srv1` | `192.168.211.60` | `servers`, `grafana`, `backup_destinations`, `slack_metrics` | grafana, loki, prometheus, slack-metrics timer, borg repositories, node_exporter, alloy, ufw, fail2ban |
 | `pi1` | `192.168.211.30` | `servers`, `backup_destinations`, `backup_sources`, `dataproxies` | borg repositories, Google Drive sync, borgmatic, node_exporter, alloy, ufw, fail2ban |
-| `b72` | `192.168.211.72` | `servers`, `backup_sources`, `mattermost` | **Not migrated yet: production `b72` doesn't run this playbook.** Target state: Bâtiment 7's Mattermost (chat.batiment7.org), caddy, postgresql, borgmatic, node_exporter, alloy, ufw, fail2ban |
+| `b74` | `192.168.211.74` | `servers`, `backup_sources`, `mattermost` | Bâtiment 7's Mattermost (chat.batiment7.org), caddy, postgresql, borgmatic, node_exporter, alloy, ufw, fail2ban |
 | `charles-ws` | `192.168.211.70` | `workstations_networkd` | Wireguard client only, configured through systemd-networkd |
 | `charles-lp` | `192.168.211.40` | `workstations_nm` | Wireguard client only, configured through NetworkManager |
 

@@ -59,6 +59,20 @@
         groups: pg_read_all_data
         target_roles: root
 
+    # mattermost creates its tables on first start, mattermost-import restores
+    # them from the other server
+    - name: Check whether the database holds a mattermost server
+      community.postgresql.postgresql_query:
+        db: mattermost
+        query: "select to_regclass('public.users') is not null as initialized"
+      register: _mattermost_db
+      changed_when: false
+      check_mode: false
+
+    - name: Keep an empty mattermost stopped until mattermost-import
+      ansible.builtin.set_fact:
+        mattermost_awaits_import: "{{ not _mattermost_db.query_result[0].initialized and not mattermost_start_empty | bool }}"
+
 - name: Mattermost as mattermost
   become: true
   become_user: mattermost
@@ -121,12 +135,21 @@
         dest: /usr/local/sbin/mattermost-import
         mode: "u=rwx,g=,o="
 
+    # Disabled too, so a reboot doesn't start it: mattermost-import enables it
     - name: Enable mattermost systemd service
       ansible.builtin.systemd:
         name: mattermost
-        enabled: true
-        state: started
+        enabled: "{{ not mattermost_awaits_import }}"
+        state: "{{ mattermost_awaits_import | ternary('stopped', 'started') }}"
         daemon_reload: true
+
+    - name: Say mattermost waits for its data
+      ansible.builtin.debug:
+        msg: >-
+          mattermost stays stopped while its database is empty: load the old
+          server with mattermost-import, or set mattermost_start_empty to start
+          from scratch
+      when: mattermost_awaits_import
 
 - name: Instanciate caddy file
   become: true

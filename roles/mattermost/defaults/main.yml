@@ -14,5 +14,11 @@ mattermost_import_steps:
   - version: "11.7.13"
     sha256: 7384073008077dd1ea9ed3d0cf997c79529084f67d6bcfb14de531813de50d1b
 
+# Whether mattermost starts while its database is still empty. In production
+# it waits for mattermost-import instead: an empty server is open to anyone
+# reaching it, and its first sign-up becomes system admin. Set it to true to
+# start a production server from scratch.
+mattermost_start_empty: "{{ deployment_is_dev | bool }}"
+
 mattermost_install_dir: /opt/mattermost
 mattermost_root_dir: /srv/mattermost

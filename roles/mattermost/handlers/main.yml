@@ -7,3 +7,4 @@
     enabled: true
     daemon_reload: true
   listen: mattermost changed
+  when: not mattermost_awaits_import | default(false)

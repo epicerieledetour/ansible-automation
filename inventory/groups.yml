@@ -4,7 +4,7 @@ servers:
     pi1:
     srv1:
     vps2:
-    b72:
+    b74:
 
 backup_destinations:
   hosts:
@@ -15,7 +15,7 @@ backup_sources:
   hosts:
     pi1:
     vps2:
-    b72:
+    b74:
 
 webservers:
   hosts:
@@ -35,7 +35,7 @@ slack_metrics:
 
 mattermost:
   hosts:
-    b72:
+    b74:
 
 dataproxies:
   hosts:

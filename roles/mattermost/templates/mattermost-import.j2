@@ -105,7 +105,8 @@ migrate_with {{ step.version }} {{ step.sha256 }}
 {% endfor %}
 
 echo "### Starting mattermost {{ mattermost_version }}"
-systemctl start mattermost
+# Enabled too: the role leaves a production server's empty mattermost disabled
+systemctl enable --now mattermost
 curl -fsS http://127.0.0.1:8065/api/v4/system/ping | grep -q '"status":"OK"'
 
 runuser -u postgres -- psql --dbname=mattermost --no-align --tuples-only --command="

@@ -14,14 +14,14 @@ platforms:
     image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
     memory_size: 2  # GB
     vcpu: 1
-    disk_size: "16G"
+    disk_size: "40G"  # backup store: holds b74's 13 GB of attachments
     qemu_user: "libvirt-qemu"
 
   - name: srv1
     image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
     memory_size: 2  # GB
     vcpu: 1
-    disk_size: "16G"
+    disk_size: "40G"  # backup store: holds b74's 13 GB of attachments
     qemu_user: "libvirt-qemu"
 
   - name: vps2
@@ -32,11 +32,11 @@ platforms:
     qemu_user: "libvirt-qemu"
 
 
-  - name: b72
+  - name: b74
     image_url: "https://saimei.ftp.acc.umu.se/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
     memory_size: 2  # GB
     vcpu: 1
-    disk_size: "16G"
+    disk_size: "40G"  # the import holds the bundle and a copy of the 13 GB of attachments
     qemu_user: "libvirt-qemu"
 
 provisioner:

@@ -3,6 +3,11 @@ membres.epicerieledetour.org, membres.localhost {
     file_server
     encode zstd gzip
 
+    # Browsers send no client certificate over HTTP/3, and verify_if_given then
+    # silently serves the anonymized data: replace Caddy's h3 advertisement,
+    # and make browsers forget the one they already cached
+    header Alt-Svc clear
+
     tls {
         client_auth {
             # Not "request": it accepts any certificate without checking it

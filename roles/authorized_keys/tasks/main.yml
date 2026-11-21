@@ -5,7 +5,8 @@
     state: present
     key: >-
       {{ lookup('file',
-                playbook_dir ~ '/keys/' ~ item ~ '-id_ed25519.pub') }}
+                query('fileglob', playbook_dir ~ '/keys/' ~ item ~ '-id_*.pub')
+                | first) }}
   loop: "{{ authorized_keys_users }}"
   when: deployment_is_prod | bool
 
