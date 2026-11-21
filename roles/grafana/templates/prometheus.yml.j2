@@ -11,3 +11,25 @@ scrape_configs:
           instance: "{{ host }}"
           host: "{{ host }}"
 {% endfor %}
+
+  - job_name: blackbox
+    scrape_interval: 5m
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+{% for target in blackbox_probe_targets %}
+      - targets: ["{{ target.url }}"]
+        labels:
+          service: "{{ target.service }}"
+          hostname: "{{ target.hostname }}"
+{% endfor %}
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [hostname]
+        target_label: __param_hostname
+      - source_labels: [hostname]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
