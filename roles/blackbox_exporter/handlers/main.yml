@@ -1,0 +1,10 @@
+---
+# Restarted and not reloaded: a reload that rejects the config is reported as a
+# success by systemd, which only sees the signal being delivered, and the
+# exporter keeps serving the previous config. A restart fails loudly instead.
+- name: Restart prometheus-blackbox-exporter
+  become: true
+  ansible.builtin.systemd:
+    name: prometheus-blackbox-exporter
+    state: restarted
+  listen: blackbox exporter changed

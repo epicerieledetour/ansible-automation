@@ -1,0 +1,33 @@
+---
+# Web applications probed by the blackbox exporter running on these hosts.
+# Each entry yields one module in blackbox.yml and one target in the
+# "blackbox" scrape job.
+#
+# name   : blackbox module name, and the "app" label on the metrics
+# url    : the .localhost alias in development, the public name in production,
+#          following the same idiom as wordpress_url
+# expect : regexp looked for in the response body. This is what separates
+#          "the server answers" from "the application works".
+#
+# The domains are repeated here rather than read from wordpress_url: a role
+# loads its vars/main.yml only when it runs, so a run limited to
+# --tags blackbox_exporter would fail on an undefined variable.
+#
+# grafana.localhost is served by these same hosts but is left unprobed: it is
+# the monitoring tool itself, and watching it from inside itself is of limited
+# value until the P6 alerting is in place.
+blackbox_exporter_targets:
+  - name: vouchers
+    url: "{{ deployment_is_dev | ternary('https://vouchers.localhost', 'https://vouchers.epicerieledetour.org') }}"
+    expect: "<title>Bons solidaires</title>"
+
+  - name: wordpress
+    url: "{{ deployment_is_dev | ternary('https://wordpress.localhost', 'https://epicerieledetour.org') }}"
+    expect: "<title>[^<]*Épicerie Le Détour"
+
+  # Served by file_server from a periodically regenerated file: this probe
+  # tells that the file is readable, not that it is up to date. Data freshness
+  # is a different problem from availability.
+  - name: membres
+    url: "{{ deployment_is_dev | ternary('https://membres.localhost/members.json', 'https://membres.epicerieledetour.org/members.json') }}"
+    expect: '"hours_in_bank"'

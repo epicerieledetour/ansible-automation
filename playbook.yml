@@ -106,6 +106,8 @@
       tags: ['wordpress']
     - role: grafana_proxy
       tags: ["grafana", "grafana_proxy"]
+    - role: blackbox_exporter
+      tags: ["blackbox_exporter"]
   tags: ['webservers']
 
 - name: Setup mattermost

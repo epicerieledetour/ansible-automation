@@ -1,0 +1,30 @@
+---
+- name: Blackbox exporter
+  become: true
+  block:
+    - name: Install prometheus-blackbox-exporter
+      ansible.builtin.apt:
+        pkg:
+          - prometheus-blackbox-exporter
+
+    - name: Configure the probing modules
+      ansible.builtin.template:
+        src: blackbox.yml.j2
+        dest: /etc/prometheus/blackbox.yml
+        owner: root
+        group: root
+        mode: "0644"
+      notify:
+        - blackbox exporter changed
+
+    - name: Start prometheus-blackbox-exporter
+      ansible.builtin.systemd:
+        name: prometheus-blackbox-exporter
+        enabled: true
+        state: started
+
+    - name: Open port 9115 for prometheus-blackbox-exporter on wireguard network
+      community.general.ufw:
+        rule: allow
+        port: "9115"
+        from_ip: 192.168.211.0/24

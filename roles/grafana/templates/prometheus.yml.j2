@@ -10,3 +10,32 @@ scrape_configs:
         labels:
           instance: "{{ host }}"
 {% endfor %}
+
+  - job_name: blackbox
+    metrics_path: /probe
+    # Every 60s rather than the global 15s: each wordpress probe triggers a
+    # full PHP render with a database round trip. A minute is plenty to
+    # notice an outage.
+    scrape_interval: 60s
+    static_configs:
+{% for host in groups['webservers'] %}
+{% for target in hostvars[host].blackbox_exporter_targets %}
+      - targets:
+          - "{{ target.url }}"
+        labels:
+          __param_module: "{{ target.name }}"
+          __prober__: "{{ hostvars[host].wireguard_address }}:9115"
+          app: "{{ target.name }}"
+{% endfor %}
+{% endfor %}
+    relabel_configs:
+      # The application URL becomes the ?target= parameter of the request
+      - source_labels: [__address__]
+        target_label: __param_target
+      # The metrics carry the application's name, not the prober's
+      - source_labels: [__param_target]
+        target_label: instance
+      # Only now does the scrape address become the prober's. The order of
+      # these three rules matters: swapped, the prober would probe itself.
+      - source_labels: [__prober__]
+        target_label: __address__
