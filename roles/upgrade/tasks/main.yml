@@ -7,14 +7,6 @@
 - name: Upgrade
   become: true
   block:
-    - name: Create Node Exporter textfile collector directory
-      ansible.builtin.file:
-        path: /var/lib/prometheus/node-exporter
-        state: directory
-        owner: root
-        group: root
-        mode: "0755"
-
     - name: Install APT upgrade metrics collector
       ansible.builtin.copy:
         src: apt-upgrade-metrics.py
