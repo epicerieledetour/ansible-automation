@@ -89,7 +89,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"}) * 1000 and on() ((time() - max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"})) < 7200)",
+          "expr": "max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"}) * 1000 and on() ((time() - max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"})) < 90000)",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -99,7 +99,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"}) * 1000 and on() ((time() - max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"})) >= 7200 < 21600)",
+          "expr": "max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"}) * 1000 and on() ((time() - max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"})) >= 90000 < 176400)",
           "instant": true,
           "range": false,
           "refId": "B"
@@ -109,7 +109,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"}) * 1000 and on() ((time() - max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"})) >= 21600)",
+          "expr": "max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"}) * 1000 and on() ((time() - max(node_textfile_mtime_seconds{file=~\".*/slack.prom\"})) >= 176400)",
           "instant": true,
           "range": false,
           "refId": "C"
@@ -174,7 +174,7 @@
         }
       },
       "transparent": true,
-      "description": "Orange once the count is more than 2 hours old (a missed hourly run), red after 6 hours."
+      "description": "Orange once the count is more than 25 hours old (a missed daily run), red after 49 hours (two missed runs)."
     }
   ],
   "schemaVersion": 41,

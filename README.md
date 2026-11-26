@@ -112,7 +112,7 @@ flowchart TB
         grafana["<b>grafana</b><br/>tcp 3000"]
         loki["<b>loki</b><br/>tcp 3100"]
         prometheus["<b>prometheus</b><br/>tcp 9090"]
-        slack["<b>slack-metrics</b><br/>hourly timer"]
+        slack["<b>slack-metrics</b><br/>daily timer"]
         borg["<b>borg repositories</b><br/>/srv/borg, dedicated 300 GB ssd"]
         agents1["node_exporter tcp 9100<br/>alloy"]
     end
@@ -266,7 +266,7 @@ Workstations are always local machines (`ansible_connection: local` on the `work
 ### Slack member count
 
 The `slack_metrics` role (group `slack_metrics`, on `srv1`) counts the members
-of the Slack workspace every hour and writes the counts to `slack.prom` in
+of the Slack workspace every day and writes the counts to `slack.prom` in
 node_exporter's textfile collector directory (`slack_metrics_textfile_dir`,
 Debian's `/var/lib/prometheus/node-exporter` by default), which serves them to
 Prometheus, shown on Grafana's "Slack" dashboard. It authenticates to Slack
@@ -302,7 +302,7 @@ vault_slack_metrics_token: "xoxb-..."
 
 Then deploy it. The role writes the token root-only to
 `/etc/slack-metrics/token` and immediately runs the count once, so an invalid
-token fails the playbook rather than the next hourly run:
+token fails the playbook rather than the next daily run:
 
 ```bash
 ansible-playbook playbook.yml --tags slack_metrics

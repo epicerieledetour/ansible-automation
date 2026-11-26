@@ -73,7 +73,7 @@ A sequence of plays, each scoped to an inventory group, applying roles tagged fo
 8. **webservers** — `systemd_handlers`, `caddy_handlers`, `caddy`, `vouchers`, `membres`, `wordpress`, `grafana_proxy` (tag `webservers`).
 9. **mattermost** — `caddy_handlers`, `caddy`, `mattermost` (tag `mattermost`): Bâtiment 7's chat.batiment7.org on `b74`, Team Edition with PostgreSQL. `/usr/local/sbin/mattermost-import` on the host loads another server's data (database dump, `config.json`, attachments), migrating it through the ESR versions in `mattermost_import_steps`.
 10. **servers** — `node_exporter`, `alloy`: monitoring agents.
-11. **slack_metrics** — `systemd_handlers`, `slack_metrics` (tag `slack_metrics`): on `srv1`, an hourly timer counts the Slack workspace members by type through the Slack API and writes them to node_exporter's textfile collector directory, for Grafana's "Slack" dashboard. The bot token is vaulted in `group_vars/slack_metrics/vault.yml`; the service runs as a `DynamicUser`, and only moves its file into the root-owned textfile directory as root.
+11. **slack_metrics** — `systemd_handlers`, `slack_metrics` (tag `slack_metrics`): on `srv1`, a daily timer counts the Slack workspace members by type through the Slack API and writes them to node_exporter's textfile collector directory, for Grafana's "Slack" dashboard. The bot token is vaulted in `group_vars/slack_metrics/vault.yml`; the service runs as a `DynamicUser`, and only moves its file into the root-owned textfile directory as root.
 
 Roles run in dependency order within each play; e.g. `caddy` must run before the site roles that register Caddy vsites and `notify: caddy changed`.
 

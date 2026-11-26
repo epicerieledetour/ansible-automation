@@ -1,8 +1,8 @@
 [Unit]
-Description=Count the members of the Slack workspace every hour
+Description=Count the members of the Slack workspace every day
 
 [Timer]
-OnCalendar=hourly
+OnCalendar=daily
 Persistent=true
 
 [Install]
