@@ -23,9 +23,9 @@
       notify:
         - slack-metrics changed
 
-    - name: Instanciate slack-metrics script
-      ansible.builtin.template:
-        src: slack-metrics.j2
+    - name: Copy slack-metrics script
+      ansible.builtin.copy:
+        src: slack-metrics
         dest: /usr/local/bin/slack-metrics
         mode: u=rwx,g=rx,o=rx
       notify:

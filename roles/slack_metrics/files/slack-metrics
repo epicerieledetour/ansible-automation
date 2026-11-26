@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# {{ ansible_managed }}
+# Deployed by the slack_metrics Ansible role: edit it there, not on the server
 #
 # Counts the members of the Slack workspace by type and writes the counts to
 # slack.prom in $STATE_DIRECTORY, for slack-metrics.service to move to
@@ -95,8 +95,7 @@ def render(counts):
         "# TYPE slack_workspace_members gauge",
     ]
     for member_type, count in counts.items():
-        # Not an f-string: its doubled braces would be read by Jinja
-        lines.append('slack_workspace_members{type="%s"} %d' % (member_type, count))
+        lines.append(f'slack_workspace_members{{type="{member_type}"}} {count}')
     return "\n".join(lines) + "\n"
 
 
