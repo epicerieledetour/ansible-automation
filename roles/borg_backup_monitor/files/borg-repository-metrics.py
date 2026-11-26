@@ -27,12 +27,11 @@ def load_state() -> dict[str, dict[str, float | bool]]:
     if not isinstance(content, dict):
         return {}
 
-    # Preserve successful-backup timestamps written by the previous poller.
     state: dict[str, dict[str, float | bool]] = {}
     for repository, value in content.items():
         if not isinstance(value, dict):
             continue
-        timestamp = value.get("last_success_timestamp", value.get("last_archive_timestamp", 0.0))
+        timestamp = value.get("last_success_timestamp", 0.0)
         has_archive = value.get("has_archive", timestamp > 0)
         state[str(repository)] = {
             "last_success_timestamp": float(timestamp),
