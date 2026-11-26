@@ -1,0 +1,25 @@
+[Unit]
+Description=Count the members of the Slack workspace for prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# Writes slack.prom in its state directory, /var/lib/slack-metrics
+ExecStart=/usr/local/bin/slack-metrics
+# Readable only by this service, in $CREDENTIALS_DIRECTORY
+LoadCredential=slack-token:/etc/slack-metrics/token
+StateDirectory=slack-metrics
+# It only talks to Slack and writes its state directory: a throwaway
+# unprivileged user, with a read-only view of the system
+DynamicUser=yes
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+
+# The textfile directory is root's: these two lines alone run as root (+),
+# only once ExecStart has succeeded, so a failed count leaves the previous
+# file in place. Both directories are in /var/lib, mv is an atomic rename.
+ExecStartPost=+/usr/bin/chown root:root %S/slack-metrics/slack.prom
+ExecStartPost=+/usr/bin/mv %S/slack-metrics/slack.prom {{ slack_metrics_textfile_dir }}/slack.prom

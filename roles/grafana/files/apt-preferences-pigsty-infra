@@ -1,0 +1,9 @@
+# Pigsty's repository, enabled for Prometheus only: it also carries grafana
+# and others, which must keep coming from their own repositories.
+Package: prometheus
+Pin: origin "repo.pigsty.io"
+Pin-Priority: 990
+
+Package: *
+Pin: origin "repo.pigsty.io"
+Pin-Priority: -1

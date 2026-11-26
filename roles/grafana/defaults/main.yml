@@ -1,0 +1,4 @@
+---
+# first limit reached is the one that's respected
+grafana_prometheus_retention_time: 1y
+grafana_prometheus_retention_size: 10GB

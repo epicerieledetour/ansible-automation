@@ -1,0 +1,4 @@
+---
+# Textfile collector directory of the node_exporter role, which prometheus
+# scrapes; Debian's prometheus-node-exporter default
+slack_metrics_textfile_dir: /var/lib/prometheus/node-exporter

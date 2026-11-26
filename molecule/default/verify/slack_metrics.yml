@@ -1,0 +1,36 @@
+---
+# Runs slack-metrics once, calls the real Slack API with the vault's token and
+# writes the textfile, then queries prometheus for the result once scraped.
+
+- name: Slack metrics
+  block:
+    - name: "Slack metrics: run slack-metrics"
+      become: true
+      ansible.builtin.systemd:
+        name: slack-metrics.service
+        state: started
+
+    # Every 15 s scrape, a fresh value after at most two
+    - name: "Slack metrics: query prometheus"
+      ansible.builtin.uri:
+        url: >-
+          http://localhost:9090/api/v1/query?query={{
+          _slack_query | urlencode }}
+        return_content: true
+      vars:
+        _slack_query: 'max(slack_workspace_members{type="full"})'
+      register: _slack_metrics
+      until: >-
+        _slack_metrics.json.data.result | length == 1
+        and _slack_metrics.json.data.result[0].value[1] | int > 0
+      retries: 6
+      delay: 5
+
+  rescue:
+    - name: "Slack metrics: record failure"
+      ansible.builtin.set_fact:
+        verify_failures: >-
+          {{ verify_failures
+          + [ansible_failed_task.name ~ ': '
+          ~ (ansible_failed_result.msg | default('failed'))
+          ~ ', see journalctl -u slack-metrics'] }}

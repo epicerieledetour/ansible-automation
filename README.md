@@ -112,6 +112,7 @@ flowchart TB
         grafana["<b>grafana</b><br/>tcp 3000"]
         loki["<b>loki</b><br/>tcp 3100"]
         prometheus["<b>prometheus</b><br/>tcp 9090"]
+        slack["<b>slack-metrics</b><br/>daily timer"]
         borg["<b>borg repositories</b><br/>/srv/borg, dedicated 300 GB ssd"]
         agents1["node_exporter tcp 9100<br/>alloy"]
     end
@@ -152,6 +153,7 @@ flowchart TB
     agentsb7 --> loki
     prometheus -->|"scrape, over wireguard"| agents2
     prometheus --> agents1
+    slack -->|"textfile"| agents1
     prometheus --> agentspi
     prometheus --> agentsb7
     grafana --> loki
@@ -169,7 +171,7 @@ Drives at 01:00 and all machines run their backups at 04:00, Montreal time.
 | host | Wireguard IP | inventory groups | what runs on it |
 |---|---|---|---|
 | `vps2` | `192.168.211.90` | `servers`, `webservers`, `vouchers`, `backup_sources` | Wireguard endpoint, caddy, wordpress, vouchers, membres, grafana reverse proxy, borgmatic, node_exporter, alloy, ufw, fail2ban |
-| `srv1` | `192.168.211.60` | `servers`, `grafana`, `backup_destinations` | grafana, loki, prometheus, borg repositories, node_exporter, alloy, ufw, fail2ban |
+| `srv1` | `192.168.211.60` | `servers`, `grafana`, `backup_destinations`, `slack_metrics` | grafana, loki, prometheus, slack-metrics timer, borg repositories, node_exporter, alloy, ufw, fail2ban |
 | `pi1` | `192.168.211.30` | `servers`, `backup_destinations`, `backup_sources`, `dataproxies` | borg repositories, Google Drive sync, borgmatic, node_exporter, alloy, ufw, fail2ban |
 | `b74` | `192.168.211.74` | `servers`, `backup_sources`, `mattermost` | Bâtiment 7's Mattermost (chat.batiment7.org), caddy, postgresql, borgmatic, node_exporter, alloy, ufw, fail2ban |
 | `charles-ws` | `192.168.211.70` | `workstations_networkd` | Wireguard client only, configured through systemd-networkd |
@@ -260,6 +262,112 @@ ansible-playbook playbook.yml --limit charles-lp --tags workstations_nm
 ```
 
 Workstations are always local machines (`ansible_connection: local` on the `workstations` inventory group): run the playbook on the workstation itself, ansible never connects to them through ssh. Don't forget to rerun the `wireguard` tag on the servers so that `vps2` knows the new peer, and to open your firewall: UDP outbound port 51820.
+
+### Prometheus
+
+Prometheus on `srv1` keeps its data for 1 year, capped at 10GB, whichever limit
+is reached first: `grafana_prometheus_retention_time` and
+`grafana_prometheus_retention_size` in `roles/grafana/defaults/main.yml`. This
+applies to every metric, the servers' node_exporter ones included. The
+`grafana` role writes them to `prometheus.yml`, as `storage.tsdb.retention`.
+
+That setting needs Prometheus 3.11 or newer, and Debian is behind (2.53 in
+trixie, 3.5 in forky): Prometheus comes from [Pigsty](https://pigsty.io)'s
+repository, `pigsty-infra`, enabled through `extrepo` like Grafana's. It is a
+third-party repository that also carries Grafana and other packages, so
+`/etc/apt/preferences.d/pigsty-infra` only allows `prometheus` from it. Like
+every package, it is upgraded by the `upgrade` role, and the `grafana` role
+restarts Prometheus when its binary was replaced, as Pigsty's package doesn't.
+
+Pigsty's package differs from Debian's in ways the role takes care of:
+
+- Its unit reads `PROMETHEUS_OPTS` from `/etc/default/prometheus`, not `ARGS`.
+  The role writes that whole file, with only what `prometheus.yml` can't set:
+  the config file and the data directory.
+- Its data directory would be `/var/lib/prometheus/data`; the role keeps
+  Debian's `/var/lib/prometheus/metrics2`, which holds the existing history.
+- It includes `promtool`, which Debian packages apart: the role removes Debian's
+  `promtool` first, and apt switches to Pigsty's `prometheus` in the same step.
+
+Once Debian ships Prometheus 3.11 or newer, the role can go back to Debian's
+package: remove the Pigsty tasks and files, write Debian's `ARGS=""` to
+`/etc/default/prometheus`, and keep the retention in `prometheus.yml`.
+
+### Slack member count
+
+The `slack_metrics` role (group `slack_metrics`, on `srv1`) counts the members
+of the Slack workspace every day and writes the counts to `slack.prom` in
+node_exporter's textfile collector directory (`slack_metrics_textfile_dir`,
+Debian's `/var/lib/prometheus/node-exporter` by default), which serves them to
+Prometheus, shown on Grafana's "Slack" dashboard. It authenticates to Slack
+with a bot token stored in the vault.
+
+#### Creating the Slack app and its token
+
+The token belongs to a Slack app that only has the right to list members:
+
+1. Go to <https://api.slack.com/apps>, **Create New App** → **From scratch**;
+   name it (for example `Seat Checker`) and pick the Le Détour workspace.
+2. In **OAuth & Permissions** → **Scopes** → **Bot Token Scopes**, add
+   `users:read`. Nothing else is needed.
+3. At the top of the same page, **Install to Workspace** and allow it. If the
+   workspace restricts app installs, a workspace admin has to approve it.
+4. Copy the **Bot User OAuth Token**: it starts with `xoxb-`.
+
+#### Setting or rotating the token
+
+The token is the `vault_slack_metrics_token` variable of
+`group_vars/slack_metrics/vault.yml`, an Ansible Vault encrypted file. Edit it
+in place, it opens decrypted in `$EDITOR` and is re-encrypted on save:
+
+```bash
+ansible-vault edit group_vars/slack_metrics/vault.yml
+# or, to pick the editor for this one command
+EDITOR=nano ansible-vault edit group_vars/slack_metrics/vault.yml
+```
+
+```yaml
+vault_slack_metrics_token: "xoxb-..."
+```
+
+Then deploy it. The role writes the token root-only to
+`/etc/slack-metrics/token` and immediately runs the count once, so an invalid
+token fails the playbook rather than the next daily run:
+
+```bash
+ansible-playbook playbook.yml --tags slack_metrics
+```
+
+To check the current value without editing:
+
+```bash
+ansible-vault view group_vars/slack_metrics/vault.yml
+```
+
+When rotating, revoke the old token from the app's **OAuth & Permissions**
+page after the new one has been deployed.
+
+#### Changing the member limit
+
+The gauge's scale and colours are fixed numbers in the dashboard,
+`roles/grafana/files/grafana/dashboards/slack.json`. The 250 comes from the
+Slack for Nonprofits program: the Pro plan is free for workspaces of 250 or
+fewer members. If that changes, update four things in the file:
+
+- `"max"`: the limit, the end of the gauge
+- the `"red"` threshold `"value"`: the limit
+- the `"orange"` threshold `"value"`: 80% of the limit, rounded to the tens
+- `"description"`: the sentence stating where the number comes from
+
+Then redeploy the dashboard, which restarts Grafana:
+
+```bash
+ansible-playbook playbook.yml --tags grafana
+```
+
+The dashboard is provisioned from that file: changes made in Grafana's own
+editor are not saved and are lost at the next deployment, so always edit the
+file.
 
 ## Production mode
 
@@ -468,4 +576,8 @@ $ curl -kL https://grafana.localhost
 ```
 
 On a Molecule/dev environment, Google OAuth is disabled, so login falls back to Grafana's built-in default account: username `admin`, password `admin` (Grafana forces a password change on first login). In production, Grafana is only reachable through Google OAuth (see `roles/grafana/templates/grafana.ini.j2`) — users log in with their `@epicerieledetour.org` Google account, and there is no separate local admin login.
+
+The "Slack" dashboard component needs the `slack_metrics` play to have run on `srv1`
+(`molecule verify` checks it through `verify/slack_metrics.yml`); its token
+and member limit are documented in [Slack member count](#slack-member-count).
 

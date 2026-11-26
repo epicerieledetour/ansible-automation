@@ -125,3 +125,12 @@
       tags: ["node_exporter"]
     - role: alloy
       tags: ["alloy"]
+
+# After the monitoring agents, whose node_exporter serves the counts
+- name: Setup Slack workspace metrics
+  hosts: slack_metrics
+  roles:
+    - role: systemd_handlers
+    - role: slack_metrics
+      tags: ["slack_metrics"]
+  tags: ["slack_metrics"]

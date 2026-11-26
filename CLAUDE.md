@@ -15,7 +15,7 @@ Use `uv` to run everything (Ansible, ansible-lint, molecule) — dependencies ar
 uv run molecule create        # create the VMs (pi1, srv1, vps2, b74) defined in molecule/default/molecule.yml
 uv run molecule prepare       # prepare VMs for the playbook
 uv run molecule converge      # run playbook.yml against the VMs
-uv run molecule verify        # check that wordpress, vouchers, membres, grafana and mattermost work
+uv run molecule verify        # check that wordpress, vouchers, membres, grafana, mattermost and the slack metrics work
 uv run molecule converge -- --tags vouchers --tags borgmatic_create   # run with extra tags
 uv run molecule login --host vps2
 uv run molecule destroy
@@ -69,10 +69,11 @@ A sequence of plays, each scoped to an inventory group, applying roles tagged fo
 4. **backup_destinations** — `borg_storage`, `borg_destination` (tag `backup`, `destination`).
 5. **backup_sources** — `systemd_handlers`, `borgmatic`, `borgmatic_system` (tag `backup`, `source`).
 6. **dataproxies** — `systemd_handlers`, `gdrivesync` (tag `dataproxies`): Google Drive sync on `pi1`, at 01:00, before the 04:00 backups.
-7. **grafana** — `systemd_handlers`, `grafana` (tag `grafana`): grafana, loki and prometheus on `srv1`, reachable over Wireguard only.
+7. **grafana** — `systemd_handlers`, `grafana` (tag `grafana`): grafana, loki and prometheus on `srv1`, reachable over Wireguard only. Prometheus comes from Pigsty's third-party repository (`extrepo enable pigsty-infra`, apt-pinned to the `prometheus` package alone), as Debian's is too old for retention in `prometheus.yml`; see README, "Prometheus".
 8. **webservers** — `systemd_handlers`, `caddy_handlers`, `caddy`, `vouchers`, `membres`, `wordpress`, `grafana_proxy` (tag `webservers`).
 9. **mattermost** — `caddy_handlers`, `caddy`, `mattermost` (tag `mattermost`): Bâtiment 7's chat.batiment7.org on `b74`, Team Edition with PostgreSQL. `/usr/local/sbin/mattermost-import` on the host loads another server's data (database dump, `config.json`, attachments), migrating it through the ESR versions in `mattermost_import_steps`.
 10. **servers** — `node_exporter`, `alloy`: monitoring agents.
+11. **slack_metrics** — `systemd_handlers`, `slack_metrics` (tag `slack_metrics`): on `srv1`, a daily timer counts the Slack workspace members by type through the Slack API and writes them to node_exporter's textfile collector directory, for Grafana's "Slack" dashboard. The bot token is vaulted in `group_vars/slack_metrics/vault.yml`; the service runs as a `DynamicUser`, and only moves its file into the root-owned textfile directory as root.
 
 Roles run in dependency order within each play; e.g. `caddy` must run before the site roles that register Caddy vsites and `notify: caddy changed`.
 
@@ -83,7 +84,7 @@ Roles run in dependency order within each play; e.g. `caddy` must run before the
 - **Handler pattern**: config-writing roles (`caddy`, `vouchers`, `membres`, etc.) `notify` shared handlers defined in small dedicated `*_handlers` roles (`caddy_handlers`, `systemd_handlers`) rather than each role owning its own handler — this lets multiple roles safely reload the same service (e.g. `caddy changed` → `systemd: name: caddy, state: reloaded`) without duplicate handler definitions.
 - **Backup topology (Borg/borgmatic)**: `borg_destination` role provisions a `borg` user + repo storage on hosts in `backup_destinations`; `borgmatic`+`borgmatic_system` on `backup_sources` hosts creates SSH trust to every destination (`roles/borgmatic/tasks/destination.yml`, looped via `groups['backup_destinations']`, using `delegate_to`) and templates per-source borgmatic config. `borgmatic_snippet` is a reusable sub-role (`include_role`) that other backup roles (e.g. `borgmatic_system`) call with `borgmatic_snippet_name`/`borgmatic_snippet_file` passed as the `include_role`'s `vars`, to add another backup "set" (a systemd unit + optional service data dir) without duplicating the borgmatic config/repo-init/create/restore logic. `create`/`restore` are gated on `ansible_run_tags` containing `borgmatic_create`/`borgmatic_restore` (opt-in via `--tags`, not run by default).
 - **Caddy vsites**: each web app role (wordpress, vouchers, membres) templates its own `/etc/caddy/sites.d/<app>.caddy` file (Caddyfile with `import sites.d/*.caddy`-style layout, implied) rather than one central vhost file — keep this per-role-owns-its-vsite convention for new web apps.
-- **Inventory** (`inventory/hosts.yml` + `inventory/groups.yml`): `hosts.yml` maps inventory names to `ansible_host`/`ansible_user` (bootstrap connection info); `groups.yml` assigns hosts to functional groups (`servers`, `backup_destinations`, `backup_sources`, `webservers`, `vouchers`, `grafana`, `mattermost`, `dataproxies`) and, in `hosts.yml`, `workstations_networkd`/`workstations_nm` that the playbook's plays target. A host can belong to multiple groups (e.g. `vps2` is a server, a backup source, and a webserver).
+- **Inventory** (`inventory/hosts.yml` + `inventory/groups.yml`): `hosts.yml` maps inventory names to `ansible_host`/`ansible_user` (bootstrap connection info); `groups.yml` assigns hosts to functional groups (`servers`, `backup_destinations`, `backup_sources`, `webservers`, `vouchers`, `grafana`, `mattermost`, `dataproxies`, `slack_metrics`) and, in `hosts.yml`, `workstations_networkd`/`workstations_nm` that the playbook's plays target. A host can belong to multiple groups (e.g. `vps2` is a server, a backup source, and a webserver).
 - **Vault-encrypted values** live inline in `group_vars`/`host_vars`/role `vars` files as `!vault |` blocks (see `roles/wordpress/vars/main.yml`), decrypted via `ansible.cfg`'s `vault_password_file=vault_password.sh`, which in turn calls `age -d` using the SSH private key matching the encrypter's public key in `keys/`.
 
 ### First-time production bootstrap
