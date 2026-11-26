@@ -7,3 +7,8 @@ repositories:
     - path: ssh://borg@{{ dest }}/./{{ inventory_hostname }}/{{ borgmatic_snippet_name }}.borg
       label: {{ dest }}-{{ borgmatic_snippet_name }}
 {% endfor %}
+
+after_backup:
+    - /usr/local/sbin/borg-repository-metrics.py success {repository}
+on_error:
+    - /usr/local/sbin/borg-repository-metrics.py failure {repository}

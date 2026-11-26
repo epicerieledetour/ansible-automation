@@ -1,0 +1,8 @@
+{
+  "store": {{ borg_backup_monitor_store | to_json }},
+  "source": {{ inventory_hostname | to_json }},
+  "backup_set": {{ borgmatic_snippet_name | to_json }},
+  "repository": {{ (borg_backup_monitor_store ~ '/' ~ inventory_hostname ~ '/' ~ borgmatic_snippet_name) | to_json }},
+  "repository_path": {{ ('ssh://borg@' ~ borg_backup_monitor_store ~ '/./' ~ inventory_hostname ~ '/' ~ borgmatic_snippet_name ~ '.borg') | to_json }},
+  "stale_after_seconds": {{ borg_backup_monitor_stale_after_seconds | int }}
+}

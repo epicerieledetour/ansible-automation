@@ -69,6 +69,8 @@
   roles:
     - systemd_handlers
     - borgmatic
+    - role: borg_backup_monitor
+      tags: ["borg_backup_monitor"]
     - role: borgmatic_system
       tags: ["borgmatic_system"]
   tags:

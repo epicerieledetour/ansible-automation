@@ -19,3 +19,10 @@
     name: prometheus
     state: restarted
   listen: prometheus changed
+
+- name: Reload Blackbox Exporter
+  become: true
+  ansible.builtin.systemd:
+    name: prometheus-blackbox-exporter
+    state: reloaded
+  listen: blackbox exporter changed
