@@ -1,6 +1,14 @@
 global:
   scrape_interval: 15s
 
+# Whichever limit is reached first. Needs Prometheus 3.11 or newer, from
+# Pigsty's repository: Debian's older versions only take command-line flags
+storage:
+  tsdb:
+    retention:
+      time: {{ grafana_prometheus_retention_time }}
+      size: {{ grafana_prometheus_retention_size }}
+
 scrape_configs:
   - job_name: node
     static_configs:

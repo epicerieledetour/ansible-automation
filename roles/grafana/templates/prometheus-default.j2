@@ -1,0 +1,6 @@
+# {{ ansible_managed }}
+#
+# Read by the prometheus unit of Pigsty's package, as $PROMETHEUS_OPTS. Only
+# what prometheus.yml can't set: retention is there. The data stays where
+# Debian's package kept it, metrics2, to keep its history.
+PROMETHEUS_OPTS='--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus/metrics2'

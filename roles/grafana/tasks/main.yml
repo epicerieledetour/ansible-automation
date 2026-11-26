@@ -95,10 +95,63 @@
       tags: ["prometheus"]
       block:
 
-        - name: Install prometheus
+        # Debian's Prometheus is too old for retention in prometheus.yml
+        # (3.11+): it comes from Pigsty's repository, pinned to it alone. See
+        # README, "Prometheus".
+        - name: Enable Pigsty repo via extrepo
+          ansible.builtin.command:
+            cmd: extrepo enable pigsty-infra
+            creates: /etc/apt/sources.list.d/extrepo_pigsty-infra.sources
+
+        - name: Take only prometheus from Pigsty repo
+          ansible.builtin.copy:
+            src: apt-preferences-pigsty-infra
+            dest: /etc/apt/preferences.d/pigsty-infra
+            mode: u=r,g=r,o=r
+
+        # Debian ships promtool apart, Pigsty's prometheus includes it: on
+        # hosts that had Debian's prometheus, which depends on promtool,
+        # removing it makes apt switch to Pigsty's prometheus in the same
+        # transaction, never leaving prometheus uninstalled
+        # Can be removed once every host has been deployed once: then move
+        # update_cache: true to "Install prometheus", or new hosts would
+        # install Debian's prometheus from a stale apt cache
+        - name: Remove Debian's promtool
           ansible.builtin.apt:
             pkg:
+              - promtool
+            state: absent
+            update_cache: true
+          notify: prometheus changed
+
+        # Installs Pigsty's prometheus, thanks to the pinning. After the first
+        # deploy, state: latest can become present (and the noqa go): the
+        # upgrade role keeps it up to date, as for Grafana's repository
+        - name: Install prometheus
+          ansible.builtin.apt:  # noqa: package-latest
+            pkg:
               - prometheus
+            state: latest
+          notify: prometheus changed
+
+        - name: Instanciate prometheus flags
+          ansible.builtin.template:
+            src: prometheus-default.j2
+            dest: /etc/default/prometheus
+            mode: u=r,g=r,o=r
+          notify: prometheus changed
+
+        # Debian's data directory, set in prometheus-default.j2: already there
+        # on hosts that had Debian's package, made here on new ones rather
+        # than left to Prometheus, as it isn't Pigsty's default
+        # The debian package takes care of this, but not the Pigsty one.
+        - name: Make prometheus data directory
+          ansible.builtin.file:
+            path: /var/lib/prometheus/metrics2
+            state: directory
+            owner: prometheus
+            group: prometheus
+            mode: u=rwx,g=rx,o=rx
 
         - name: Instanciate prometheus config
           ansible.builtin.template:
@@ -107,22 +160,27 @@
             mode: u=rw,g=r,o=r
           notify: prometheus changed
 
-        - name: Set prometheus retention
-          ansible.builtin.lineinfile:
-            path: /etc/default/prometheus
-            regexp: "^ARGS="
-            line: >-
-              ARGS="--storage.tsdb.retention.time={{
-              grafana_prometheus_retention_time }}
-              --storage.tsdb.retention.size={{
-              grafana_prometheus_retention_size }}"
-          notify: prometheus changed
-
         - name: Start prometheus
           ansible.builtin.systemd:
             name: prometheus
             enabled: true
             state: started
+
+        # Pigsty's package doesn't restart prometheus when upgraded, here or
+        # by the upgrade role: restart it once its running binary is replaced
+        - name: Restart prometheus if its binary was upgraded
+          ansible.builtin.shell:
+            cmd: |
+              set -o pipefail
+              pid=$(systemctl show --property MainPID --value prometheus)
+              if [ "$pid" != 0 ] \
+                && readlink "/proc/$pid/exe" | grep -q ' (deleted)$'; then
+                systemctl restart prometheus
+                echo restarted
+              fi
+            executable: /bin/bash
+          register: grafana_prometheus_upgrade_restart
+          changed_when: "'restarted' in grafana_prometheus_upgrade_restart.stdout"
 
     # Grafana is reached by the webservers' caddy reverse proxy, loki by every
     # server's alloy. Prometheus is only needed locally by grafana, but opened

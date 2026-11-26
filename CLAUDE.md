@@ -69,7 +69,7 @@ A sequence of plays, each scoped to an inventory group, applying roles tagged fo
 4. **backup_destinations** — `borg_storage`, `borg_destination` (tag `backup`, `destination`).
 5. **backup_sources** — `systemd_handlers`, `borgmatic`, `borgmatic_system` (tag `backup`, `source`).
 6. **dataproxies** — `systemd_handlers`, `gdrivesync` (tag `dataproxies`): Google Drive sync on `pi1`, at 01:00, before the 04:00 backups.
-7. **grafana** — `systemd_handlers`, `grafana` (tag `grafana`): grafana, loki and prometheus on `srv1`, reachable over Wireguard only.
+7. **grafana** — `systemd_handlers`, `grafana` (tag `grafana`): grafana, loki and prometheus on `srv1`, reachable over Wireguard only. Prometheus comes from Pigsty's third-party repository (`extrepo enable pigsty-infra`, apt-pinned to the `prometheus` package alone), as Debian's is too old for retention in `prometheus.yml`; see README, "Prometheus".
 8. **webservers** — `systemd_handlers`, `caddy_handlers`, `caddy`, `vouchers`, `membres`, `wordpress`, `grafana_proxy` (tag `webservers`).
 9. **mattermost** — `caddy_handlers`, `caddy`, `mattermost` (tag `mattermost`): Bâtiment 7's chat.batiment7.org on `b74`, Team Edition with PostgreSQL. `/usr/local/sbin/mattermost-import` on the host loads another server's data (database dump, `config.json`, attachments), migrating it through the ESR versions in `mattermost_import_steps`.
 10. **servers** — `node_exporter`, `alloy`: monitoring agents.

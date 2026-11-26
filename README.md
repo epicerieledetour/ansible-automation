@@ -263,6 +263,36 @@ ansible-playbook playbook.yml --limit charles-lp --tags workstations_nm
 
 Workstations are always local machines (`ansible_connection: local` on the `workstations` inventory group): run the playbook on the workstation itself, ansible never connects to them through ssh. Don't forget to rerun the `wireguard` tag on the servers so that `vps2` knows the new peer, and to open your firewall: UDP outbound port 51820.
 
+### Prometheus
+
+Prometheus on `srv1` keeps its data for 1 year, capped at 10GB, whichever limit
+is reached first: `grafana_prometheus_retention_time` and
+`grafana_prometheus_retention_size` in `roles/grafana/defaults/main.yml`. This
+applies to every metric, the servers' node_exporter ones included. The
+`grafana` role writes them to `prometheus.yml`, as `storage.tsdb.retention`.
+
+That setting needs Prometheus 3.11 or newer, and Debian is behind (2.53 in
+trixie, 3.5 in forky): Prometheus comes from [Pigsty](https://pigsty.io)'s
+repository, `pigsty-infra`, enabled through `extrepo` like Grafana's. It is a
+third-party repository that also carries Grafana and other packages, so
+`/etc/apt/preferences.d/pigsty-infra` only allows `prometheus` from it. Like
+every package, it is upgraded by the `upgrade` role, and the `grafana` role
+restarts Prometheus when its binary was replaced, as Pigsty's package doesn't.
+
+Pigsty's package differs from Debian's in ways the role takes care of:
+
+- Its unit reads `PROMETHEUS_OPTS` from `/etc/default/prometheus`, not `ARGS`.
+  The role writes that whole file, with only what `prometheus.yml` can't set:
+  the config file and the data directory.
+- Its data directory would be `/var/lib/prometheus/data`; the role keeps
+  Debian's `/var/lib/prometheus/metrics2`, which holds the existing history.
+- It includes `promtool`, which Debian packages apart: the role removes Debian's
+  `promtool` first, and apt switches to Pigsty's `prometheus` in the same step.
+
+Once Debian ships Prometheus 3.11 or newer, the role can go back to Debian's
+package: remove the Pigsty tasks and files, write Debian's `ARGS=""` to
+`/etc/default/prometheus`, and keep the retention in `prometheus.yml`.
+
 ### Slack member count
 
 The `slack_metrics` role (group `slack_metrics`, on `srv1`) counts the members
